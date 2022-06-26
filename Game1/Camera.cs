@@ -18,20 +18,19 @@ namespace Game1
         MouseState mouseState = default(MouseState);
         KeyboardState keyboardState = default(KeyboardState);
 
-        public float translationUnitsps { get; set; } = 30f;
-        public float rotationRadiansps { get; set; } = 60f;
+        public float translationUnitsps { get; set; } = 60f;
+        public float rotationRadiansps { get; set; } = 70f;
 
         public float fieldOfViewDeg = 80f;
-        public float nearClipPlane = .05f;
-        public float farClipPlane = 2000f;
-        private const float nearPlaneDistance = 0.05f;
-        private const float farPlaneDistance = 1000f;
+        public float nearClipPlane = 0.1f;
+        public float farClipPlane = 200f;
+        private const float nearPlaneDistance = 0.1f;
+        private const float farPlaneDistance = 2000f;
+
+
+        bool usingMouseLook = false;
         
-
-
-        float yMouseAngle = 0f;
-        float xMouseAngle = 0f;
-        //bool mouseLookOn = true;
+        bool mouseLookOn = false;
 
         Vector3 up = Vector3.Up;
         Matrix cameraWorldMatrix = Matrix.Identity;
@@ -180,36 +179,39 @@ namespace Game1
             if (_keyboardState.IsKeyDown(Keys.Up)) { RotateUp(gameTime); }
             else if (_keyboardState.IsKeyDown(Keys.Down)) { RotateDown(gameTime); }
 
-            //if (_mouseState.LeftButton== ButtonState.Pressed)
-            //{
-            //    mouseLookOn = !mouseLookOn;
-            //}
 
-            //if (mouseLookOn)
-            //{
-            //    Vector2 diffMousePos = _mouseState.Position.ToVector2() - mouseState.Position.ToVector2();
 
-            //    if (diffMousePos.X != 0f)
-            //    {
-            //        RotateLeftOrRight(gameTime, diffMousePos.X);
+            if (usingMouseLook)
+            {
+                if (_mouseState.LeftButton == ButtonState.Pressed)
+                {
+                    mouseLookOn = !mouseLookOn;
+                }
 
-            //    }
-                
-            //    if (diffMousePos.Y != 0f)
-            //    {
-            //        RotateUpOrDown(gameTime, diffMousePos.Y);
-            //    }
-            //}
+                if (mouseLookOn)
+                {
+                    Vector2 diffMousePos = _mouseState.Position.ToVector2() - mouseState.Position.ToVector2();
+
+                    if (diffMousePos.X != 0f)
+                    {
+                        RotateLeftOrRight(gameTime, diffMousePos.X);
+
+                    }
+
+                    if (diffMousePos.Y != 0f)
+                    {
+                        RotateUpOrDown(gameTime, diffMousePos.Y);
+                    }
+                }
+            }
+
+
+
 
             mouseState = _mouseState;
             keyboardState = _keyboardState;
 
-            if (position!= posPrev)
-            {
-                Console.WriteLine(position);
-                posPrev = position;
-
-            }
+          
             CreateWorldandViewMatrices();
             CreatePerspectiveProjectionMatrix(graphicsDevice, fieldOfViewDeg);
 
