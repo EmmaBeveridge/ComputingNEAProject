@@ -188,12 +188,12 @@ namespace Game1
             //avatars.Add(new Avatar(Content.Load<Model>("houseBake6"), new Vector3(0, 41, 0)));
             
             
-            avatars.Add(new Avatar(Content.Load<Model>("grass"), new Vector3(0, -12, 0)));
+            avatars.Add(new Avatar(Content.Load<Model>("grass"), new Vector3(0, -12, 0))); // was at y=-12
             avatars.Add(new Avatar(Content.Load<Model>("HouseInteriorWalls"), new Vector3(0, 0, 0)));
             avatars.Add(new Avatar(Content.Load<Model>("HouseExteriorWalls"), new Vector3(0, 0, 0)));
             //avatars.Add(new Avatar(Content.Load<Model>("Countertop"), new Vector3(60, 0, 100)));
             //avatars.Add(new Avatar(Content.Load<Model>("CountertopSink"), new Vector3(105, 0, 100)));
-            avatars.Add(new Avatar(Content.Load<Model>("Shower"), new Vector3(330, 0, -105)));
+            //avatars.Add(new Avatar(Content.Load<Model>("Shower"), new Vector3(330, 0, -105)));
             //avatars.Add(new Avatar(Content.Load<Model>("Toilet"), new Vector3(285, 0, -55)));
             //avatars.Add(new Avatar(Content.Load<Model>("Bookcase"), new Vector3(70, 0, 5)));
             //avatars.Add(new Avatar(Content.Load<Model>("Fridge"), new Vector3(155, 0, 100)));

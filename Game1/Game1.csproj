@@ -53,6 +53,7 @@
     <Compile Include="Items\EndTable.cs" />
     <Compile Include="Items\Fridge.cs" />
     <Compile Include="Items\Oven.cs" />
+    <Compile Include="Items\Shower.cs" />
     <Compile Include="Items\Sink.cs" />
     <Compile Include="Items\Sofa.cs" />
     <Compile Include="Items\Table.cs" />

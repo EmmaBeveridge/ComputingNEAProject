@@ -24,10 +24,10 @@
 /processorParam:PremultiplyTextureAlpha=True
 /processorParam:PremultiplyVertexColors=True
 /processorParam:ResizeTexturesToPowerOfTwo=False
-/processorParam:RotationX=0
+/processorParam:RotationX=270
 /processorParam:RotationY=0
-/processorParam:RotationZ=0
-/processorParam:Scale=0.03
+/processorParam:RotationZ=90
+/processorParam:Scale=10
 /processorParam:SwapWindingOrder=False
 /processorParam:TextureFormat=Compressed
 /build:Bed.fbx

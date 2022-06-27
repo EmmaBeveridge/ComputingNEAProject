@@ -201,6 +201,9 @@ namespace Game1
                         case "TV":
                             items.Add(JsonConvert.DeserializeObject<TV>(itemTemp));
                             break;
+                        case "Shower":
+                            items.Add(JsonConvert.DeserializeObject<Shower>(itemTemp));
+                            break;
                         default:
                             items.Add(itemUncast);
                             break;

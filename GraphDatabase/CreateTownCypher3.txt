@@ -10,5 +10,5 @@ MERGE (n23)-[:PATH_BETWEEN]->(n22)-[:PATH_BETWEEN]->(n23)<-[:CONTAINS]-(n18)-[:C
 MERGE (n18)-[:PATH_BETWEEN]->(n22)
 MERGE (:HouseExteriorWalls {id: "", class: "HouseExteriorWalls", dimensions: "", relativeLocationX: 0, relativeLocationZ: 0})<-[:CONTAINS]-(n0)-[:CONTAINS]->(n24)-[:PATH_BETWEEN]->(n3)-[:PATH_BETWEEN]->(n24)<-[:PATH_BETWEEN]-(n33:Room {id: "", class: "Bathroom", relativeLocationX: 27, relativeLocationZ: -214})<-[:PATH_BETWEEN]-(n24)
 MERGE (n25:Item {id: "", class: "Toilet", relativeLocationX: 285, inventory: "", dimensions: "", relativeLocationZ: -55})-[:PATH_BETWEEN]->(n26:Item {id: "", class: "Sink", relativeLocationX: 230, inventory: "", dimensions: "", relativeLocationZ: -115})-[:PATH_BETWEEN]->(n25)<-[:PATH_BETWEEN]-(n27:Item {id: "", class: "Shower", relativeLocationX: 330, inventory: "", dimensions: "", relativeLocationZ: -105})<-[:PATH_BETWEEN]-(n25)<-[:CONTAINS]-(n33)-[:PATH_BETWEEN]->(n25)-[:PATH_BETWEEN]->(n33)-[:CONTAINS]->(n26)-[:PATH_BETWEEN]->(n33)-[:PATH_BETWEEN]->(n26)
-MERGE (n27)-[:PATH_BETWEEN]->(n26)-[:PATH_BETWEEN]->(n27)-[:PATH_BETWEEN]->(n33)-[:PATH_BETWEEN]->(n27)
+MERGE (n27)-[:PATH_BETWEEN]->(n26)-[:PATH_BETWEEN]->(n27)-[:PATH_BETWEEN]->(n33)-[:PATH_BETWEEN]->(n27)<-[:CONTAINS]-(n33)
 MERGE (:HouseInteriorWalls {id: "", class: "", relativeLocationX: "", relativeLocationZ: ""})<-[:CONTAINS]-(n0)-[:CONTAINS]->(n33)
