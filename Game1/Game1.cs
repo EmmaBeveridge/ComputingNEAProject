@@ -46,9 +46,7 @@ namespace Game1
         }
 
 
-
-        
-        
+       
 
         protected  override void Initialize()
         {
@@ -189,8 +187,8 @@ namespace Game1
             
             
             avatars.Add(new Avatar(Content.Load<Model>("grass"), new Vector3(0, -12, 0))); // was at y=-12
-            avatars.Add(new Avatar(Content.Load<Model>("HouseInteriorWalls"), new Vector3(0, 0, 0)));
-            avatars.Add(new Avatar(Content.Load<Model>("HouseExteriorWalls"), new Vector3(0, 0, 0)));
+            avatars.Add(new Avatar(Content.Load<Model>("HouseInteriorWalls"), new Vector3(0, -2, 0)));
+            avatars.Add(new Avatar(Content.Load<Model>("HouseExteriorWalls"), new Vector3(0, -2, 0)));
             //avatars.Add(new Avatar(Content.Load<Model>("Countertop"), new Vector3(60, 0, 100)));
             //avatars.Add(new Avatar(Content.Load<Model>("CountertopSink"), new Vector3(105, 0, 100)));
             //avatars.Add(new Avatar(Content.Load<Model>("Shower"), new Vector3(330, 0, -105)));
@@ -219,7 +217,7 @@ namespace Game1
                 {
                     foreach (Item item in room.items)
                     {
-                        avatars.Add(new Avatar(Content.Load<Model>(item.modelName), new Vector3(float.Parse(item.locationX), 0, float.Parse(item.locationZ))));
+                        avatars.Add(new Avatar(Content.Load<Model>(item.modelName), new Vector3(float.Parse(item.locationX), -2, float.Parse(item.locationZ))));
                     }
                 }
             }
