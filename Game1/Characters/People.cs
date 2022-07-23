@@ -7,6 +7,8 @@ using System.Threading.Tasks;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using Game1.NavMesh;
+using Game1.AStar;
 
 namespace Game1
 {
@@ -29,7 +31,7 @@ namespace Game1
     class People
     {
         protected Vector3 position;
-        protected Vector3 targetPosition = Vector3.Zero;
+        //protected Vector3 targetPosition = Vector3.Zero;
         protected Vector3 targetVector = Vector3.Zero;
         protected Vector3 viewVector = Vector3.Forward;
         protected const float velocity = 30f;
@@ -40,14 +42,20 @@ namespace Game1
         protected Matrix translationMatrix;
 
 
+        protected const float yValue = 0f;
+
+
         
         public Avatar avatar;
 
         public PeopleMotionStates motionState;
         public PeopleActionStates actionState;
 
-
-        public People( Model _model, Vector3 _position)
+        protected List<Vector3> pathPoints;
+        protected Mesh mesh;
+        protected Path pathFinder;
+        protected Vector3 goal;
+        public People( Model _model, Vector3 _position, Mesh argMesh)
         {
             position = _position;
             avatar = new Avatar (_model, _position);
@@ -58,7 +66,9 @@ namespace Game1
             rotationMatrix = Matrix.Identity;
             avatar.worldMatrix = Matrix.Identity; 
             viewVector = avatar.worldMatrix.Forward; //direction vector avatar is looking in
-           
+            mesh = argMesh;
+            pathFinder = new Path(argMesh);
+            pathPoints = new List<Vector3>();
 
         }
 
@@ -70,32 +80,104 @@ namespace Game1
             {
                 Random random = new Random();
 
-                targetPosition = new Vector3(random.Next(-1000, 1000), 0, random.Next(-1000, 1000)); //temporary for NPC
-                targetVector = getTargetVector(gameTime); //assigns target vector to variable
-                motionState = PeopleMotionStates.rotating; //avatar must first rotate to look at the point they are going to move towards so the avatar state is set to rotating
+                goal = new Vector3(random.Next(-1000, 1000), yValue, random.Next(-1000, 1000)); //temporary for npc
                 actionState = PeopleActionStates.moving;
-                getNewRotationMatrix(gameTime); // updates rotation matrix
+
+                pathFinder.FindPath(position, goal, ref pathPoints);
+
+
+                MovePerson(gameTime);
+
+                //targetPosition = new Vector3(random.Next(-1000, 1000), 0, random.Next(-1000, 1000)); //temporary for NPC
+                //targetVector = getTargetVector(gameTime); //assigns target vector to variable
+                //motionState = PeopleMotionStates.rotating; //avatar must first rotate to look at the point they are going to move towards so the avatar state is set to rotating
+                //actionState = PeopleActionStates.moving;
+                //getNewRotationMatrix(gameTime); // updates rotation matrix
                 
             }
 
-            else if (motionState == PeopleMotionStates.rotating) //if avatar is still rotating to view target
-            {
-                getNewRotationMatrix(gameTime); //updates the rotation matrix
-            }
+            //else if (motionState == PeopleMotionStates.rotating) //if avatar is still rotating to view target
+            //{
+            //    getNewRotationMatrix(gameTime); //updates the rotation matrix
+            //}
             
-            else if (motionState==PeopleMotionStates.moving) //if the avatar is facing in the correct direction and now is moving towards position
-            {
-                targetVector = getTargetVector(gameTime); //update the target vector for avatar's current position
-                rotationMatrix = Matrix.Identity;
-                getNewTranslationMatrix(gameTime); //updates the translation matrix
+            //else if (motionState==PeopleMotionStates.moving) //if the avatar is facing in the correct direction and now is moving towards position
+            //{
+            //    targetVector = getTargetVector(gameTime); //update the target vector for avatar's current position
+            //    rotationMatrix = Matrix.Identity;
+            //    getNewTranslationMatrix(gameTime); //updates the translation matrix
           
+            //}
+
+            else if (actionState == PeopleActionStates.moving)
+            {
+                MovePerson(gameTime);
             }
+
+
 
             updateTransformationMatrix(); //updates transformation matrix with transformations occured in current frame 
 
             avatar.worldMatrix *= transformationMatrix; //transforms world matrix by transformations specified in transformation matrix
             viewVector = avatar.worldMatrix.Forward; //adjusts view vector of model
             position = avatar.worldMatrix.Translation; //adjusts position variable to position in model's world matrix
+
+        }
+
+
+        public void MovePerson( GameTime gameTime)
+        {
+           
+            if (pathPoints.Count == 0)
+            {
+                motionState = PeopleMotionStates.idle;
+                actionState = PeopleActionStates.idle;
+                return;
+            }
+
+            if (motionState == PeopleMotionStates.idle && pathPoints.Count > 0)
+            { 
+                Vector3 nextTarget = pathPoints[0];
+                targetVector = getTargetVector(gameTime, nextTarget);
+                if (!(targetVector.X == 0 && targetVector.Z == 0)) 
+                {
+                    motionState = PeopleMotionStates.rotating;
+                
+                    getNewRotationMatrix(gameTime);
+                
+                }
+
+                
+
+            }
+
+
+            if (motionState == PeopleMotionStates.rotating)
+            {
+                getNewRotationMatrix(gameTime);
+            }
+
+
+            if (motionState == PeopleMotionStates.moving)
+            {
+                if (pathPoints.Count == 0)
+                {
+                    motionState = PeopleMotionStates.idle;
+                    actionState = PeopleActionStates.idle;
+                    return;
+                }
+
+                Vector3 currentTarget = pathPoints[0];
+
+                targetVector = getTargetVector(gameTime, currentTarget);
+                rotationMatrix = Matrix.Identity;
+                getNewTranslationMatrix(gameTime);
+
+
+
+            }
+            
+           
 
         }
 
@@ -155,7 +237,7 @@ namespace Game1
 
 
 
-        public Vector3 getTargetVector(GameTime gameTime)
+        public Vector3 getTargetVector(GameTime gameTime, Vector3 targetPosition)
         {
             if (targetPosition.Y == -100) //returned when point not on plane selected
             {
@@ -169,8 +251,11 @@ namespace Game1
                 if (targetVector.Length() < maxDistanceCanCover) // prevents problem of avatar overshooting target position and then recalculating target vector and overshooting again causing it to oscillate about its target point.
                                                                  // if the object can cover the entire distance to target point in next frame, then it should 
                 {
+                    pathPoints.RemoveAt(0);
+
+
                     motionState = PeopleMotionStates.idle; //changes motion state back to idle as object completes its movement 
-                    actionState = PeopleActionStates.idle; //changes action state back to idle as object completes its movement
+                    //actionState = PeopleActionStates.idle; //changes action state back to idle as object completes its movement
                     return targetVector; //returns the target vector of full length as all of vector can be moved through next frame
 
                 }

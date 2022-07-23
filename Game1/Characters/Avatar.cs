@@ -10,11 +10,11 @@ using Microsoft.Xna.Framework.Input;
 
 namespace Game1
 {
-    class Avatar
+    public class Avatar
     {
 
         
-         Model model;
+        Model model;
         public Matrix worldMatrix;
 
 

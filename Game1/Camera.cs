@@ -18,12 +18,12 @@ namespace Game1
         MouseState mouseState = default(MouseState);
         KeyboardState keyboardState = default(KeyboardState);
 
-        public float translationUnitsps { get; set; } = 60f;
+        public float translationUnitsps { get; set; } = 200f;
         public float rotationRadiansps { get; set; } = 70f;
 
         public float fieldOfViewDeg = 80f;
         public float nearClipPlane = 0.1f;
-        public float farClipPlane = 200f;
+        public float farClipPlane = 2000f;
         private const float nearPlaneDistance = 0.1f;
         private const float farPlaneDistance = 2000f;
 

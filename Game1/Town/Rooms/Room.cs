@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
+using Game1.Town;
 namespace Game1.Rooms
 {
     public class Room
@@ -12,7 +13,7 @@ namespace Game1.Rooms
         public List<Item> items = new List<Item>();
         
         [JsonProperty ("id")]
-        string id;
+        public string id;
 
 
         [JsonProperty ("relativeLocationX")]
@@ -25,6 +26,10 @@ namespace Game1.Rooms
 
         [JsonProperty ("class")]
         public string roomClass;
+
+
+        public House house;
+
 
         public Room( string argId, int[] argLocation, string argRoomClass)
         {

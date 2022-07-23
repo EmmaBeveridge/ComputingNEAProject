@@ -203,7 +203,7 @@
 /processorParam:TextureFormat=Compressed
 /build:FurnishedHouse1.fbx
 
-#begin grass.dae
+#begin Grass.fbx
 /importer:FbxImporter
 /processor:ModelProcessor
 /processorParam:ColorKeyColor=0,0,0,0
@@ -217,10 +217,10 @@
 /processorParam:RotationX=90
 /processorParam:RotationY=0
 /processorParam:RotationZ=90
-/processorParam:Scale=10
+/processorParam:Scale=100
 /processorParam:SwapWindingOrder=False
 /processorParam:TextureFormat=Compressed
-/build:grass.dae
+/build:Grass.fbx
 
 #begin houseBake6.fbx
 /importer:FbxImporter
@@ -258,7 +258,7 @@
 /processorParam:Scale=10
 /processorParam:SwapWindingOrder=False
 /processorParam:TextureFormat=Compressed
-/build:HouseExteriorWalls.fbx
+/build:HouseExteriorWalls.fbx;HouseExteriorWallsBrown.fbx
 
 #begin HouseInteriorWalls.fbx
 /importer:FbxImporter
@@ -277,7 +277,7 @@
 /processorParam:Scale=10
 /processorParam:SwapWindingOrder=False
 /processorParam:TextureFormat=Compressed
-/build:HouseInteriorWalls.fbx
+/build:HouseInteriorWalls.fbx;HouseInteriorWallsBrown.fbx
 
 #begin LoadingScreen0.png
 /importer:TextureImporter
@@ -436,6 +436,25 @@
 /processorParam:SwapWindingOrder=False
 /processorParam:TextureFormat=Compressed
 /build:Oven.fbx
+
+#begin ResidentialMap.fbx
+/importer:FbxImporter
+/processor:ModelProcessor
+/processorParam:ColorKeyColor=0,0,0,0
+/processorParam:ColorKeyEnabled=True
+/processorParam:DefaultEffect=BasicEffect
+/processorParam:GenerateMipmaps=True
+/processorParam:GenerateTangentFrames=False
+/processorParam:PremultiplyTextureAlpha=True
+/processorParam:PremultiplyVertexColors=True
+/processorParam:ResizeTexturesToPowerOfTwo=False
+/processorParam:RotationX=270
+/processorParam:RotationY=0
+/processorParam:RotationZ=90
+/processorParam:Scale=10
+/processorParam:SwapWindingOrder=False
+/processorParam:TextureFormat=Compressed
+/build:ResidentialMap.fbx
 
 #begin Shower.fbx
 /importer:FbxImporter

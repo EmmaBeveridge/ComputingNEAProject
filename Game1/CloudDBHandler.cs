@@ -8,7 +8,8 @@ using Neo4jClient;
 using Newtonsoft.Json;
 using Game1.Rooms;
 using Game1.Items;
-
+using Game1.Town;
+using Game1.Town.Districts;
 namespace Game1
 {
     public class CloudDBHandler : IDisposable
@@ -29,9 +30,9 @@ namespace Game1
             //client = new GraphClient(uri);
         }
 
-        public async Task CreateTownAsync()
+        public async Task CreateTownInDBAsync()
         {
-            string query = ReadInQuery("CreateTownCypher3.txt");
+            string query = ReadInQuery("CreateTownCypher6.txt");
 
             var session = driver.AsyncSession();
             try
@@ -61,23 +62,355 @@ namespace Game1
 
 
 
+        public async Task<List<Town.Town>> GetTownsInDB()
+        {
+            var session = driver.AsyncSession();
+            List<Town.Town> towns = new List<Town.Town>();
+
+            string query = $"MATCH (t:Town) RETURN t";
+
+            try
+            {
+                var readResults = await session.ReadTransactionAsync(async tx =>
+                {
+                    var result = await tx.RunAsync(query);
+                    return (await result.ToListAsync());
+                });
+
+                foreach (var result in readResults)
+                {
+                    var townTemp = JsonConvert.SerializeObject(result[0].As<INode>().Properties);
+                    Town.Town town = JsonConvert.DeserializeObject<Town.Town>(townTemp);
+                    towns.Add(town);
+
+
+                }
+
+                return towns;
+
+            }
+
+            catch (Neo4jException ex)
+            {
+                Console.WriteLine($"{query} - {ex}");
+                throw;
+            }
+            finally
+            {
+                Console.WriteLine("Got towns");
+                await session.CloseAsync();
+            }
+
+        }
 
 
 
 
 
+        public async Task<List<District>> GetDistrictsInTown(Town.Town town)
+        {
+            var session = driver.AsyncSession();
+            List<District> districts = new List<District>();
+
+            string query = $"MATCH (t:Town)-[:CONTAINS]-(d:District) WHERE t.id='{town.id}' RETURN d";
+
+            try
+            {
+                var readResults = await session.ReadTransactionAsync(async tx =>
+                {
+                    var result = await tx.RunAsync(query);
+                    return (await result.ToListAsync());
+                });
+
+                foreach (var result in readResults)
+                {
+                    var districtTemp = JsonConvert.SerializeObject(result[0].As<INode>().Properties);
+                    District districtUncast = JsonConvert.DeserializeObject<District>(districtTemp);
+
+                    switch (districtUncast.districtClass)
+                    {
+                        case "Residential":
+                            districts.Add(JsonConvert.DeserializeObject<Residential>(districtTemp));
+                            break;
+                        default:
+                            districts.Add(districtUncast);
+                            break;
+
+
+                    }
+
+
+                }
+
+                return districts;
+
+            }
+
+            catch (Neo4jException ex)
+            {
+                Console.WriteLine($"{query} - {ex}");
+                throw;
+            }
+            finally
+            {
+                Console.WriteLine("got districts");
+                await session.CloseAsync();
+            }
+
+        }
 
 
 
 
+        public async Task<List<Street>> GetStreetsInDistrict(District district)
+        {
+            var session = driver.AsyncSession();
+            List<Street> streets = new List<Street>();
+
+            string query = $"MATCH (d:District)-[:CONTAINS]-(s:Street) WHERE d.id='{district.id}' RETURN s";
+
+            try
+            {
+                var readResults = await session.ReadTransactionAsync(async tx =>
+                {
+                    var result = await tx.RunAsync(query);
+                    return (await result.ToListAsync());
+                });
+
+                foreach (var result in readResults)
+                {
+
+                    var streetTemp = JsonConvert.SerializeObject(result[0].As<INode>().Properties);
+                    Street street = JsonConvert.DeserializeObject<Street>(streetTemp);
+                    streets.Add(street);
+                    
+                }
+
+                return streets;
+
+            }
+
+            catch (Neo4jException ex)
+            {
+                Console.WriteLine($"{query} - {ex}");
+                throw;
+            }
+            finally
+            {
+                Console.WriteLine("got streets");
+                await session.CloseAsync();
+            }
+
+        }
+
+        public async Task<List<Street>> SetStreetPointers(List<Street> streets)
+        {
+            
+
+            foreach (Street street in streets)
+            {
+                var sessionParent = driver.AsyncSession();
 
 
-        public async Task<List<Room>> GetRoomsInHouse()
+                string getParentQuery = $"MATCH (p:Street)-[:PARENT]-(s:Street) WHERE s.id='{street.id}' RETURN p.id";
+                try
+                {
+                    var readResults = await sessionParent.ReadTransactionAsync(async tx =>
+                    {
+                        var result = await tx.RunAsync(getParentQuery);
+                        return (await result.ToListAsync());
+                    });
+
+                    foreach (var result in readResults)
+                    {
+
+
+                        string parentID = result.ToString();
+
+                        if (streets.Exists(s => s.id == parentID))
+                        {
+                            street.parent = streets.Find(s => s.id == parentID);
+
+                        }
+
+                        
+
+                        
+
+                    }
+
+                    
+
+                }
+
+                catch (Neo4jException ex)
+                {
+                    Console.WriteLine($"{getParentQuery} - {ex}");
+                    throw;
+                }
+                finally
+                {
+                    await sessionParent.CloseAsync();
+                }
+
+                var sessionChildren = driver.AsyncSession();
+                string getChildrenQuery = $"MATCH (s:Street)-[:CHILD]-(c:Street) WHERE s.id='{street.id}' RETURN c.id";
+
+                try
+                {
+                    var readResults = await sessionChildren.ReadTransactionAsync(async tx =>
+                    {
+                        var result = await tx.RunAsync(getChildrenQuery);
+                        return (await result.ToListAsync());
+                    });
+
+                    foreach (var result in readResults)
+                    {
+
+
+                        string childID = result.ToString();
+
+                        if (streets.Exists(s => s.id == childID))
+                        {
+                            street.children.AddRange(streets.FindAll(s => s.id == childID));
+
+                        }
+
+
+                        
+
+
+
+                    }
+
+                    
+
+                }
+
+                catch (Neo4jException ex)
+                {
+                    Console.WriteLine($"{getParentQuery} - {ex}");
+                    throw;
+                }
+                finally
+                {
+                    Console.WriteLine("set pointers");
+                    await sessionChildren.CloseAsync();
+                }
+                
+                
+               
+
+            }
+
+
+             return streets;
+
+
+        }
+
+
+        public async Task<List<House>> GetHousesOnStreet(Street street)
+        {
+            var session = driver.AsyncSession();
+            List<House> houses = new List<House>();
+
+            string query = $"MATCH (s:Street)-[:CONTAINS]-(h:House) WHERE s.id='{street.id}' RETURN h";
+
+            try
+            {
+                var readResults = await session.ReadTransactionAsync(async tx =>
+                {
+                    var result = await tx.RunAsync(query);
+                    return (await result.ToListAsync());
+                });
+
+                foreach (var result in readResults)
+                {
+
+                    var houseTemp = JsonConvert.SerializeObject(result[0].As<INode>().Properties);
+                    House house = JsonConvert.DeserializeObject<House>(houseTemp);
+                    house.rotation = street.rotation;
+                    house.street = street;
+                    houses.Add(house);
+
+                }
+
+                return houses;
+            }
+
+            catch (Neo4jException ex)
+            {
+                Console.WriteLine($"{query} - {ex}");
+                throw;
+            }
+            finally
+            {
+                Console.WriteLine("got houses");
+                await session.CloseAsync();
+            }
+
+        }
+
+        public async Task<List<Building>> GetBuildingsOnStreet(Street street)
+        {
+            var session = driver.AsyncSession();
+            List<Building> buildings = new List<Building>();
+
+            string query = $"MATCH (s:Street)-[:CONTAINS]-(b:Building) WHERE s.id='{street.id}' RETURN b";
+
+            try
+            {
+                var readResults = await session.ReadTransactionAsync(async tx =>
+                {
+                    var result = await tx.RunAsync(query);
+                    return (await result.ToListAsync());
+                });
+
+                foreach (var result in readResults)
+                {
+
+                    var buildingTemp = JsonConvert.SerializeObject(result[0].As<INode>().Properties);
+                    Building buildingUncast = JsonConvert.DeserializeObject<Building>(buildingTemp);
+                    Building building;
+
+                    switch (buildingUncast.buildingClass)
+                    {
+                        
+                        default:
+                            building = buildingUncast;
+                            break;
+
+
+                    }
+
+                    building.rotation = street.rotation;
+                    building.street = street;
+                    buildings.Add(building);
+
+                }
+
+                return buildings;
+            }
+
+            catch (Neo4jException ex)
+            {
+                Console.WriteLine($"{query} - {ex}");
+                throw;
+            }
+            finally
+            {
+                await session.CloseAsync();
+            }
+
+        }
+
+        public async Task<List<Room>> GetRoomsInHouse(House house)
         {
             var session = driver.AsyncSession();
             List<Room> rooms = new List<Room>();
 
-            string query = "MATCH (h:House)-[:CONTAINS]-(r:Room) RETURN r";
+            string query = $"MATCH (h:House)-[:CONTAINS]-(r:Room) WHERE h.id='{house.id}' RETURN r";
 
             try
             {
@@ -139,7 +472,7 @@ namespace Game1
             List<Item> items = new List<Item>();
 
 
-            string query = $"MATCH(r: Room{{class:'{room.roomClass}'}})-[:CONTAINS]-(i:Item) RETURN i";
+            string query = $"MATCH(r: Room{{class:'{room.roomClass}'}})-[:CONTAINS]-(i:Item) WHERE r.id='{room.id}' RETURN i";
 
             try
             {
