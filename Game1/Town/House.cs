@@ -33,6 +33,11 @@ namespace Game1.Town
         public string side;
 
 
+
+        public static Mesh navMesh;
+        public static List<House> houses = new List<House>();
+
+
         public Vector3 townLocation;
 
 
@@ -45,8 +50,7 @@ namespace Game1.Town
         public Street street;
 
         public List<Vector3> corners = new List<Vector3>();
-        public static Mesh navMesh;
-
+        
 
         public string interiorWallsName;
         public string exteriorWallsName;
@@ -56,6 +60,7 @@ namespace Game1.Town
 
         public List<Avatar> wallAvatars = new List<Avatar>();
 
+        public Matrix houseToTownTransformation;
 
         public void GenerateAvatar()
         {
@@ -70,10 +75,12 @@ namespace Game1.Town
 
             Matrix translationMatrix = Matrix.CreateTranslation(townLocation);
 
+            houseToTownTransformation = rotationMatrix * translationMatrix;
+
             wallAvatars.Add(new Avatar(exteriorWallsModel, townLocation));
             wallAvatars.Add(new Avatar(interiorWallsModel, townLocation));
 
-            wallAvatars.ForEach(delegate (Avatar a) { a.worldMatrix = rotationMatrix * translationMatrix; } );
+            wallAvatars.ForEach(delegate (Avatar a) { a.worldMatrix = houseToTownTransformation; } );
 
             
 
@@ -99,18 +106,38 @@ namespace Game1.Town
             
         }
 
+        public static House getHouseContainingPoint(Vector3 position)
+        {
+            foreach (House house in houses)
+            {
+                if (house.inHouse(position))
+                {
+                    return house;
+                }
+
+            }
+
+            return null;
+        }
+
+
         public bool inHouse(Vector3 position)
         {
-            
+            if (corners.Contains(position))
+            {
+                return true;
+            }
+
+
             int intersectionCount = 0;
             for (int i = 0; i < corners.Count; i++)
             {
                 Vector3 v1 = corners[i];
-                Vector3 v2 = corners[i + 1 % corners.Count];
+                Vector3 v2 = corners[(i + 1) % corners.Count];
 
                 LineSegment edge = new LineSegment(v1, v2);
                 Vector3 intersection = new Vector3();
-                if (edge.Intersects(position, position + Vector3.UnitX, out intersection, true))
+                if (edge.Intersects(position, position + Vector3.UnitX, out intersection, true, true))
                 {
                     intersectionCount++;
                 }

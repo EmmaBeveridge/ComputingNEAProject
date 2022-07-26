@@ -22,16 +22,31 @@ namespace Game1
 
         public override void Update(GameTime gameTime, GraphicsDevice graphicsDevice, Matrix projection, Matrix view, Game game)
         {
-            if (Mouse.GetState().LeftButton == ButtonState.Pressed && game.IsActive) //if user has clicked mouse, indicating they want to move the avatar
+
+            MouseState currentMouseState = Mouse.GetState();
+
+            if (currentMouseState.LeftButton == ButtonState.Pressed && prevMouseState.LeftButton == ButtonState.Released && game.IsActive) //if user has clicked mouse, indicating they want to move the avatar
             {
                 goal = MouseInput.MousePosToWorldCoordinates(graphicsDevice, projection, view); //finds the position user has clicked in the 3d world and sets this as the avatar's target position
-                
 
+              
                 if (goal.Y != -100)
                 {
 
-                    pathFinder.FindPath(position, goal, ref pathPoints);
+                    //pathFinder.FindPath(position, goal, ref pathPoints);
                     actionState = PeopleActionStates.moving;
+                  
+                    BuildPath();
+
+                    
+
+                    //foreach (Vector3 point in pathPoints)
+                    //{
+                    //    Console.WriteLine(point.ToString());
+
+                    //}
+                    
+
 
                     //MovePerson(gameTime);
 
@@ -51,8 +66,9 @@ namespace Game1
             }
 
 
-            if (actionState == PeopleActionStates.moving)
+            else if (actionState == PeopleActionStates.moving)
             {
+                
                 MovePerson(gameTime);
             }
 
@@ -68,6 +84,8 @@ namespace Game1
             //    getNewTranslationMatrix(gameTime); //updates the translation matrix
 
             //}
+
+            prevMouseState = currentMouseState;
 
             updateTransformationMatrix(); //updates transformation matrix with transformations occured in current frame 
 

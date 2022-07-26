@@ -124,10 +124,10 @@ namespace Game1.AStar
 
             obstructingEdges.RemoveAll(o => sharedEdges.Any(s => s == o));
 
-            foreach (LineSegment edge in obstructingEdges)
-            {
-                Console.WriteLine(edge.v1.position.ToString() + "    " + edge.v2.position.ToString() );
-            }
+            //foreach (LineSegment edge in obstructingEdges)
+            //{
+            //    //Console.WriteLine(edge.v1.position.ToString() + "    " + edge.v2.position.ToString() );
+            //}
 
 
             nodes = new NodeCollection();
@@ -209,11 +209,25 @@ namespace Game1.AStar
                 return;
             }
 
+
+            //foreach (var triangle in mesh.triangles)
+            //{
+            //    Console.WriteLine($"A:{triangle.A.position.ToString()}\nB:{triangle.B.position.ToString()}\nC:{triangle.C.position.ToString()}\n\n");
+            //}
+
+            //for (int i = 0; i < mesh.triangles.Length; i++)
+            //{
+            //    Console.WriteLine($"\"tri{i}\":{{\"A\":[{mesh.triangles[i].A.position.X} , {mesh.triangles[i].A.position.Z}] , \"B\":[{mesh.triangles[i].B.position.X} , {mesh.triangles[i].B.position.Z}] ,\"C\":[{mesh.triangles[i].C.position.X} , {mesh.triangles[i].C.position.Z}] }},");
+            //}
+
+
             Triangle triangleStart = mesh.GetClosestTriangle(from);
             Triangle triangleEnd = mesh.GetClosestTriangle(to);
 
             var firstPoint = triangleStart.GetClosestPoint(from);
             var lastPoint = triangleEnd.GetClosestPoint(to);
+
+            
 
             if (firstPoint == lastPoint)
             {
@@ -241,10 +255,14 @@ namespace Game1.AStar
                 return;
             }
 
+            Console.WriteLine("SearchResult" + searchResult.Count);
+
             foreach (Vertex vertex in searchResult)
             {
                 result.Add(vertex.position);
             }
+
+            Console.WriteLine("Result length" + result.Count);
 
         }
 

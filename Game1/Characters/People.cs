@@ -9,6 +9,7 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Game1.NavMesh;
 using Game1.AStar;
+using Game1.Town;
 
 namespace Game1
 {
@@ -30,12 +31,14 @@ namespace Game1
 
     class People
     {
+        protected MouseState prevMouseState = new MouseState();
+
         protected Vector3 position;
         //protected Vector3 targetPosition = Vector3.Zero;
         protected Vector3 targetVector = Vector3.Zero;
         protected Vector3 viewVector = Vector3.Forward;
-        protected const float velocity = 30f;
-        protected const float angularVelocity = 10f;
+        protected const float velocity = 60f;
+        protected const float angularVelocity = 20f;
         
         protected Matrix transformationMatrix;
         protected Matrix rotationMatrix;
@@ -55,6 +58,8 @@ namespace Game1
         protected Mesh mesh;
         protected Path pathFinder;
         protected Vector3 goal;
+        
+
         public People( Model _model, Vector3 _position, Mesh argMesh)
         {
             position = _position;
@@ -83,8 +88,8 @@ namespace Game1
                 goal = new Vector3(random.Next(-1000, 1000), yValue, random.Next(-1000, 1000)); //temporary for npc
                 actionState = PeopleActionStates.moving;
 
-                pathFinder.FindPath(position, goal, ref pathPoints);
-
+                //pathFinder.FindPath(position, goal, ref pathPoints);
+                BuildPath();
 
                 MovePerson(gameTime);
 
@@ -125,11 +130,169 @@ namespace Game1
         }
 
 
+
+        public void BuildPath()
+        {
+            House currentHouse = House.getHouseContainingPoint(position);
+            House goalHouse = House.getHouseContainingPoint(goal);
+
+            bool currentlyOutside = currentHouse == null ? true : false;
+            bool goalOutside = goalHouse == null ? true : false;
+
+            if (currentlyOutside && goalOutside)
+            {
+                mesh = Town.Town.navMesh;
+                pathFinder = new Path(mesh);
+                pathFinder.FindPath(position, goal, ref pathPoints);
+                
+
+            }
+
+            else if (currentlyOutside && !goalOutside)
+            {
+                List<Vector3> pathToHouse = new List<Vector3>();
+                mesh = Town.Town.navMesh;
+                pathFinder = new Path(mesh);
+                pathFinder.FindPath(position, goalHouse.townLocation, ref pathToHouse);
+                pathPoints.AddRange(pathToHouse);
+
+                List<Vector3> houseToGoal = new List<Vector3>();
+                mesh = House.navMesh;
+                pathFinder = new Path(mesh);
+                Vector3 localHouseGoal = (Matrix.CreateTranslation(goal) * Matrix.Invert(goalHouse.houseToTownTransformation)).Translation;
+
+                pathFinder.FindPath(Vector3.Zero, localHouseGoal, ref houseToGoal);
+
+                foreach (Vector3 point in houseToGoal)
+                {
+                    pathPoints.Add((Matrix.CreateTranslation(point) * goalHouse.houseToTownTransformation).Translation);
+
+                }
+
+
+                
+
+            }
+
+            else if (!currentlyOutside && goalOutside)
+            {
+                List<Vector3> pathToOutside = new List<Vector3>();
+                mesh = House.navMesh;
+                pathFinder = new Path(mesh);
+                Vector3 localHouseStart = (Matrix.CreateTranslation(position) * Matrix.Invert(currentHouse.houseToTownTransformation)).Translation;
+
+                pathFinder.FindPath(localHouseStart, Vector3.Zero, ref pathToOutside);
+
+                foreach (Vector3 point in pathToOutside)
+                {
+                    pathPoints.Add((Matrix.CreateTranslation(point) * currentHouse.houseToTownTransformation).Translation);
+                }
+
+                List<Vector3> outsideToGoal = new List<Vector3>();
+
+                mesh = Town.Town.navMesh;
+                pathFinder = new Path(mesh);
+                pathFinder.FindPath(currentHouse.townLocation, goal, ref outsideToGoal);
+
+                pathPoints.AddRange(outsideToGoal);
+
+                 
+            }
+
+            else if (!currentlyOutside && !goalOutside)
+            {
+                if (currentHouse.id == goalHouse.id)
+                {
+                    Console.WriteLine((new System.Diagnostics.StackTrace()).GetFrame(1).GetMethod().ToString());
+
+                    mesh = House.navMesh;
+                    pathFinder = new Path(mesh);
+
+                    Vector3 localHouseStart = (Matrix.CreateTranslation(position) * Matrix.Invert(currentHouse.houseToTownTransformation)).Translation;
+                    Vector3 localHouseGoal = (Matrix.CreateTranslation(goal) * Matrix.Invert(currentHouse.houseToTownTransformation)).Translation;
+
+                    List<Vector3> localHousePoints = new List<Vector3>();
+
+                    pathFinder.FindPath(localHouseStart, localHouseGoal, ref localHousePoints);
+
+                    Console.WriteLine("localHousePoints;" + localHousePoints.Count);
+                    Console.WriteLine("pp:" + pathPoints.Count);
+                    foreach (Vector3 point in localHousePoints)
+                    {
+                        pathPoints.Add((Matrix.CreateTranslation(point) * currentHouse.houseToTownTransformation).Translation);
+                        Console.WriteLine((Matrix.CreateTranslation(point) * currentHouse.houseToTownTransformation).Translation.ToString());
+                        Console.WriteLine("pp:" + pathPoints.Count);
+                    }
+
+                    Console.WriteLine("Path length:" + pathPoints.Count);
+
+                }
+
+                else if (currentHouse.id != goalHouse.id)
+                {
+
+                    List<Vector3> pathToOutside = new List<Vector3>();
+                    mesh = House.navMesh;
+                    pathFinder = new Path(mesh);
+                    Vector3 localHouseStart = (Matrix.CreateTranslation(position) * Matrix.Invert(currentHouse.houseToTownTransformation)).Translation;
+
+                    pathFinder.FindPath(localHouseStart, Vector3.Zero, ref pathToOutside);
+
+                    foreach (Vector3 point in pathToOutside)
+                    {
+                        pathPoints.Add((Matrix.CreateTranslation(point) * currentHouse.houseToTownTransformation).Translation);
+                    }
+
+                    List<Vector3> outsideToGoalHouse = new List<Vector3>();
+
+                    mesh = Town.Town.navMesh;
+                    pathFinder = new Path(mesh);
+                    pathFinder.FindPath(currentHouse.townLocation, goalHouse.townLocation, ref outsideToGoalHouse);
+
+                    pathPoints.AddRange(outsideToGoalHouse);
+
+                    List<Vector3> houseToGoal = new List<Vector3>();
+                    mesh = House.navMesh;
+                    pathFinder = new Path(mesh);
+                    Vector3 localHouseGoal = (Matrix.CreateTranslation(goal) * Matrix.Invert(goalHouse.houseToTownTransformation)).Translation;
+
+                    pathFinder.FindPath(Vector3.Zero, localHouseGoal, ref houseToGoal);
+
+                    foreach (Vector3 point in houseToGoal)
+                    {
+                        pathPoints.Add((Matrix.CreateTranslation(point) * goalHouse.houseToTownTransformation).Translation);
+
+                    }
+
+                   
+
+
+
+                }
+
+
+
+
+
+            }
+
+
+
+
+
+        }
+
+
+
+
         public void MovePerson( GameTime gameTime)
         {
            
             if (pathPoints.Count == 0)
             {
+               
+
+
                 motionState = PeopleMotionStates.idle;
                 actionState = PeopleActionStates.idle;
                 return;
@@ -168,8 +331,9 @@ namespace Game1
                 }
 
                 Vector3 currentTarget = pathPoints[0];
-
+                
                 targetVector = getTargetVector(gameTime, currentTarget);
+                
                 rotationMatrix = Matrix.Identity;
                 getNewTranslationMatrix(gameTime);
 

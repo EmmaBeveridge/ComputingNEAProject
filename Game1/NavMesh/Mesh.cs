@@ -21,7 +21,7 @@ namespace Game1.NavMesh
         public List<Vertex> vertices;
         int[] indices;
 
-
+        Triangulator triangulator = new Triangulator();
 
         public Triangle[] triangles;
         Vector3[] vertexPositions { get { if (vertexPositions == null) { CacheVertices(); } return vertexPositions; } set { vertexPositions = value; } }
@@ -49,22 +49,35 @@ namespace Game1.NavMesh
 
         }
 
-        public Mesh()
-        {
-            Triangulator.BuildTriangles();
+        //public Mesh()
+        //{
+        //    triangulator.BuildTriangles();
 
-            vertices = Triangulator.resultVertices;
-            indices = Triangulator.indices;
+        //    vertices = triangulator.resultVertices;
+        //    indices = triangulator.indices;
+
+        //    SetTriangles(vertices, indices);
+
+
+        //}
+
+
+
+        public Mesh(bool town=false, bool house = false)
+        {
+            if (house == true)
+            {
+                triangulator.BuildHouseTriangles();
+            }
+            else if (town == true)
+            {
+                triangulator.BuildTownTriangles();
+            }
+
+            vertices = triangulator.resultVertices;
+            indices = triangulator.indices;
 
             SetTriangles(vertices, indices);
-
-
-        }
-
-
-
-        public Mesh(bool town=false, bool house = false,  Matrix tranformationMatrix = default(Matrix))
-        {
 
         }
 
@@ -94,7 +107,10 @@ namespace Game1.NavMesh
                 triangles[triID] = new Triangle(points[indices[i]], points[indices[i + 1]], points[indices[i + 2]], triID++);
 
             }
-
+            for (int i = 0; i < triangles.Length; i++)
+            {
+                Console.WriteLine($"\"tri{i}\":{{\"A\":[{triangles[i].A.position.X} , {triangles[i].A.position.Z}] , \"B\":[{triangles[i].B.position.X} , {triangles[i].B.position.Z}] ,\"C\":[{triangles[i].C.position.X} , {triangles[i].C.position.Z}] }},");
+            }
 
             //Console.WriteLine($"max X:{maxX}\n max Z:{maxZ}\n min X {minX}\n min z {minZ}");
 
@@ -180,8 +196,10 @@ namespace Game1.NavMesh
 
             for (int i = 0; i < triangles.Length; i++)
             {
+                
                 if (triangles[i].Encloses(point))
                 {
+                   
                     return triangles[i];
                 }
 

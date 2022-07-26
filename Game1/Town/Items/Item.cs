@@ -20,7 +20,7 @@ namespace Game1
 
         [JsonProperty("relativeLocationX")]
         public string locationX;
-
+        
         [JsonProperty("relativeLocationZ")]
         public string locationZ;
 

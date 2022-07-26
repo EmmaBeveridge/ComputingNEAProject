@@ -57,7 +57,7 @@ namespace Game1.NavMesh
 
 
 
-        public bool Intersects(Vector3 a, Vector3 b, out Vector3 intersection, bool vectorInfinite)//vectorInfinite refers to ab not linesegment  
+        public bool Intersects(Vector3 a, Vector3 b, out Vector3 intersection, bool vectorInfinite, bool vectorNonNegative = false)//vectorInfinite refers to ab not linesegment  
         {
             intersection = Vector3.Zero;
 
@@ -93,6 +93,15 @@ namespace Game1.NavMesh
 
                 }
             }
+
+            if (vectorNonNegative)
+            {
+                if (lambda < 0)
+                {
+                    return false;
+                }
+            }
+
 
             if (mu > 1 || mu < 0)
             {

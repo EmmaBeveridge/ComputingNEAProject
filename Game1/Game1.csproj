@@ -51,7 +51,6 @@
     <Compile Include="AStar\PriorityQueue.cs" />
     <Compile Include="DataClasses\ExcelFileManager.cs" />
     <Compile Include="GameStates.cs" />
-    <Compile Include="NavMesh\OutsideMap.cs" />
     <Compile Include="Town\Building.cs" />
     <Compile Include="Town\Districts\District.cs" />
     <Compile Include="Town\Districts\Residential.cs" />

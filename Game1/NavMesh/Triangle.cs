@@ -222,7 +222,45 @@ namespace Game1.NavMesh
             var c = LineSegment.EpsilonUnitInterval(1 - a - b);
 
             return (0 <= a && a <= 1 && 0 <= b && b <= 1 && 0 <= c && c <= 1);
+
+
+            //List<Vector3> corners = new List<Vector3>();
+            //corners.Add(A.position);
+            //corners.Add(B.position);
+            //corners.Add(C.position);
+
+            //int intersectionCount = 0;
+            //for (int i = 0; i < corners.Count; i++)
+            //{
+            //    Vector3 v1 = corners[i];
+            //    Vector3 v2 = corners[(i + 1) % corners.Count];
+
+            //    LineSegment edge = new LineSegment(v1, v2);
+            //    Vector3 intersection = new Vector3();
+            //    if (edge.Intersects(point, point + Vector3.UnitX, out intersection, true))
+            //    {
+            //        intersectionCount++;
+            //    }
+
+
+            //}
+
+            //if (intersectionCount % 2 == 0) { return false; }
+            //return true;
+
+
+
+
+
+
+
+
+
+
         }
+
+
+
 
 
 

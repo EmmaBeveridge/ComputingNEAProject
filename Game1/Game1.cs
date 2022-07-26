@@ -25,7 +25,7 @@ namespace Game1
         List<People> people = new List<People>();
         
         List<Town.Town> towns = new List<Town.Town>();
-
+        
         List<Texture2D> loadingScreens = new List<Texture2D>();
 
         
@@ -33,7 +33,7 @@ namespace Game1
 
         SpriteBatch spriteBatch;
 
-        Mesh navMesh;
+        
 
 
         Camera camera;
@@ -71,7 +71,7 @@ namespace Game1
             camera = new Camera(GraphicsDevice, this.Window, new Vector3(0,60,-200), Vector3.Zero);
             this.IsMouseVisible = true;
             
-            navMesh = new Mesh();
+            
 
         }
 
@@ -174,6 +174,7 @@ namespace Game1
                             house.GenerateAvatar();
                             house.SetCorners();
                             avatars.AddRange(house.wallAvatars);
+                            House.houses.Add(house);
                             house.rooms = await cloudDBHandler.GetRoomsInHouse(house);
 
                             foreach (Room room in house.rooms)
@@ -197,9 +198,11 @@ namespace Game1
                             }
 
 
-
+                            
 
                         }
+                        
+                        
 
 
 
@@ -209,10 +212,13 @@ namespace Game1
                 }
 
 
-
+                
 
             }
-
+            
+            
+            House.navMesh = new Mesh(house: true);
+            Town.Town.navMesh = new Mesh(town: true);
 
         }
 
@@ -284,7 +290,7 @@ namespace Game1
             Model woman2 = Content.Load<Model>("woman4");
             Model man2 = Content.Load<Model>("man4");
             Model woman5 = Content.Load<Model>("woman5");
-            player = new Player(woman2, new Vector3(10, 0, 0), navMesh);
+            player = new Player(woman2, new Vector3(10, 0, 0), Town.Town.navMesh);
             people.Add(player);
             //people.Add(new People(man2, new Vector3(10, 5, 10), navMesh));
             //people.Add(new People(woman5, new Vector3(-20, 5, -20), navMesh));
