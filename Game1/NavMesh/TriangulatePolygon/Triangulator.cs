@@ -55,7 +55,7 @@ namespace Game1.NavMesh.TriangulatePolygon
                 List<Vector2> houseVertices = new List<Vector2>();
                 holeCount++;
                 
-                foreach (Vector3 corner in house.corners)
+                foreach (Vector3 corner in house.groundCorners)
                 {
 
                     houseVertices.Add(new Vector2(corner.X, corner.Z));

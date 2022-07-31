@@ -51,6 +51,18 @@
 /processorParam:TextureFormat=Compressed
 /build:Bin.fbx
 
+#begin BlueButton.jpg
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:BlueButton.jpg
+
 #begin Bookcase.fbx
 /importer:FbxImporter
 /processor:ModelProcessor
@@ -69,6 +81,13 @@
 /processorParam:SwapWindingOrder=False
 /processorParam:TextureFormat=Compressed
 /build:Bookcase.fbx
+
+#begin buttonFont.spritefont
+/importer:FontDescriptionImporter
+/processor:FontDescriptionProcessor
+/processorParam:PremultiplyAlpha=True
+/processorParam:TextureFormat=Compressed
+/build:buttonFont.spritefont
 
 #begin Chair.fbx
 /importer:FbxImporter
@@ -455,6 +474,25 @@
 /processorParam:SwapWindingOrder=False
 /processorParam:TextureFormat=Compressed
 /build:ResidentialMap.fbx
+
+#begin Roof.fbx
+/importer:FbxImporter
+/processor:ModelProcessor
+/processorParam:ColorKeyColor=0,0,0,0
+/processorParam:ColorKeyEnabled=True
+/processorParam:DefaultEffect=BasicEffect
+/processorParam:GenerateMipmaps=True
+/processorParam:GenerateTangentFrames=False
+/processorParam:PremultiplyTextureAlpha=True
+/processorParam:PremultiplyVertexColors=True
+/processorParam:ResizeTexturesToPowerOfTwo=False
+/processorParam:RotationX=270
+/processorParam:RotationY=0
+/processorParam:RotationZ=90
+/processorParam:Scale=10
+/processorParam:SwapWindingOrder=False
+/processorParam:TextureFormat=Compressed
+/build:Roof.fbx;RoofBrown.fbx
 
 #begin Shower.fbx
 /importer:FbxImporter

@@ -13,6 +13,11 @@ namespace Game1.Items
         public Bed(string argId, int[] argLocation, string argRoomClass) : base(argId, argLocation, argRoomClass)
         {
             modelName = "Bed";
+
+            actionLabels.Add("sleep");
+            actionLabels.Add("nap");
+            actionLabels.Add("relax");
+
         }
 
 

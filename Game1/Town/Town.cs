@@ -23,7 +23,8 @@ namespace Game1.Town
 
         static public List<Vector3> corners = new List<Vector3> { new Vector3(maxX, 0, maxZ), new Vector3(maxX, 0, minZ), new Vector3(minX, 0, minZ), new Vector3(minX, 0, maxZ) };
         static public Mesh navMesh;
-        public List<District> districts;
+        public List<District> districts = new List<District>();
+        public List<House> houses = new List<House>();
 
     }
 }

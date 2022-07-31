@@ -24,7 +24,9 @@ namespace Game1
     {
         idle,
         moving,
-        engaged
+        engaged,
+        selectingItemAction,
+        selectingHouseAction
     }
 
 
@@ -58,9 +60,15 @@ namespace Game1
         protected Mesh mesh;
         protected Path pathFinder;
         protected Vector3 goal;
-        
 
-        public People( Model _model, Vector3 _position, Mesh argMesh)
+        protected House currentHouse;
+        protected House goalHouse;
+        protected Item selectedItem;
+        public Town.Town town;
+        protected Game1 game;
+
+
+        public People(Model _model, Vector3 _position, Mesh argMesh, Town.Town argTown, Game1 argGame)
         {
             position = _position;
             avatar = new Avatar (_model, _position);
@@ -72,15 +80,21 @@ namespace Game1
             avatar.worldMatrix = Matrix.Identity; 
             viewVector = avatar.worldMatrix.Forward; //direction vector avatar is looking in
             mesh = argMesh;
+            currentHouse = null;
             pathFinder = new Path(argMesh);
             pathPoints = new List<Vector3>();
+            town = argTown;
+            game = argGame;
+            
 
         }
 
 
 
-        public virtual void Update(GameTime gameTime, GraphicsDevice graphicsDevice, Matrix projection, Matrix view, Game game)
+        public virtual void Update(GameTime gameTime, GraphicsDevice graphicsDevice, Matrix projection, Matrix view, Game1 game)
         {
+            //currentHouse = House.getHouseContainingPoint(position);
+
             if (actionState==PeopleActionStates.idle && game.IsActive) //if user has clicked mouse, indicating they want to move the avatar
             {
                 Random random = new Random();
@@ -133,8 +147,11 @@ namespace Game1
 
         public void BuildPath()
         {
+            
+            //House goalHouse = House.getHouseContainingPoint(goal);
             House currentHouse = House.getHouseContainingPoint(position);
-            House goalHouse = House.getHouseContainingPoint(goal);
+            pathPoints.Clear();
+
 
             bool currentlyOutside = currentHouse == null ? true : false;
             bool goalOutside = goalHouse == null ? true : false;
@@ -151,6 +168,7 @@ namespace Game1
             else if (currentlyOutside && !goalOutside)
             {
                 List<Vector3> pathToHouse = new List<Vector3>();
+                
                 mesh = Town.Town.navMesh;
                 pathFinder = new Path(mesh);
                 pathFinder.FindPath(position, goalHouse.townLocation, ref pathToHouse);
@@ -285,16 +303,16 @@ namespace Game1
 
 
 
-        public void MovePerson( GameTime gameTime)
+        public virtual void MovePerson( GameTime gameTime)
         {
            
             if (pathPoints.Count == 0)
             {
                
-
-
                 motionState = PeopleMotionStates.idle;
                 actionState = PeopleActionStates.idle;
+                //currentHouse = House.getHouseContainingPoint(position);
+                currentHouse = goalHouse;
                 return;
             }
 
@@ -302,6 +320,10 @@ namespace Game1
             { 
                 Vector3 nextTarget = pathPoints[0];
                 targetVector = getTargetVector(gameTime, nextTarget);
+
+
+
+
                 if (!(targetVector.X == 0 && targetVector.Z == 0)) 
                 {
                     motionState = PeopleMotionStates.rotating;
@@ -327,6 +349,8 @@ namespace Game1
                 {
                     motionState = PeopleMotionStates.idle;
                     actionState = PeopleActionStates.idle;
+                    //currentHouse = House.getHouseContainingPoint(position);
+                    currentHouse = goalHouse;
                     return;
                 }
 

@@ -49,8 +49,10 @@
     <Compile Include="AStar\NodeLinks.cs" />
     <Compile Include="AStar\Path.cs" />
     <Compile Include="AStar\PriorityQueue.cs" />
+    <Compile Include="Characters\Button.cs" />
     <Compile Include="DataClasses\ExcelFileManager.cs" />
     <Compile Include="GameStates.cs" />
+    <Compile Include="GOAP\GOAPAgent.cs" />
     <Compile Include="Town\Building.cs" />
     <Compile Include="Town\Districts\District.cs" />
     <Compile Include="Town\Districts\Residential.cs" />

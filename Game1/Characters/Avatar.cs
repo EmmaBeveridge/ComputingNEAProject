@@ -14,10 +14,10 @@ namespace Game1
     {
 
         
-        Model model;
+        public Model model;
         public Matrix worldMatrix;
-
-
+        public int id;
+        static int idCount;
 
 
 
@@ -25,6 +25,8 @@ namespace Game1
         {
             model = _model;
             worldMatrix = Matrix.CreateTranslation(_position);
+            id = idCount;
+            idCount++;
         }
 
 

@@ -14,6 +14,7 @@ namespace Game1.Items
         public Toilet(string argId, int[] argLocation, string argRoomClass) : base(argId, argLocation, argRoomClass)
         {
             modelName = "Toilet";
+            actionLabels.Add("use toilet");
 
         }
 

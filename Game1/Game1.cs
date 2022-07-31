@@ -10,6 +10,7 @@ using System.Threading;
 using Game1.NavMesh;
 using Game1.Town;
 using Game1.Town.Districts;
+using Game1.Characters;
  
 
 namespace Game1
@@ -22,6 +23,7 @@ namespace Game1
         GraphicsDeviceManager graphicsManager;
         
         List<Avatar> avatars = new List<Avatar>();
+        public List<Button> buttons = new List<Button>();
         List<People> people = new List<People>();
         
         List<Town.Town> towns = new List<Town.Town>();
@@ -32,7 +34,7 @@ namespace Game1
 
 
         SpriteBatch spriteBatch;
-
+        SpriteFont spriteFont;
         
 
 
@@ -77,7 +79,7 @@ namespace Game1
 
 
         
-
+        
 
 
 
@@ -129,7 +131,8 @@ namespace Game1
             loadingScreens.Add(Content.Load<Texture2D>("LoadingScreen7"));
             loadingScreens.Add(Content.Load<Texture2D>("LoadingScreen8"));
 
-
+            Button.defaultTexture = Content.Load<Texture2D>("BlueButton");
+            spriteFont = Content.Load<SpriteFont>("buttonFont");
             
         }
 
@@ -159,6 +162,7 @@ namespace Game1
 
                     district.streets = await cloudDBHandler.GetStreetsInDistrict(district);
                     district.streets = await cloudDBHandler.SetStreetPointers(district.streets);
+                    
 
 
                     foreach (Street street in district.streets)
@@ -171,11 +175,13 @@ namespace Game1
                             house.setWallsFromColourScheme();
                             house.exteriorWallsModel = Content.Load<Model>(house.exteriorWallsName);
                             house.interiorWallsModel = Content.Load<Model>(house.interiorWallsName);
+                            house.roofModel = Content.Load<Model>(house.roofName);
                             house.GenerateAvatar();
-                            house.SetCorners();
+                           
                             avatars.AddRange(house.wallAvatars);
                             House.houses.Add(house);
                             house.rooms = await cloudDBHandler.GetRoomsInHouse(house);
+                            town.houses.Add(house);
 
                             foreach (Room room in house.rooms)
                             {
@@ -189,6 +195,7 @@ namespace Game1
                                     item.model = Content.Load<Model>(item.modelName);
                                     item.GenerateAvatar();
                                     avatars.Add(item.avatar);
+                                    item.BuildButtons(graphicsManager);
 
 
                                 }
@@ -219,6 +226,7 @@ namespace Game1
             
             House.navMesh = new Mesh(house: true);
             Town.Town.navMesh = new Mesh(town: true);
+            
 
         }
 
@@ -259,6 +267,20 @@ namespace Game1
 
         //}
 
+        public void RemoveAvatar(Avatar avatar)
+        {
+            int index = avatars.FindIndex(a => a.id == avatar.id);
+            if (index != -1)
+            {
+                avatars.RemoveAt(index);
+            }
+
+        }
+
+        public void AddAvatar(Avatar avatar)
+        {
+            avatars.Add(avatar);
+        }
 
 
         async Task LoadGame()
@@ -290,7 +312,7 @@ namespace Game1
             Model woman2 = Content.Load<Model>("woman4");
             Model man2 = Content.Load<Model>("man4");
             Model woman5 = Content.Load<Model>("woman5");
-            player = new Player(woman2, new Vector3(10, 0, 0), Town.Town.navMesh);
+            player = new Player(woman2, new Vector3(10, 0, 0), Town.Town.navMesh, towns[0], this);
             people.Add(player);
             //people.Add(new People(man2, new Vector3(10, 5, 10), navMesh));
             //people.Add(new People(woman5, new Vector3(-20, 5, -20), navMesh));
@@ -422,7 +444,16 @@ namespace Game1
                     avatar.Draw(camera.view, camera.projection);  
                 }
 
+                spriteBatch.Begin();
 
+                foreach (Button button in buttons)
+                {
+                    spriteBatch.Draw(button.buttonTexture, button.position); 
+                    spriteBatch.DrawString(spriteFont, button.buttonLabel, new Vector2( button.position.X + button.buttonTexture.Width/4, button.position.Y + button.buttonTexture.Height/20), Color.Black);
+
+                }
+
+                spriteBatch.End();
                 
 
 
