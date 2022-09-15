@@ -10,36 +10,38 @@ using Microsoft.Xna.Framework.Input;
 using Game1.NavMesh;
 using Game1.AStar;
 using Game1.Town;
+using Game1.GOAP;
 
 namespace Game1
 {
-    enum PeopleMotionStates
+    public enum PeopleMotionStates
     {
         idle,
         moving,
         rotating
     }
 
-    enum PeopleActionStates
+    public enum PeopleActionStates
     {
         idle,
         moving,
         engaged,
+        beginMoving,
         selectingItemAction,
         selectingHouseAction
     }
 
 
 
-    class People
+    public class People
     {
         protected MouseState prevMouseState = new MouseState();
 
-        protected Vector3 position;
+        public Vector3 position;
         //protected Vector3 targetPosition = Vector3.Zero;
         protected Vector3 targetVector = Vector3.Zero;
         protected Vector3 viewVector = Vector3.Forward;
-        protected const float velocity = 60f;
+        protected const float velocity = 100f;
         protected const float angularVelocity = 20f;
         
         protected Matrix transformationMatrix;
@@ -59,13 +61,19 @@ namespace Game1
         protected List<Vector3> pathPoints;
         protected Mesh mesh;
         protected Path pathFinder;
-        protected Vector3 goal;
+        public Vector3 goal;
 
-        protected House currentHouse;
+        public House currentHouse;
         protected House goalHouse;
         protected Item selectedItem;
         public Town.Town town;
         protected Game1 game;
+
+
+        //protected Agent agent;
+        public GOAPPerson goapPerson;
+        public StateMachine<GOAPPerson.GOAPPersonState> goapStateMachine;
+        public bool reachedGoal = false;
 
 
         public People(Model _model, Vector3 _position, Mesh argMesh, Town.Town argTown, Game1 argGame)
@@ -85,6 +93,10 @@ namespace Game1
             pathPoints = new List<Vector3>();
             town = argTown;
             game = argGame;
+
+            goapPerson = new GOAPPerson(this);
+            goapStateMachine = goapPerson.BuildAI();
+            
             
 
         }
@@ -94,39 +106,39 @@ namespace Game1
         public virtual void Update(GameTime gameTime, GraphicsDevice graphicsDevice, Matrix projection, Matrix view, Game1 game)
         {
             //currentHouse = House.getHouseContainingPoint(position);
+            
+            goapStateMachine.Tick(gameTime);
 
-            if (actionState==PeopleActionStates.idle && game.IsActive) //if user has clicked mouse, indicating they want to move the avatar
+
+            if (actionState==PeopleActionStates.idle && game.IsActive) 
             {
-                Random random = new Random();
-
-                goal = new Vector3(random.Next(-1000, 1000), yValue, random.Next(-1000, 1000)); //temporary for npc
-                actionState = PeopleActionStates.moving;
-
-                //pathFinder.FindPath(position, goal, ref pathPoints);
-                BuildPath();
-
-                MovePerson(gameTime);
-
-                //targetPosition = new Vector3(random.Next(-1000, 1000), 0, random.Next(-1000, 1000)); //temporary for NPC
-                //targetVector = getTargetVector(gameTime); //assigns target vector to variable
-                //motionState = PeopleMotionStates.rotating; //avatar must first rotate to look at the point they are going to move towards so the avatar state is set to rotating
+                //Random random = new Random();
+                //goal = new Vector3(random.Next(-1000, 1000), yValue, random.Next(-1000, 1000)); //temporary for npc
                 //actionState = PeopleActionStates.moving;
-                //getNewRotationMatrix(gameTime); // updates rotation matrix
+
+                //BuildPath();
+                //MovePerson(gameTime);
+
                 
+
+ 
             }
 
-            //else if (motionState == PeopleMotionStates.rotating) //if avatar is still rotating to view target
-            //{
-            //    getNewRotationMatrix(gameTime); //updates the rotation matrix
-            //}
-            
-            //else if (motionState==PeopleMotionStates.moving) //if the avatar is facing in the correct direction and now is moving towards position
-            //{
-            //    targetVector = getTargetVector(gameTime); //update the target vector for avatar's current position
-            //    rotationMatrix = Matrix.Identity;
-            //    getNewTranslationMatrix(gameTime); //updates the translation matrix
-          
-            //}
+
+            else if (actionState == PeopleActionStates.beginMoving)
+            {
+
+                //set into beginMoving state and goal assigned in GoTo class in GOAPPerson
+
+                actionState = PeopleActionStates.moving;
+                BuildPath();
+                MovePerson(gameTime);
+
+            }
+
+
+
+
 
             else if (actionState == PeopleActionStates.moving)
             {
@@ -147,8 +159,10 @@ namespace Game1
 
         public void BuildPath()
         {
-            
-            //House goalHouse = House.getHouseContainingPoint(goal);
+
+            reachedGoal = false;
+
+            House goalHouse = House.getHouseContainingPoint(goal);
             House currentHouse = House.getHouseContainingPoint(position);
             pathPoints.Clear();
 
@@ -313,6 +327,8 @@ namespace Game1
                 actionState = PeopleActionStates.idle;
                 //currentHouse = House.getHouseContainingPoint(position);
                 currentHouse = goalHouse;
+
+                reachedGoal = true;
                 return;
             }
 
@@ -351,6 +367,7 @@ namespace Game1
                     actionState = PeopleActionStates.idle;
                     //currentHouse = House.getHouseContainingPoint(position);
                     currentHouse = goalHouse;
+                    reachedGoal = true;
                     return;
                 }
 

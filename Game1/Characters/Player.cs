@@ -24,10 +24,16 @@ namespace Game1
 
         public override void Update(GameTime gameTime, GraphicsDevice graphicsDevice, Matrix projection, Matrix view, Game1 game)
         {
+            
+            goapStateMachine.Tick(gameTime);
+
 
             MouseState currentMouseState = Mouse.GetState();
 
 
+            if ()
+
+            
             if (actionState == PeopleActionStates.selectingItemAction && game.IsActive)
             {
 
@@ -38,9 +44,13 @@ namespace Game1
                     {
                         Console.WriteLine("Selected action:" + selectedButton.buttonLabel);
                         game.buttons.Clear();
-                        goal = selectedItem.townLocation;
+
+
+                        goapPerson.PushNewAction(selectedButton.buttonAction);
+
+                        //goal = selectedItem.townLocation;
                         actionState = PeopleActionStates.moving;
-                        BuildPath();
+                        //BuildPath();
 
                     }
                     else
@@ -138,7 +148,14 @@ namespace Game1
                 
 
             }
+            
+            else if (actionState == PeopleActionStates.beginMoving)
+            {
+                actionState = PeopleActionStates.moving;
+                BuildPath();
+                MovePerson(gameTime);
 
+            }
 
             else if (actionState == PeopleActionStates.moving)
             {
@@ -146,18 +163,7 @@ namespace Game1
                 MovePerson(gameTime);
             }
 
-            //else if (motionState == PeopleMotionStates.rotating) //if avatar is still rotating to view target
-            //{
-            //    getNewRotationMatrix(gameTime); //updates the rotation matrix
-            //}
-
-            //else if (motionState == PeopleMotionStates.moving) //if the avatar is facing in the correct direction and now is moving towards position
-            //{
-            //    rotationMatrix = Matrix.Identity;
-            //    targetVector = getTargetVector(gameTime); //update the target vector for avatar's current position
-            //    getNewTranslationMatrix(gameTime); //updates the translation matrix
-
-            //}
+            
 
             prevMouseState = currentMouseState;
 
@@ -176,24 +182,6 @@ namespace Game1
         }
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
         public override void MovePerson(GameTime gameTime)
         {
 
@@ -204,6 +192,7 @@ namespace Game1
                 motionState = PeopleMotionStates.idle;
                 actionState = PeopleActionStates.idle;
                 //currentHouse = House.getHouseContainingPoint(position);
+                reachedGoal = true;
                 currentHouse = goalHouse;
                 return;
             }
@@ -215,7 +204,9 @@ namespace Game1
 
                 House nextHouse = House.getHouseContainingPoint(nextTarget);
 
-                if ( nextHouse != currentHouse && currentHouse!= null)
+
+
+                if ( nextHouse == null && currentHouse!= null)
                 {
                     game.AddAvatar(currentHouse.wallAvatars.Find(a => a.model == currentHouse.roofModel));
                 }
@@ -223,13 +214,6 @@ namespace Game1
                 {
                     game.RemoveAvatar(nextHouse.wallAvatars.Find(a => a.model == nextHouse.roofModel));
                 }
-
-
-
-
-               
-
-
 
                 if (!(targetVector.X == 0 && targetVector.Z == 0))
                 {
@@ -257,11 +241,15 @@ namespace Game1
                     motionState = PeopleMotionStates.idle;
                     actionState = PeopleActionStates.idle;
                     //currentHouse = House.getHouseContainingPoint(position);
+                    reachedGoal = true;
                     currentHouse = goalHouse;
                     return;
                 }
 
+
                 Vector3 currentTarget = pathPoints[0];
+
+                
 
                 targetVector = getTargetVector(gameTime, currentTarget);
 

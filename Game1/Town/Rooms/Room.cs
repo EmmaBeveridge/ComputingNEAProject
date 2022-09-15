@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Game1.Town;
+using Game1.GOAP;
 namespace Game1.Rooms
 {
     public class Room
@@ -29,6 +30,9 @@ namespace Game1.Rooms
 
 
         public House house;
+
+        public List<GOAPAction> GOAPActions = new List<GOAPAction>();
+
 
 
         public Room( string argId, int[] argLocation, string argRoomClass)

@@ -33,6 +33,9 @@ namespace Game1.AStar
                 links[to].Add(from);
             }
 
+            //Console.WriteLine($"Link from:{from.position}, to: {to.position}");
+
+
         }
 
         public bool Contains(Vertex vertex)

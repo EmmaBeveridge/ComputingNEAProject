@@ -135,6 +135,8 @@ namespace Game1.NavMesh
 
         public bool Crosses(Vector2 a, Vector2 b, out Vector3 intersection)
         {
+            //https://www.geeksforgeeks.org/check-if-two-given-line-segments-intersect/
+
             intersection = Vector3.Zero;
 
             Vector2 c = new Vector2(v1.position.X, v1.position.Z);
@@ -148,7 +150,7 @@ namespace Game1.NavMesh
                 return false;
             }
 
-            float numerator1 = ((a.Y - c.Y) * (d.X - c.X)) - ((a.X - c.X) * (d.Y - c.Y));
+            float numerator1 = ((a.Y - c.Y) * (d.X - c.X)) - ((a.X - c.X) * (d.Y - c.Y)); //https://www.geeksforgeeks.org/orientation-3-ordered-points/
             float numerator2 = ((a.Y - c.Y) * (b.X - a.X)) - ((a.X - c.X) * (b.Y - a.Y));
 
             if (numerator1 == 0 || numerator2 == 0)

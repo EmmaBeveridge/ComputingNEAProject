@@ -24,6 +24,8 @@ namespace Game1
         
         List<Avatar> avatars = new List<Avatar>();
         public List<Button> buttons = new List<Button>();
+        List<ToolbarButton> toolbarButtons = new List<ToolbarButton>();
+
         List<People> people = new List<People>();
         
         List<Town.Town> towns = new List<Town.Town>();
@@ -47,6 +49,9 @@ namespace Game1
         GameStates.States gameState = GameStates.States.Loading;
         bool isLoading=false;
         
+
+
+       
 
         public Game1()
         {
@@ -133,7 +138,25 @@ namespace Game1
 
             Button.defaultTexture = Content.Load<Texture2D>("BlueButton");
             spriteFont = Content.Load<SpriteFont>("buttonFont");
+
+
+            Vector2 toolbarButtonTextureDim = new Vector2(50);
+
+            Texture2D needsButtonTexture = Content.Load<Texture2D>("NeedsButton4");
+            toolbarButtons.Add(new ToolbarButton(null, new Vector2((graphicsManager.GraphicsDevice.Viewport.Width - 4*toolbarButtonTextureDim.X),(graphicsManager.GraphicsDevice.Viewport.Height - toolbarButtonTextureDim.Y)), needsButtonTexture));
             
+            
+            Texture2D relationshipButtonTexture = Content.Load<Texture2D>("RelationshipButton2");
+            toolbarButtons.Add(new ToolbarButton(null, new Vector2((graphicsManager.GraphicsDevice.Viewport.Width - 3 *toolbarButtonTextureDim.X), (graphicsManager.GraphicsDevice.Viewport.Height - toolbarButtonTextureDim.Y)), relationshipButtonTexture));
+            
+            Texture2D skillsButtonTexture = Content.Load<Texture2D>("SkillsButton2");
+            toolbarButtons.Add(new ToolbarButton(null, new Vector2((graphicsManager.GraphicsDevice.Viewport.Width - 2 * toolbarButtonTextureDim.X), (graphicsManager.GraphicsDevice.Viewport.Height - toolbarButtonTextureDim.Y)), skillsButtonTexture));
+            
+            Texture2D careerButtonTexture = Content.Load<Texture2D>("CareerButton2");
+            toolbarButtons.Add(new ToolbarButton(null, new Vector2((graphicsManager.GraphicsDevice.Viewport.Width - toolbarButtonTextureDim.X), (graphicsManager.GraphicsDevice.Viewport.Height - toolbarButtonTextureDim.Y)), careerButtonTexture));
+
+
+
         }
 
         protected override void UnloadContent()
@@ -197,13 +220,19 @@ namespace Game1
                                     avatars.Add(item.avatar);
                                     item.BuildButtons(graphicsManager);
 
+                                    
+                                    room.GOAPActions.AddRange(item.GOAPActions);
+
+
 
                                 }
 
+                                house.GOAPActions.AddRange(room.GOAPActions);
 
 
                             }
 
+                            town.GOAPActions.AddRange(house.GOAPActions);
 
                             
 
@@ -283,6 +312,15 @@ namespace Game1
         }
 
 
+        public void BuildActions()
+        {
+
+        }
+
+
+
+
+
         async Task LoadGame()
         {
 
@@ -309,6 +347,12 @@ namespace Game1
 
             await BuildTownAsync().ConfigureAwait(false);
 
+
+
+
+
+
+
             Model woman2 = Content.Load<Model>("woman4");
             Model man2 = Content.Load<Model>("man4");
             Model woman5 = Content.Load<Model>("woman5");
@@ -325,8 +369,8 @@ namespace Game1
             
             
             avatars.Add(new Avatar(Content.Load<Model>("Grass"), new Vector3(0, -12, 0))); // was at y=-12
-            //avatars.Add(new Avatar(Content.Load<Model>("HouseInteriorWalls"), new Vector3(0, -5, 0))); //was at y=-2
-            //avatars.Add(new Avatar(Content.Load<Model>("HouseExteriorWalls"), new Vector3(0, -5, 0))); //was at y=-2
+            avatars.Add(new Avatar(Content.Load<Model>("HouseInteriorWalls"), new Vector3(0, -5, 0))); //was at y=-2
+            avatars.Add(new Avatar(Content.Load<Model>("HouseExteriorWalls"), new Vector3(0, -5, 0))); //was at y=-2
             //avatars.Add(new Avatar(Content.Load<Model>("Countertop"), new Vector3(60, 0, 100)));
             //avatars.Add(new Avatar(Content.Load<Model>("CountertopSink"), new Vector3(105, 0, 100)));
             //avatars.Add(new Avatar(Content.Load<Model>("Shower"), new Vector3(330, 0, -105)));
@@ -424,8 +468,8 @@ namespace Game1
             
             camera.Update(gameTime);
 
-            
-            
+
+            //buttons.AddRange(toolbarButtons);
             base.Update(gameTime);
         }
 
@@ -448,16 +492,25 @@ namespace Game1
 
                 foreach (Button button in buttons)
                 {
+
                     spriteBatch.Draw(button.buttonTexture, button.position); 
-                    spriteBatch.DrawString(spriteFont, button.buttonLabel, new Vector2( button.position.X + button.buttonTexture.Width/4, button.position.Y + button.buttonTexture.Height/20), Color.Black);
+
+                    if (button.buttonLabel != null)
+                    {
+                        spriteBatch.DrawString(spriteFont, button.buttonLabel, new Vector2( button.position.X + button.buttonTexture.Width/4, button.position.Y + button.buttonTexture.Height/20), Color.Black);
+
+                    }
+                    
+                }
+
+                foreach (ToolbarButton button in toolbarButtons)
+                {
+                    spriteBatch.Draw(button.buttonTexture, button.position);
 
                 }
 
                 spriteBatch.End();
                 
-
-
-
             }
            
            

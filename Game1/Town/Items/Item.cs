@@ -12,6 +12,8 @@ using Game1.DataClasses;
 using System.Data;
 using Game1.NavMesh;
 using Game1.Characters;
+using Game1.GOAP;
+using Game1.Town;
 
 namespace Game1
 {
@@ -43,15 +45,22 @@ namespace Game1
         public Vector3 townLocation;
 
         public Vector3 houseTownLocation;
+        public House house;
 
         public float rotation;
 
 
         public Room room;
 
-        public List<string> actionLabels = new List<string>();
+        public Dictionary<string, GOAPAction> actionLabels = new Dictionary<string, GOAPAction>();
         public List<Button> actionButtons = new List<Button>();
-        
+        public  List<GOAPAction> GOAPActions = new List<GOAPAction>();
+
+
+        public People interactingWithPerson = null;
+        public bool actionComplete = false;
+        public double actionTimeElapsed = 0;
+
 
         public Avatar avatar;
         public Model model;
@@ -77,8 +86,14 @@ namespace Game1
 
 
             Matrix relativeTransformation = Matrix.CreateTranslation(new Vector3(int.Parse(locationX), 0, int.Parse(locationZ))) * rotationMatrix;
+
+
+
+            house = room.house;
+            houseTownLocation = house.townLocation ;
             
-            houseTownLocation = room.house.townLocation ;
+
+
             Matrix translationMatrix = Matrix.CreateTranslation(houseTownLocation);
 
             avatar = new Avatar(model, houseTownLocation);
@@ -222,7 +237,7 @@ namespace Game1
                 if ( angle>= MathHelper.TwoPi) { angle -= MathHelper.TwoPi; }
 
 
-                actionButtons.Add(new Button(actionLabels[i], new Vector2(x, y)));
+                actionButtons.Add(new Button(actionLabels.Keys.ElementAt(i), actionLabels.Values.ElementAt(i), new Vector2(x, y)));
 
 
 
@@ -243,7 +258,9 @@ namespace Game1
 
 
 
+        public virtual void DefineActions() { }
 
+        public virtual Action<GameTime> BeginAction(string actionName, People person) { return null; }
 
 
 

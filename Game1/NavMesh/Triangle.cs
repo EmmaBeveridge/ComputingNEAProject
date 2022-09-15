@@ -345,7 +345,10 @@ namespace Game1.NavMesh
 
 
 
-
+        public override string ToString()
+        {
+            return $"A: {A.position.ToString()} B:{B.position.ToString()} C:{C.position.ToString()}";
+        }
 
 
 

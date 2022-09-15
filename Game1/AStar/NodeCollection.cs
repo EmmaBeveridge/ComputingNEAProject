@@ -23,7 +23,7 @@ namespace Game1.AStar
 
         public void CalculateStaticLinks(Func<Vector3, Vector3, bool> condition)
         {
-            CalculateLinks(condition, nodes, linksStatic);
+            CalculateLinks(condition, nodes, linksStatic); // static link letting walk through wall??? why?
         }
 
         public void CalculateDynamicLinks(Vertex start, Vertex end, Func<Vector3, Vector3, bool> condition)
@@ -75,9 +75,29 @@ namespace Game1.AStar
             {
                 foreach (var inner in newNodes.Where(n => n != outer))
                 {
+                    
+
+
+
                     if (condition(outer.position, inner.position))
-                    {
-                        links.AddLink(outer, inner);
+                    {   
+                        if (outer.position.X == 345 && outer.position.Z == -105 &&  inner.position.X == 345 && inner.position.Z == 25)
+                        {
+                            
+                        }
+                        else if (outer.position.X == 345 && outer.position.Z == 25 && inner.position.X == 345 && inner.position.Z == -105) 
+                        { }
+                         
+                        //quick fix, needs addressed later - I think because pts are collinear?? when checking if in line of sight, says they are as Crosses test goes wrong, numerator 2 evaluates to 0 when checking intersection with wall x= 345 -> 200
+                        // this just stops link from these two nodes being added so cannot be traversed 
+
+                       
+                        else
+                        {
+                            links.AddLink(outer, inner);
+
+                        }
+                        
                     }
                 }
             }

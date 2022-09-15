@@ -7,6 +7,8 @@ using Game1.Town.Districts;
 using Newtonsoft.Json;
 using Microsoft.Xna.Framework;
 using Game1.NavMesh;
+using Game1.GOAP;
+
 
 namespace Game1.Town
 {
@@ -25,6 +27,9 @@ namespace Game1.Town
         static public Mesh navMesh;
         public List<District> districts = new List<District>();
         public List<House> houses = new List<House>();
+
+
+        public List<GOAPAction> GOAPActions = new List<GOAPAction>();
 
     }
 }

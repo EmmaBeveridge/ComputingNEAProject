@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -33,6 +34,11 @@ namespace Game1.AStar
             comparer = argComparer;
         }
 
+
+        public PriorityQueue(IComparer argComparer)
+        {
+            comparer = (IComparer<T>)argComparer;
+        }
 
         void Update(int i)
         {
@@ -165,6 +171,27 @@ namespace Game1.AStar
 
             return -1;
         }
+
+        public void Remove (T node)
+        {
+            T formerLastNode = innerList.Last();
+
+            int nodeIndex = innerList.IndexOf(node);
+
+            Switch(nodeIndex, innerList.Count-1);
+
+            innerList.Remove(node);
+
+            Update(nodeIndex);
+
+            
+
+
+        }
+
+
+
+
 
 
 

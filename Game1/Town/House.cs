@@ -11,6 +11,7 @@ using Microsoft.Xna.Framework.Graphics;
 using Newtonsoft.Json;
 using System.Text.RegularExpressions;
 using Game1.NavMesh;
+using Game1.GOAP;
 
 namespace Game1.Town
 
@@ -63,6 +64,9 @@ namespace Game1.Town
 
         public Matrix houseToTownTransformation;
         public List<Plane> planes = new List<Plane>();
+
+        public List<GOAPAction> GOAPActions = new List<GOAPAction>(); 
+
 
         public void GenerateAvatar()
         {

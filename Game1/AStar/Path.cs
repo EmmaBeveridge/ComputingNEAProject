@@ -8,7 +8,7 @@ using Microsoft.Xna.Framework;
 
 namespace Game1.AStar
 {
-    class Path
+    public class Path
     {
         public Mesh mesh;
         public float maxScale, minScale;
@@ -46,6 +46,12 @@ namespace Game1.AStar
 
             foreach (LineSegment edge in obstructingEdges)
             {
+
+                if(edge.v1.position.X == 200 && edge.v2.position.X == 350)
+                {
+
+                }
+
                 if (edge.Equals(a, b))
                 {
                     return true;
@@ -260,6 +266,8 @@ namespace Game1.AStar
             foreach (Vertex vertex in searchResult)
             {
                 result.Add(vertex.position);
+                Triangle tri = mesh.GetTriangleAt(vertex.position);
+                Console.WriteLine(tri.ToString());
             }
 
             Console.WriteLine("Result length" + result.Count);

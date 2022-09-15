@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Game1.GOAP
 {
-    class GOAPAgent
+    interface Interface1
     {
     }
 }
