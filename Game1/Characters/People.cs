@@ -28,7 +28,8 @@ namespace Game1
         engaged,
         beginMoving,
         selectingItemAction,
-        selectingHouseAction
+        selectingHouseAction,
+        typingChat
     }
 
 
@@ -66,6 +67,7 @@ namespace Game1
         public House currentHouse;
         protected House goalHouse;
         protected Item selectedItem;
+        protected People selectedPerson;
         public Town.Town town;
         protected Game1 game;
 
@@ -74,6 +76,11 @@ namespace Game1
         public GOAPPerson goapPerson;
         public StateMachine<GOAPPerson.GOAPPersonState> goapStateMachine;
         public bool reachedGoal = false;
+
+        public BoundingBox boundingBox { get { return avatar.UpdateBoundingBox(); } }
+
+
+
 
 
         public People(Model _model, Vector3 _position, Mesh argMesh, Town.Town argTown, Game1 argGame)
@@ -100,6 +107,10 @@ namespace Game1
             
 
         }
+
+
+
+       
 
 
 

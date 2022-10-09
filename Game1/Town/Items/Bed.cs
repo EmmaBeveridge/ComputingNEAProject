@@ -29,6 +29,7 @@ namespace Game1.Items
             
             var sleep = new GOAPAction("sleep");
             sleep.SetPrecondition(GOAPPerson.IsTired, true);
+            sleep.SetPrecondition("Available", true);
             sleep.SetPostcondition(GOAPPerson.IsTired, false);
             sleep.item = this;
             GOAPActions.Add(sleep);
@@ -73,7 +74,7 @@ namespace Game1.Items
 
         public void sleep(GameTime timer) 
         {
-            const float actionTime = 1;
+            const float actionTime = 10;
             
             actionTimeElapsed += timer.ElapsedGameTime.TotalSeconds;
 

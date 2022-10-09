@@ -65,7 +65,7 @@ namespace Game1.GOAP
 
                 // all done. we reached our goal
                 if (goal.Equals(currentNode.WorldState))
-                {
+                {           
                     var plan = ReconstructPlan(currentNode, selectedNodes);
                     Storage.Clear();
                     return plan;

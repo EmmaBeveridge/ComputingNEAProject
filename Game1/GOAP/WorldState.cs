@@ -17,7 +17,7 @@ namespace Game1.GOAP
         /// bitmask used to explicitly state false. We need a separate store for negatives because the absence of a value doesnt necessarily mean
         /// it is false.
         /// </summary>
-        public long DontCare;
+        public long DontCare; //for each of the conditions, we may not actually care if they are true or false in this world state. If we don't care, then we set a 0 at the position of the condition index in this variable
 
         /// <summary>
         /// required so that we can get the condition index from the string name
@@ -47,16 +47,16 @@ namespace Game1.GOAP
 
         internal bool Set(int conditionId, bool value)
         {
-            this.Values = value ? (this.Values | (1L << conditionId)) : (this.Values & ~(1L << conditionId));
-            this.DontCare ^= (1 << conditionId);
+            this.Values = value ? (this.Values | (1L << conditionId)) : (this.Values & ~(1L << conditionId)); // if the condition which has state stored at position conditionID should be true in this world state: a binary string with a 1 at the position of the condition id and 0 everywhere else (obtained by left shifting 1 condtionID times (1L<<conditionID)) and using or operator to preserve other desired condition values already set for this worldstate (whatever is held at this.Values position conditionID, it will become a 1 because of using the or operator). if the condition which has state stored at conditionID should be false for this worldstate: we first make a state such that all of the condtions except the one we are trying to make false are set to 1 i.e. true (using bitwise complement operator to flip all zero bits in the intial binary string with a 1 at the position of the condition id to make a string with 1 for every other condition except for one that we want to be false. We do this so that when we apply the and operator, we guarantee that the condition we want to be false will be false (as whatever condition previously was in Values, because we are performing and operator with a false, the result will be false. By setting all the other values to 1, we can preserve the values already held in Values variable as result of and will depend solely on the value already stored. 
+            this.DontCare ^= (1 << conditionId); //since we care about the state of this condition we must set its DontCare value to 0. As DontCare is initialised to -1 = 111111111... in twos complement binary, the XOR operator will make the value at position conditionid 0 while preserving the other values as all values for which we don't care about will stay 1( 1 XOR 0 =1) and all values we previously said we care about will remain 0 (0 XOR 0 = 0). New value will be set to 0 (1 XOR 1 = 0)
             return true;
         }
 
 
         public bool Equals(WorldState other)
         {
-            var care = this.DontCare ^ -1L;
-            return (this.Values & care) == (other.Values & care);
+            var care = this.DontCare ^ -1L; //-1 in two's complement = 1111111111... When XOR performed with don't care all conditions that we care about (0 in DontCare) will be a 1 in care and all values that we don't care about (1 in DontCare) will become 0 in care. 
+            return (this.Values & care) == (other.Values & care); //if the conditions in this world state that we actually care about match those in the other state, return true.
         }
 
 

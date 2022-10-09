@@ -166,8 +166,7 @@ namespace Game1.GOAP
         internal int FindActionIndex(GOAPAction goapAction)
         {
             var idx = this.actions.IndexOf(goapAction);
-            if (idx > -1)
-                return idx;
+            if (idx > -1) { return idx; }
 
             this.actions.Add(goapAction);
 

@@ -50,6 +50,7 @@
     <Compile Include="AStar\Path.cs" />
     <Compile Include="AStar\PriorityQueue.cs" />
     <Compile Include="Characters\Button.cs" />
+    <Compile Include="Characters\Textbox.cs" />
     <Compile Include="Characters\ToolbarButton.cs" />
     <Compile Include="DataClasses\ExcelFileManager.cs" />
     <Compile Include="GameStates.cs" />
@@ -62,6 +63,7 @@
     <Compile Include="GOAP\GOAPWorld.cs" />
     <Compile Include="GOAP\StateMachine.cs" />
     <Compile Include="GOAP\WorldState.cs" />
+    <Compile Include="TextboxInput.cs" />
     <Compile Include="Town\Building.cs" />
     <Compile Include="Town\Districts\District.cs" />
     <Compile Include="Town\Districts\Residential.cs" />

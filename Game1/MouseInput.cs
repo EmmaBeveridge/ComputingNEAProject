@@ -16,14 +16,47 @@ namespace Game1
     static class MouseInput
     {
 
+
+        public static MouseState previousMouseState;
+        public static MouseState currentMouseState;
+
+        public static MouseState GetState()
+        {
+            
+            currentMouseState = Mouse.GetState();
+            return currentMouseState;
+        }
+
+
+        public static void SetPreviousState()
+        {
+            previousMouseState = currentMouseState;
+        }
+
+        public static bool IsPressed (bool left)
+        {
+            if (left) { return currentMouseState.LeftButton == ButtonState.Pressed; }
+            else { return currentMouseState.RightButton == ButtonState.Pressed; }
+        }
+
+
+        public static bool HasNotBeenPressed(bool left)
+        {
+            if (left) { return currentMouseState.LeftButton == ButtonState.Pressed && previousMouseState.LeftButton == ButtonState.Released; }
+            else { return currentMouseState.RightButton == ButtonState.Pressed && previousMouseState.RightButton == ButtonState.Released; }
+        }
+
+
         public static Vector3 MousePosToWorldCoordinates(GraphicsDevice GraphicsDevice, Matrix projection, Matrix view)
         {
 
 
-            MouseState ms = Mouse.GetState();
+            //MouseState ms = Mouse.GetState();
 
-            Vector3 nearScreenPoint = new Vector3(ms.X, ms.Y, 0.1f);
-            Vector3 farScreenPoint = new Vector3(ms.X, ms.Y, 0.2f);
+            //MouseState ms = GetState();
+
+            Vector3 nearScreenPoint = new Vector3(currentMouseState.X, currentMouseState.Y, 0.1f);
+            Vector3 farScreenPoint = new Vector3(currentMouseState.X, currentMouseState.Y, 0.2f);
             Vector3 nearWorldPoint = GraphicsDevice.Viewport.Unproject(nearScreenPoint, projection, view, Matrix.Identity);
             Vector3 farWorldPoint = GraphicsDevice.Viewport.Unproject(farScreenPoint, projection, view, Matrix.Identity);
 
@@ -56,10 +89,10 @@ namespace Game1
 
         private static Ray GetRay(GraphicsDevice GraphicsDevice, Matrix projection, Matrix view)
         {
-            MouseState ms = Mouse.GetState();
+            //MouseState currentMouseState = GetState();
 
-            Vector3 nearScreenPoint = new Vector3(ms.X, ms.Y, 0.1f);
-            Vector3 farScreenPoint = new Vector3(ms.X, ms.Y, 0.2f);
+            Vector3 nearScreenPoint = new Vector3(currentMouseState.X, currentMouseState.Y, 0.1f);
+            Vector3 farScreenPoint = new Vector3(currentMouseState.X, currentMouseState.Y, 0.2f);
             Vector3 nearWorldPoint = GraphicsDevice.Viewport.Unproject(nearScreenPoint, projection, view, Matrix.Identity);
             Vector3 farWorldPoint = GraphicsDevice.Viewport.Unproject(farScreenPoint, projection, view, Matrix.Identity);
 
@@ -78,10 +111,9 @@ namespace Game1
 
 
             if (currentHouse == null) { return false; }
-            MouseState ms = Mouse.GetState();
-
-            Vector3 nearScreenPoint = new Vector3(ms.X, ms.Y, 0.1f);
-            Vector3 farScreenPoint = new Vector3(ms.X, ms.Y, 0.2f);
+            //MouseState currentMouseState = GetState();
+            Vector3 nearScreenPoint = new Vector3(currentMouseState.X, currentMouseState.Y, 0.1f);
+            Vector3 farScreenPoint = new Vector3(currentMouseState.X, currentMouseState.Y, 0.2f);
             Vector3 nearWorldPoint = graphicsDevice.Viewport.Unproject(nearScreenPoint, projection, view, Matrix.Identity);
             Vector3 farWorldPoint = graphicsDevice.Viewport.Unproject(farScreenPoint, projection, view, Matrix.Identity);
 
@@ -130,10 +162,9 @@ namespace Game1
         {
 
             if (town == null) { return false; }
-            MouseState ms = Mouse.GetState();
-
-            Vector3 nearScreenPoint = new Vector3(ms.X, ms.Y, 0.1f);
-            Vector3 farScreenPoint = new Vector3(ms.X, ms.Y, 0.2f);
+            //MouseState currentMouseState = GetState();
+            Vector3 nearScreenPoint = new Vector3(currentMouseState.X, currentMouseState.Y, 0.1f);
+            Vector3 farScreenPoint = new Vector3(currentMouseState.X, currentMouseState.Y, 0.2f);
             Vector3 nearWorldPoint = graphicsDevice.Viewport.Unproject(nearScreenPoint, projection, view, Matrix.Identity);
             Vector3 farWorldPoint = graphicsDevice.Viewport.Unproject(farScreenPoint, projection, view, Matrix.Identity);
 
@@ -183,14 +214,35 @@ namespace Game1
         }
 
 
+
+
+        public static bool FindPersonSelected(List<People> people, GraphicsDevice graphicsDevice, Matrix projection, Matrix view, ref People personSelected)
+        {
+            Ray ray = GetRay(graphicsDevice, projection, view);
+            foreach (People person in people)
+            {
+                if (person.boundingBox.Intersects(ray) != null)
+                {
+                    personSelected = person;
+                    return true;
+
+                }
+            }
+
+            return false;
+        }
+
+
+
+
         public static Button  GetButtonPressed(List<Button> buttonsToCheck)
         {
-            MouseState ms = Mouse.GetState();
-            Console.WriteLine(ms.X+" "+ms.Y);
+            //MouseState currentMouseState = Mouse.GetState();
+            Console.WriteLine(currentMouseState.X+" "+currentMouseState.Y);
             foreach (Button button in buttonsToCheck)
             {
 
-                if (MouseOverButton(button, ms))
+                if (MouseOverButton(button, currentMouseState))
                 {
                     return button;
                 }
@@ -205,16 +257,33 @@ namespace Game1
 
         public static ToolbarButton GetToolbarButton(List<ToolbarButton> toolbarButtons)
         {
-            MouseState ms = 
+            //MouseState currentMouseState = Mouse.GetState();
+            foreach(ToolbarButton button in toolbarButtons)
+            {
+                if(MouseOverButton(button, currentMouseState))
+                {
+                    return button;
+                }
+            }
+
+            return null;
         }
 
 
-        private static bool MouseOverButton(Button button, MouseState ms)
+        private static bool MouseOverButton(Button button, MouseState currentMouseState)
         {
 
             Rectangle buttonRect = new Rectangle((int)button.position.X, (int)button.position.Y, button.buttonTexture.Width, button.buttonTexture.Height);
 
-            if (buttonRect.Contains(ms.X, ms.Y))
+            return MouseOverRectangle(buttonRect);
+
+
+        }
+
+
+        public static bool MouseOverRectangle(Rectangle rectangle)
+        {
+            if (rectangle.Contains(currentMouseState.X, currentMouseState.Y))
             {
                 return true;
             }
@@ -223,9 +292,6 @@ namespace Game1
 
 
         }
-
-
-
 
 
     }

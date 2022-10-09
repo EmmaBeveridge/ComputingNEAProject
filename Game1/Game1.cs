@@ -26,7 +26,10 @@ namespace Game1
         public List<Button> buttons = new List<Button>();
         List<ToolbarButton> toolbarButtons = new List<ToolbarButton>();
 
-        List<People> people = new List<People>();
+        public bool displayTextbox = false;
+        Textbox currentTextbox;
+
+        public List<People> people = new List<People>();
         
         List<Town.Town> towns = new List<Town.Town>();
         
@@ -138,6 +141,10 @@ namespace Game1
 
             Button.defaultTexture = Content.Load<Texture2D>("BlueButton");
             spriteFont = Content.Load<SpriteFont>("buttonFont");
+
+            Textbox.defaultTextboxTexture = Content.Load<Texture2D>("Textbox");
+            Textbox.defaultCursorTexture = Content.Load<Texture2D>("Cursor");
+            Textbox.defaultFont = spriteFont;
 
 
             Vector2 toolbarButtonTextureDim = new Vector2(50);
@@ -359,7 +366,7 @@ namespace Game1
             player = new Player(woman2, new Vector3(10, 0, 0), Town.Town.navMesh, towns[0], this);
             people.Add(player);
             //people.Add(new People(man2, new Vector3(10, 5, 10), navMesh));
-            //people.Add(new People(woman5, new Vector3(-20, 5, -20), navMesh));
+            people.Add(new People(woman5, new Vector3(10, 0, 0), Town.Town.navMesh, towns[0], this));
 
 
             avatars.AddRange(people.Select(people => people.avatar));
@@ -426,7 +433,10 @@ namespace Game1
         protected override async void Update(GameTime gameTime)
         {
 
-            
+            MouseInput.SetPreviousState();
+
+
+
             if (Keyboard.GetState().IsKeyDown(Keys.Escape))
             {
                 Exit();
@@ -455,6 +465,21 @@ namespace Game1
                     person.Update(gameTime, GraphicsDevice, camera.projection, camera.view, this);
                 }
 
+                if (displayTextbox)
+                {
+                    if (currentTextbox == null) 
+                    {
+                        currentTextbox = new Textbox(new Vector2(graphicsManager.GraphicsDevice.Viewport.Width/2 - Textbox.defaultTextboxTexture.Width/2, graphicsManager.GraphicsDevice.Viewport.Height/3 ));
+                      
+                    }
+                    currentTextbox.Update();
+                    TextboxInputHandler.HandleInput(gameTime, currentTextbox);
+                    
+
+                    
+                    
+                }
+
             }
 
             if (gameState == GameStates.States.Playing && isLoading)
@@ -465,8 +490,12 @@ namespace Game1
             }
 
 
+            if (!displayTextbox)
+            {
+                camera.Update(gameTime);
+
+            }
             
-            camera.Update(gameTime);
 
 
             //buttons.AddRange(toolbarButtons);
@@ -508,6 +537,13 @@ namespace Game1
                     spriteBatch.Draw(button.buttonTexture, button.position);
 
                 }
+
+                if (displayTextbox)
+                {
+                    currentTextbox.Draw(spriteBatch);
+                }
+
+
 
                 spriteBatch.End();
                 

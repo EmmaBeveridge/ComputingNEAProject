@@ -13,44 +13,38 @@ using Game1.Characters;
 
 namespace Game1
 {
-    class Player: People
+    class Player : People
     {
-        
-        public Player(Model _model, Vector3 _position, Mesh argMesh, Town.Town argTown, Game1 argGame) :base(_model, _position, argMesh, argTown, argGame)
+
+        public Player(Model _model, Vector3 _position, Mesh argMesh, Town.Town argTown, Game1 argGame) : base(_model, _position, argMesh, argTown, argGame)
         {
-            
+
         }
 
 
         public override void Update(GameTime gameTime, GraphicsDevice graphicsDevice, Matrix projection, Matrix view, Game1 game)
         {
-            
+
+
             goapStateMachine.Tick(gameTime);
 
 
-            MouseState currentMouseState = Mouse.GetState();
+            MouseInput.GetState();
 
 
-            if ()
-
-            
-            if (actionState == PeopleActionStates.selectingItemAction && game.IsActive)
+            if (MouseInput.currentMouseState.LeftButton == ButtonState.Pressed && MouseInput.previousMouseState.LeftButton == ButtonState.Released && game.IsActive)
             {
 
-                if (currentMouseState.LeftButton == ButtonState.Pressed && prevMouseState.LeftButton == ButtonState.Released)
+                if (actionState == PeopleActionStates.selectingItemAction)
                 {
                     Button selectedButton = MouseInput.GetButtonPressed(selectedItem.actionButtons);
                     if (selectedButton != null)
                     {
                         Console.WriteLine("Selected action:" + selectedButton.buttonLabel);
                         game.buttons.Clear();
-
-
                         goapPerson.PushNewAction(selectedButton.buttonAction);
-
-                        //goal = selectedItem.townLocation;
                         actionState = PeopleActionStates.moving;
-                        //BuildPath();
+
 
                     }
                     else
@@ -58,96 +52,155 @@ namespace Game1
                         game.buttons.Clear();
                         actionState = PeopleActionStates.idle;
                     }
- 
+
                 }
 
-            }
+                else if (MouseInput.FindPersonSelected(game.people, graphicsDevice, projection, view, ref selectedPerson)) //is person selected
+                {
+                    Console.WriteLine("Selected Person");
+                    actionState = PeopleActionStates.typingChat;
+                    DisplayTextbox(game);
 
+                }
+                else if (actionState == PeopleActionStates.typingChat) { }
 
-            else if (currentMouseState.LeftButton == ButtonState.Pressed && prevMouseState.LeftButton == ButtonState.Released && game.IsActive) //if user has clicked mouse, indicating they want to move the avatar
-            {
-                bool isItemSelected = MouseInput.FindItemSelected(currentHouse, graphicsDevice, projection, view, ref selectedItem);
-                if (isItemSelected)
-                { 
-                    //goal = selectedItem.townLocation;
+                else if (MouseInput.FindItemSelected(currentHouse, graphicsDevice, projection, view, ref selectedItem)) //is item selected
+                {
+
                     actionState = PeopleActionStates.selectingItemAction;
                     DisplayItemLabels(selectedItem);
-                    Console.WriteLine("Selected:"+selectedItem.id);
+                    Console.WriteLine("Selected:" + selectedItem.id);
                 }
 
+                else if (MouseInput.FindHouseSelected(town, graphicsDevice, projection, view, ref goalHouse) && goalHouse != currentHouse) //is a new house selected
+                {
+                    goal = goalHouse.townLocation;
+                    actionState = PeopleActionStates.moving;
+                    BuildPath();
+                    Console.WriteLine("Selected:" + goalHouse.id);
+
+
+
+                }
                 else
                 {
-                    
-                    bool isHouseSelected = MouseInput.FindHouseSelected(town, graphicsDevice, projection, view, ref goalHouse);
-                    if (isHouseSelected)
-                    {   if (goalHouse == currentHouse)
-                        {
-                            isHouseSelected = false;
-                        }
-                        else
-                        {
-                            goal = goalHouse.townLocation;
-                            actionState = PeopleActionStates.moving;
-                            BuildPath();
-                            Console.WriteLine("Selected:" + goalHouse.id); 
+                    goal = MouseInput.MousePosToWorldCoordinates(graphicsDevice, projection, view); //finds the position user has clicked in the 3d world and sets this as the avatar's target position
 
-                        }
-                        
-                    }
-                    if (!isHouseSelected)
+                    if (goal.Y != -100)
                     {
-                        goal = MouseInput.MousePosToWorldCoordinates(graphicsDevice, projection, view); //finds the position user has clicked in the 3d world and sets this as the avatar's target position
-
-                        if (goal.Y != -100)
-                        {
-                            goalHouse = House.getHouseContainingPoint(goal);
-                            actionState = PeopleActionStates.moving;
-                            BuildPath();
-                        }
-
-                        
-
-                        
+                        goalHouse = House.getHouseContainingPoint(goal);
+                        actionState = PeopleActionStates.moving;
+                        BuildPath();
                     }
 
                 }
-                
-                
-              
-                //if (goal.Y != -100)
-                //{
 
-                //    //pathFinder.FindPath(position, goal, ref pathPoints);
-                //    actionState = PeopleActionStates.moving;
-                  
-                //    BuildPath();
-
-                    
-
-                //    //foreach (Vector3 point in pathPoints)
-                //    //{
-                //    //    Console.WriteLine(point.ToString());
-
-                //    //}
-                    
-
-
-                //    //MovePerson(gameTime);
-
-
-                //    //targetVector = getTargetVector(gameTime); //assigns target vector to variable
-                //    //motionState = PeopleMotionStates.rotating; //avatar must first rotate to look at the point they are going to move towards so the avatar state is set to rotating
-                //    //getNewRotationMatrix(gameTime); // updates rotation matrix
-
-                //}
-                ////else
-                ////{
-                ////    motionState = PeopleMotionStates.moving;
-                ////}
-                
-                
 
             }
+
+
+
+            //    if (actionState == PeopleActionStates.selectingItemAction && game.IsActive)
+            //{
+
+            //    if (MouseInput.currentMouseState.LeftButton == ButtonState.Pressed && MouseInput.previousMouseState.LeftButton == ButtonState.Released)
+            //    {
+            //        Button selectedButton = MouseInput.GetButtonPressed(selectedItem.actionButtons);
+            //        if (selectedButton != null)
+            //        {
+            //            Console.WriteLine("Selected action:" + selectedButton.buttonLabel);
+            //            game.buttons.Clear();
+
+
+            //            goapPerson.PushNewAction(selectedButton.buttonAction);
+
+            //            //goal = selectedItem.townLocation;
+            //            actionState = PeopleActionStates.moving;
+            //            //BuildPath();
+
+            //        }
+            //        else
+            //        {
+            //            game.buttons.Clear();
+            //            actionState = PeopleActionStates.idle;
+            //        }
+ 
+            //    }
+
+            //}
+
+
+            //else if (MouseInput.currentMouseState.LeftButton == ButtonState.Pressed && MouseInput.previousMouseState.LeftButton == ButtonState.Released && game.IsActive) //if user has clicked mouse, indicating they want to move the avatar
+            //{   
+                
+            //    bool isPersonSelected = MouseInput.FindPersonSelected(game.people, graphicsDevice, projection, view, ref selectedPerson);
+            //    if (isPersonSelected)
+            //    {
+            //        Console.WriteLine("Selected Person");
+            //        actionState = PeopleActionStates.typingChat;
+            //        DisplayTextbox(game);
+
+            //    }
+            //    else
+            //    {
+
+
+
+
+            //        bool isItemSelected = MouseInput.FindItemSelected(currentHouse, graphicsDevice, projection, view, ref selectedItem);
+
+            //        if (isItemSelected)
+            //        {
+            //            //goal = selectedItem.townLocation;
+            //            actionState = PeopleActionStates.selectingItemAction;
+            //            DisplayItemLabels(selectedItem);
+            //            Console.WriteLine("Selected:" + selectedItem.id);
+            //        }
+
+            //        else
+            //        {
+
+            //            bool isHouseSelected = MouseInput.FindHouseSelected(town, graphicsDevice, projection, view, ref goalHouse);
+            //            if (isHouseSelected)
+            //            {
+            //                if (goalHouse == currentHouse)
+            //                {
+            //                    isHouseSelected = false;
+            //                }
+            //                else
+            //                {
+            //                    goal = goalHouse.townLocation;
+            //                    actionState = PeopleActionStates.moving;
+            //                    BuildPath();
+            //                    Console.WriteLine("Selected:" + goalHouse.id);
+
+            //                }
+
+            //            }
+            //            if (!isHouseSelected)
+            //            {
+            //                goal = MouseInput.MousePosToWorldCoordinates(graphicsDevice, projection, view); //finds the position user has clicked in the 3d world and sets this as the avatar's target position
+
+            //                if (goal.Y != -100)
+            //                {
+            //                    goalHouse = House.getHouseContainingPoint(goal);
+            //                    actionState = PeopleActionStates.moving;
+            //                    BuildPath();
+            //                }
+
+
+
+
+            //            }
+
+            //        }
+
+            //    }
+              
+              
+                
+
+            //}
             
             else if (actionState == PeopleActionStates.beginMoving)
             {
@@ -165,7 +218,7 @@ namespace Game1
 
             
 
-            prevMouseState = currentMouseState;
+           // prevMouseState = MouseInput.currentMouseState;
 
             updateTransformationMatrix(); //updates transformation matrix with transformations occured in current frame 
 
@@ -175,7 +228,10 @@ namespace Game1
 
         }
 
-
+        public void DisplayTextbox(Game1 game)
+        {
+            game.displayTextbox = true;
+        }
         public void DisplayItemLabels(Item selectedItem)
         {
             selectedItem.DisplayActions(game);

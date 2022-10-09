@@ -572,9 +572,9 @@ namespace Game1.NavMesh.TriangulatePolygon
             //float det = (vertexPos.X - prevPos.X) * (nextPos.Y - vertexPos.Y) - (nextPos.X - vertexPos.X) * (vertexPos.Y - prevPos.Y);
             //return (det < 0);
 
-            Vector2 d1 = Vector2.Normalize(vertexPos - prevPos);
-            Vector2 d2 = Vector2.Normalize(nextPos - vertexPos);
-            Vector2 n2 = new Vector2(-d2.Y, d2.X);
+            Vector2 d1 = Vector2.Normalize(vertexPos - prevPos); //points from prevPos towards vertexPos
+            Vector2 d2 = Vector2.Normalize(nextPos - vertexPos); //points from vertexPos towards nextPos
+            Vector2 n2 = new Vector2(-d2.Y, d2.X); //rotates d2 through 270, makes it so that if angle is either obtuse or acute (ie. convex) dot product between vectors >0 as either vector can be projected onto the other so that length of projection in direction of vector >0
 
             return (Vector2.Dot(d1, n2) > 0f);
 

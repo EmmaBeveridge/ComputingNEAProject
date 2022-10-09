@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Game1.AStar
 {
-    class PriorityQueue<T> //using binary tree
+    class PriorityQueue<T> //using binary heap
     {
         List<T> innerList = new List<T>();
         IComparer<T> comparer;
@@ -42,12 +42,12 @@ namespace Game1.AStar
 
         void Update(int i)
         {
-            if (BubbleUpTree(i) < i)
+            if (BubbleUpHeap(i) < i)
             {
                 return;
             }
 
-            BubbleDownTree();
+            BubbleDownHeap();
         }
 
         private int Compare(int a, int b)
@@ -57,7 +57,7 @@ namespace Game1.AStar
 
 
 
-        private void BubbleDownTree()
+        private void BubbleDownHeap()
         {
             int priority = 0, nodePriority, leftChildPriority, rightChildPriority;
 
@@ -67,7 +67,7 @@ namespace Game1.AStar
                 leftChildPriority = 2 * priority + 1;
                 rightChildPriority = 2 * priority + 2;
 
-                if (innerList.Count > leftChildPriority && Compare(priority, leftChildPriority) > 0) //innerList[priority] > innerList[leftChildPriority]
+                if (innerList.Count > leftChildPriority && Compare(priority, leftChildPriority) > 0) //innerList[priority] > innerList[leftChildPriority] i.e if total estimated cost of node at index priority is greater than that at leftChildPriority
                 {
                     priority = leftChildPriority;
                 }
@@ -91,7 +91,7 @@ namespace Game1.AStar
 
 
 
-        private int BubbleUpTree(int i)
+        private int BubbleUpHeap(int i)
         {
             int priority = i, parentPriority;
 
@@ -135,7 +135,7 @@ namespace Game1.AStar
         public int Push(T item)
         {
             innerList.Add(item);
-            return BubbleUpTree(innerList.Count - 1);
+            return BubbleUpHeap(innerList.Count - 1);
         }
 
 
@@ -146,7 +146,7 @@ namespace Game1.AStar
             innerList.RemoveAt(innerList.Count - 1);
             if (innerList.Count != 0)
             {
-                BubbleDownTree();
+                BubbleDownHeap();
 
             }
             

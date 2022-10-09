@@ -30,6 +30,42 @@ namespace Game1
         }
 
 
+        public BoundingBox UpdateBoundingBox()
+        {
+            Vector3 minVector = new Vector3(float.MaxValue);
+            Vector3 maxVector = new Vector3(float.MinValue);
+
+            foreach (ModelMesh mesh in model.Meshes)
+            {
+                foreach (ModelMeshPart meshPart in mesh.MeshParts)
+                {
+                    int vertexStride = meshPart.VertexBuffer.VertexDeclaration.VertexStride;
+                    int vertexBufferSize = meshPart.NumVertices * vertexStride;
+
+                    float[] vertexData = new float[vertexBufferSize / sizeof(float)];
+                    meshPart.VertexBuffer.GetData<float>(vertexData);
+
+                    for (int i = 0; i < (vertexBufferSize / sizeof(float)); i += (vertexStride / sizeof(float)))
+                    {
+
+                        Vector3 transformedPosition = Vector3.Transform(new Vector3(vertexData[i], vertexData[i + 1], vertexData[i + 2]), worldMatrix);
+
+                        minVector = Vector3.Min(minVector, transformedPosition);
+                        maxVector = Vector3.Max(maxVector, transformedPosition);
+                    }
+                    
+
+
+
+
+                }
+
+            }
+
+
+            return new BoundingBox(minVector, maxVector);
+
+        }
 
         
 
