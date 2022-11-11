@@ -10,6 +10,8 @@ using Game1.Rooms;
 using Game1.Items;
 using Game1.Town;
 using Game1.Town.Districts;
+using Game1.DataClasses;
+
 namespace Game1
 {
     public class CloudDBHandler : IDisposable
@@ -32,7 +34,7 @@ namespace Game1
 
         public async Task CreateTownInDBAsync()
         {
-            string query = ReadInQuery("CreateTownCypher6.txt");
+            string query = ReadInQuery("Cypher.txt");
 
             var session = driver.AsyncSession();
             try
@@ -125,12 +127,12 @@ namespace Game1
                 foreach (var result in readResults)
                 {
                     var districtTemp = JsonConvert.SerializeObject(result[0].As<INode>().Properties);
-                    District districtUncast = JsonConvert.DeserializeObject<District>(districtTemp);
+                    District districtUncast = JsonConvert.DeserializeObject<District>(districtTemp, new PointConverter());
 
                     switch (districtUncast.districtClass)
                     {
                         case "Residential":
-                            districts.Add(JsonConvert.DeserializeObject<Residential>(districtTemp));
+                            districts.Add(JsonConvert.DeserializeObject<Residential>(districtTemp, new PointConverter()));
                             break;
                         default:
                             districts.Add(districtUncast);
@@ -181,7 +183,7 @@ namespace Game1
                 {
 
                     var streetTemp = JsonConvert.SerializeObject(result[0].As<INode>().Properties);
-                    Street street = JsonConvert.DeserializeObject<Street>(streetTemp);
+                    Street street = JsonConvert.DeserializeObject<Street>(streetTemp, new PointConverter());
                     streets.Add(street);
                     
                 }
@@ -254,7 +256,7 @@ namespace Game1
                 }
 
                 var sessionChildren = driver.AsyncSession();
-                string getChildrenQuery = $"MATCH (s:Street)-[:CHILD]-(c:Street) WHERE s.id='{street.id}' RETURN c.id";
+                string getChildrenQuery = $"MATCH (s:Street)-[:CHILD]->(c:Street) WHERE s.id='{street.id}' RETURN c.id";
 
                 try
                 {
@@ -266,9 +268,10 @@ namespace Game1
 
                     foreach (var result in readResults)
                     {
+                        
 
 
-                        string childID = result.ToString();
+                        string childID = result.Values.Values.ToList()[0].ToString();
 
                         if (streets.Exists(s => s.id == childID))
                         {
@@ -329,7 +332,7 @@ namespace Game1
                 {
 
                     var houseTemp = JsonConvert.SerializeObject(result[0].As<INode>().Properties);
-                    House house = JsonConvert.DeserializeObject<House>(houseTemp);
+                    House house = JsonConvert.DeserializeObject<House>(houseTemp, new PointConverter());
                     house.rotation = street.rotation;
                     house.street = street;
                     houses.Add(house);
@@ -371,7 +374,7 @@ namespace Game1
                 {
 
                     var buildingTemp = JsonConvert.SerializeObject(result[0].As<INode>().Properties);
-                    Building buildingUncast = JsonConvert.DeserializeObject<Building>(buildingTemp);
+                    Building buildingUncast = JsonConvert.DeserializeObject<Building>(buildingTemp, new PointConverter());
                     Building building;
 
                     switch (buildingUncast.buildingClass)
@@ -423,21 +426,21 @@ namespace Game1
                 foreach (var result in readResults)
                 {
                     var roomTemp = JsonConvert.SerializeObject(result[0].As<INode>().Properties);
-                    Room roomUncast = JsonConvert.DeserializeObject<Room>(roomTemp);
+                    Room roomUncast = JsonConvert.DeserializeObject<Room>(roomTemp, new PointConverter());
 
                     switch (roomUncast.roomClass)
                     {
                         case "Kitchen":
-                            rooms.Add(JsonConvert.DeserializeObject<Kitchen>(roomTemp));
+                            rooms.Add(JsonConvert.DeserializeObject<Kitchen>(roomTemp, new PointConverter()));
                             break;
                         case "Bathroom":
-                            rooms.Add(JsonConvert.DeserializeObject<Bathroom>(roomTemp));
+                            rooms.Add(JsonConvert.DeserializeObject<Bathroom>(roomTemp, new PointConverter()));
                             break;
                         case "Bedroom":
-                            rooms.Add(JsonConvert.DeserializeObject<Bedroom>(roomTemp));
+                            rooms.Add(JsonConvert.DeserializeObject<Bedroom>(roomTemp, new PointConverter()));
                             break;
                         case "LivingRoom":
-                            rooms.Add(JsonConvert.DeserializeObject<LivingRoom>(roomTemp));
+                            rooms.Add(JsonConvert.DeserializeObject<LivingRoom>(roomTemp, new PointConverter()));
                             break;
                         default:
                             rooms.Add(roomUncast);
@@ -485,57 +488,57 @@ namespace Game1
                 foreach (var result in readResults)
                 {
                     var itemTemp = JsonConvert.SerializeObject(result[0].As<INode>().Properties);
-                    Item itemUncast = JsonConvert.DeserializeObject<Item>(itemTemp);
+                    Item itemUncast = JsonConvert.DeserializeObject<Item>(itemTemp, new PointConverter());
 
                     switch (itemUncast.itemClass)
                     {
                         case "Fridge":
-                            items.Add(JsonConvert.DeserializeObject<Fridge>(itemTemp));
+                            items.Add(JsonConvert.DeserializeObject<Fridge>(itemTemp, new PointConverter()));
                             break;
                         case "Oven":
-                            items.Add(JsonConvert.DeserializeObject<Oven>(itemTemp));
+                            items.Add(JsonConvert.DeserializeObject<Oven>(itemTemp, new PointConverter()));
                             break;
                         case "Chair":
-                            items.Add(JsonConvert.DeserializeObject<Chair>(itemTemp));
+                            items.Add(JsonConvert.DeserializeObject<Chair>(itemTemp, new PointConverter()));
                             break;
                         case "Table":
-                            items.Add(JsonConvert.DeserializeObject<Table>(itemTemp));
+                            items.Add(JsonConvert.DeserializeObject<Table>(itemTemp, new PointConverter()));
                             break;
                         case "Countertop":
-                            items.Add(JsonConvert.DeserializeObject<Countertop>(itemTemp));
+                            items.Add(JsonConvert.DeserializeObject<Countertop>(itemTemp, new PointConverter()));
                             break;
                         case "CountertopSink":
-                            items.Add(JsonConvert.DeserializeObject<CountertopSink>(itemTemp));
+                            items.Add(JsonConvert.DeserializeObject<CountertopSink>(itemTemp, new PointConverter()));
                             break;
                         case "Bin":
-                            items.Add(JsonConvert.DeserializeObject<Bin>(itemTemp));
+                            items.Add(JsonConvert.DeserializeObject<Bin>(itemTemp, new PointConverter()));
                             break;
                         case "Bed":
-                            items.Add(JsonConvert.DeserializeObject<Bed>(itemTemp));
+                            items.Add(JsonConvert.DeserializeObject<Bed>(itemTemp, new PointConverter()));
                             break;
                         case "Bookcase":
-                            items.Add(JsonConvert.DeserializeObject<Bookcase>(itemTemp));
+                            items.Add(JsonConvert.DeserializeObject<Bookcase>(itemTemp, new PointConverter()));
                             break;
                         case "Dresser":
-                            items.Add(JsonConvert.DeserializeObject<Dresser>(itemTemp));
+                            items.Add(JsonConvert.DeserializeObject<Dresser>(itemTemp, new PointConverter()));
                             break;
                         case "EndTable":
-                            items.Add(JsonConvert.DeserializeObject<EndTable>(itemTemp));
+                            items.Add(JsonConvert.DeserializeObject<EndTable>(itemTemp, new PointConverter()));
                             break;
                         case "Sink":
-                            items.Add(JsonConvert.DeserializeObject<Sink>(itemTemp));
+                            items.Add(JsonConvert.DeserializeObject<Sink>(itemTemp, new PointConverter()));
                             break;
                         case "Sofa":
-                            items.Add(JsonConvert.DeserializeObject<Sofa>(itemTemp));
+                            items.Add(JsonConvert.DeserializeObject<Sofa>(itemTemp, new PointConverter()));
                             break;
                         case "Toilet":
-                            items.Add(JsonConvert.DeserializeObject<Toilet>(itemTemp));
+                            items.Add(JsonConvert.DeserializeObject<Toilet>(itemTemp, new PointConverter()));
                             break;
                         case "TV":
-                            items.Add(JsonConvert.DeserializeObject<TV>(itemTemp));
+                            items.Add(JsonConvert.DeserializeObject<TV>(itemTemp, new PointConverter()));
                             break;
                         case "Shower":
-                            items.Add(JsonConvert.DeserializeObject<Shower>(itemTemp));
+                            items.Add(JsonConvert.DeserializeObject<Shower>(itemTemp, new PointConverter()));
                             break;
                         default:
                             items.Add(itemUncast);

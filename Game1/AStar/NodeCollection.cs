@@ -11,6 +11,7 @@ namespace Game1.AStar
     public class NodeCollection
     {
         HashSet<Vertex> nodes = new HashSet<Vertex>();
+
         List<Vertex> nodesDynamic = new List<Vertex>();
         NodeLinks linksStatic = new NodeLinks();
         NodeLinks linksDynamic = new NodeLinks();

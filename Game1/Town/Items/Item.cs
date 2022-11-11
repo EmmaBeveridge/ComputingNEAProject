@@ -11,9 +11,10 @@ using Microsoft.Xna.Framework.Graphics;
 using Game1.DataClasses;
 using System.Data;
 using Game1.NavMesh;
-using Game1.Characters;
+
 using Game1.GOAP;
 using Game1.Town;
+using Game1.UI;
 
 namespace Game1
 {
@@ -24,17 +25,21 @@ namespace Game1
         public string id;
 
 
-        [JsonProperty("relativeLocationX")]
-        public string locationX;
-        
-        [JsonProperty("relativeLocationZ")]
-        public string locationZ;
+        //[JsonProperty("relativeLocationX")]
+        //public string locationX;
 
+        //[JsonProperty("relativeLocationZ")]
+        //public string locationZ;
+
+        [JsonProperty("relativeLocation")]
+        public Neo4j.Driver.Point relativeLoc;
 
 
         [JsonProperty("class")]
         public string itemClass;
 
+        [JsonProperty("inventory")]
+        public List<string> inventory;
 
 
         public List<Plane> planes = new List<Plane>();
@@ -57,9 +62,12 @@ namespace Game1
         public  List<GOAPAction> GOAPActions = new List<GOAPAction>();
 
 
-        public People interactingWithPerson = null;
-        public bool actionComplete = false;
-        public double actionTimeElapsed = 0;
+        public bool IsAvailable = true;
+
+
+        //public People interactingWithPerson = null;
+        //public bool actionComplete = false;
+        //public double actionTimeElapsed = 0;
 
 
         public Avatar avatar;
@@ -85,12 +93,12 @@ namespace Game1
             Matrix rotationMatrix = Matrix.CreateRotationY(MathHelper.ToRadians(rotation));
 
 
-            Matrix relativeTransformation = Matrix.CreateTranslation(new Vector3(int.Parse(locationX), 0, int.Parse(locationZ))) * rotationMatrix;
+            Matrix relativeTransformation = Matrix.CreateTranslation(new Vector3((float)relativeLoc.X, 0, (float)relativeLoc.Y)) * rotationMatrix;
 
 
 
             house = room.house;
-            houseTownLocation = house.townLocation ;
+            houseTownLocation = house.TownLocation ;
             
 
 
@@ -251,8 +259,8 @@ namespace Game1
 
         public void DisplayActions(Game1 game)
         {
-            game.buttons.Clear();
-            game.buttons.AddRange(actionButtons);
+            game.UIHandler.ClearButtons();
+            game.UIHandler.AddRangeButtons(actionButtons);
         }
 
 
@@ -260,7 +268,7 @@ namespace Game1
 
         public virtual void DefineActions() { }
 
-        public virtual Action<GameTime> BeginAction(string actionName, People person) { return null; }
+        //public virtual Action<GameTime> BeginAction(string actionName, People person) { return null; }
 
 
 

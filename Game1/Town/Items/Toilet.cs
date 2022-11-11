@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Game1.Actions;
 using Game1.GOAP;
 using Microsoft.Xna.Framework;
 
@@ -23,54 +24,50 @@ namespace Game1.Items
         public override void DefineActions()
         {
 
-            var useToilet = new GOAPAction("useToilet");
-            useToilet.SetPrecondition(GOAPPerson.NeedsToilet, true);
-            useToilet.SetPostcondition(GOAPPerson.NeedsToilet, false);
-            useToilet.item = this;
-            GOAPActions.Add(useToilet);
-            actionLabels.Add("use toilet", useToilet);
-
-
+            ToiletAction toilet = new ToiletAction(this);
+            GOAPAction toiletGOAP = toilet.DefineGOAPAction();
+            GOAPActions.Add(toiletGOAP);
+            actionLabels.Add("use toilet", toiletGOAP);
 
         }
 
 
 
-        public override Action<GameTime> BeginAction(string actionName, People person)
-        {
-            interactingWithPerson = person;
-            Action<GameTime> currentAction = null;
-            switch (actionName)
-            {
-                case "useToilet":
-                    currentAction = useToilet;
-                    break;
+        //public override Action<GameTime> BeginAction(string actionName, People person)
+        //{
+        //    interactingWithPerson = person;
+        //    Action<GameTime> currentAction = null;
+        //    switch (actionName)
+        //    {
+        //        case "useToilet":
+        //            currentAction = UseToilet;
+        //            break;
 
-                default:
-                    break;
-            }
-            return currentAction;
-        }
+        //        default:
+        //            break;
+        //    }
+        //    return currentAction;
+        //}
 
 
-        public void useToilet(GameTime timer)
-        {
-            const float actionTime = 2;
-            actionTimeElapsed += timer.ElapsedGameTime.TotalSeconds;
+        //public void UseToilet(GameTime timer)
+        //{
+        //    const float actionTime = 2;
+        //    actionTimeElapsed += timer.ElapsedGameTime.TotalSeconds;
 
-            if (actionTimeElapsed >= actionTime)
-            {
-                actionComplete = true;
-                actionTimeElapsed = 0;
-                Console.WriteLine("finished with toilet");
-                return;
-            }
+        //    if (actionTimeElapsed >= actionTime)
+        //    {
+        //        actionComplete = true;
+        //        actionTimeElapsed = 0;
+        //        Console.WriteLine("finished with toilet");
+        //        return;
+        //    }
 
-            Console.WriteLine("using toilet");
-            interactingWithPerson.goapPerson.goapPersonState.personState.Toilet++;
+        //    Console.WriteLine("using toilet");
+        //    interactingWithPerson.goapPerson.goapPersonState.personState.Toilet++;
 
            
-        }
+        //}
 
 
     }

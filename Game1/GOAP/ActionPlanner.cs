@@ -93,16 +93,18 @@ namespace Game1.GOAP
         {
             this.viableActions.Clear();
 
+            GOAPAction validAction = new GOAPAction();
 
             foreach (GOAPAction action in this.actions)
             {
                 if (action.Validate())
                 {
-                    action.UpdateCost(person.position);
+                    action.UpdateCost(person, person.Needs);
                     this.viableActions.Add(action);
                     
                 }
             }
+            
 
             return GOAPWorld.Plan(this, startState, goalState, selectedNodes);
         }
@@ -177,24 +179,52 @@ namespace Game1.GOAP
         internal List<GOAPNode> GetPossibleTransitions(WorldState fr)
         {
             var result = new List<GOAPNode>();
-            for (var i = 0; i < this.viableActions.Count; ++i)
+
+
+            foreach (GOAPAction action in viableActions)
             {
-                // see if precondition is met
-                var pre = this.preConditions[i];
-                var care = (pre.DontCare ^ -1L);
+                int actionIndex = FindActionIndex(action);
+                var pre = this.preConditions[actionIndex];
+                var care = pre.DontCare ^ -1L;
                 bool met = ((pre.Values & care) == (fr.Values & care));
                 if (met)
                 {
                     var node = new GOAPNode
                     {
-                        Action = this.viableActions[i],
-                        CostSoFar = this.viableActions[i].Cost,
-                        WorldState = this.ApplyPostConditions(this, i, fr)
+                        Action = action,
+                        CostSoFar = action.Cost,
+                        WorldState = this.ApplyPostConditions(this, actionIndex, fr)
                     };
+
                     result.Add(node);
                 }
+
             }
             return result;
+
+
+
+
+            //for (var i = 0; i < this.viableActions.Count; ++i)
+            //{
+            //    // see if precondition is met
+
+
+            //    var pre = this.preConditions[i];
+            //    var care = (pre.DontCare ^ -1L);
+            //    bool met = ((pre.Values & care) == (fr.Values & care));
+            //    if (met)
+            //    {
+            //        var node = new GOAPNode
+            //        {
+            //            Action = this.viableActions[i],
+            //            CostSoFar = this.viableActions[i].Cost,
+            //            WorldState = this.ApplyPostConditions(this, i, fr)
+            //        };
+            //        result.Add(node);
+            //    }
+            //}
+            //return result;
         }
 
 

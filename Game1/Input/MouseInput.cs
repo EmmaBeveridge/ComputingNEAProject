@@ -9,7 +9,8 @@ using Game1.Town.Districts;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
-using Game1.Characters;
+
+using Game1.UI;
 
 namespace Game1
 {
@@ -74,11 +75,11 @@ namespace Game1
 
                 pickedPosition.Y = 0;
 
-                Console.WriteLine(pickedPosition);
+                Console.WriteLine("Clicked"+pickedPosition);
 
                 return pickedPosition;
             }
-
+            Console.WriteLine("Click not valid");
             return new Vector3(0, -100, 0); //used as null return as Vector3 non nullable - no valid return will have y!=0
                    
         }

@@ -10,8 +10,9 @@ using System.Threading;
 using Game1.NavMesh;
 using Game1.Town;
 using Game1.Town.Districts;
-using Game1.Characters;
- 
+
+using Game1.ML;
+using Game1.UI;
 
 namespace Game1
 
@@ -20,14 +21,11 @@ namespace Game1
 
     public class Game1 : Game
     {
-        GraphicsDeviceManager graphicsManager;
+        public GraphicsDeviceManager graphicsManager;
         
         List<Avatar> avatars = new List<Avatar>();
-        public List<Button> buttons = new List<Button>();
-        List<ToolbarButton> toolbarButtons = new List<ToolbarButton>();
-
-        public bool displayTextbox = false;
-        Textbox currentTextbox;
+       
+        public UIHandler UIHandler = new UIHandler();
 
         public List<People> people = new List<People>();
         
@@ -86,31 +84,6 @@ namespace Game1
         }
 
 
-        
-        
-
-
-
-
-
-
-
-
-        //public static async Task<List<Room>> GetRooms()
-        //{
-
-        //    using (var cloudDBHandler = new CloudDBHandler())
-        //    {
-        //        List<Room> rooms = await cloudDBHandler.GetRoomsInHouse();
-
-
-        //        return rooms;
-
-        //    }
-
-            
-
-        //}
 
         public static async Task CreateTownDB()
         {            
@@ -147,23 +120,20 @@ namespace Game1
             Textbox.defaultFont = spriteFont;
 
 
-            Vector2 toolbarButtonTextureDim = new Vector2(50);
-
-            Texture2D needsButtonTexture = Content.Load<Texture2D>("NeedsButton4");
-            toolbarButtons.Add(new ToolbarButton(null, new Vector2((graphicsManager.GraphicsDevice.Viewport.Width - 4*toolbarButtonTextureDim.X),(graphicsManager.GraphicsDevice.Viewport.Height - toolbarButtonTextureDim.Y)), needsButtonTexture));
             
-            
-            Texture2D relationshipButtonTexture = Content.Load<Texture2D>("RelationshipButton2");
-            toolbarButtons.Add(new ToolbarButton(null, new Vector2((graphicsManager.GraphicsDevice.Viewport.Width - 3 *toolbarButtonTextureDim.X), (graphicsManager.GraphicsDevice.Viewport.Height - toolbarButtonTextureDim.Y)), relationshipButtonTexture));
-            
-            Texture2D skillsButtonTexture = Content.Load<Texture2D>("SkillsButton2");
-            toolbarButtons.Add(new ToolbarButton(null, new Vector2((graphicsManager.GraphicsDevice.Viewport.Width - 2 * toolbarButtonTextureDim.X), (graphicsManager.GraphicsDevice.Viewport.Height - toolbarButtonTextureDim.Y)), skillsButtonTexture));
-            
-            Texture2D careerButtonTexture = Content.Load<Texture2D>("CareerButton2");
-            toolbarButtons.Add(new ToolbarButton(null, new Vector2((graphicsManager.GraphicsDevice.Viewport.Width - toolbarButtonTextureDim.X), (graphicsManager.GraphicsDevice.Viewport.Height - toolbarButtonTextureDim.Y)), careerButtonTexture));
 
+            NeedsButton.defaultTexture = Content.Load<Texture2D>("NeedsButton4");
 
+           
+            RelationshipsButton.defaultTexture = Content.Load<Texture2D>("RelationshipButton2");
+            
+            SkillsButton.defaultTexture = Content.Load<Texture2D>("SkillsButton2");
+           
+            CareerButton.defaultTexture = Content.Load<Texture2D>("CareerButton2");
 
+            NeedBar.GenerateTexture(GraphicsDevice);
+            ToolbarPanel.GenerateTexture(GraphicsDevice);
+            RelationshipBar.GenerateTexture(GraphicsDevice);
         }
 
         protected override void UnloadContent()
@@ -217,7 +187,7 @@ namespace Game1
                             {
                                 room.house = house;
                                 room.items = await cloudDBHandler.GetItemsInRoom(room);
-
+                                room.SetLocation();
                                 foreach (Item item in room.items)
                                 {
                                     item.rotation = house.rotation;
@@ -268,40 +238,6 @@ namespace Game1
 
 
 
-        //public static async Task<List<District>> GetTowns(CloudDBHandler cloudDBHandler)
-        //{
-
-        //    List<Town.Town> towns = await cloudDBHandler.GetTownsInDB
-
-        //    using (var cloudDBHandler = new CloudDBHandler())
-        //    {
-        //        List<District> districts = await cloudDBHandler.GetDistrictsInTown();
-
-
-        //        return districts;
-
-        //    }
-
-
-
-        //}
-
-
-        //public static async Task<List<District>> GetDistricts()
-        //{
-
-        //    using (var cloudDBHandler = new CloudDBHandler())
-        //    {
-        //        List<District> districts = await cloudDBHandler.GetDistrictsInTown();
-
-
-        //        return districts;
-
-        //    }
-
-
-
-        //}
 
         public void RemoveAvatar(Avatar avatar)
         {
@@ -355,7 +291,7 @@ namespace Game1
             await BuildTownAsync().ConfigureAwait(false);
 
 
-
+            MLMain.BuildML();
 
 
 
@@ -363,10 +299,14 @@ namespace Game1
             Model woman2 = Content.Load<Model>("woman4");
             Model man2 = Content.Load<Model>("man4");
             Model woman5 = Content.Load<Model>("woman5");
-            player = new Player(woman2, new Vector3(10, 0, 0), Town.Town.navMesh, towns[0], this);
+            Texture2D womanPurple = Content.Load<Texture2D>("WomanPurple");
+            Texture2D womanYellow = Content.Load<Texture2D>("WomanYellow");
+            player = new Player(woman2, new Vector3(10, 0, 0), Town.Town.navMesh, towns[0], this, womanPurple);
+
+
             people.Add(player);
             //people.Add(new People(man2, new Vector3(10, 5, 10), navMesh));
-            people.Add(new People(woman5, new Vector3(10, 0, 0), Town.Town.navMesh, towns[0], this));
+            people.Add(new People(woman5, new Vector3(60, 0, 40), Town.Town.navMesh, towns[0], this, womanYellow));
 
 
             avatars.AddRange(people.Select(people => people.avatar));
@@ -378,23 +318,23 @@ namespace Game1
             avatars.Add(new Avatar(Content.Load<Model>("Grass"), new Vector3(0, -12, 0))); // was at y=-12
             avatars.Add(new Avatar(Content.Load<Model>("HouseInteriorWalls"), new Vector3(0, -5, 0))); //was at y=-2
             avatars.Add(new Avatar(Content.Load<Model>("HouseExteriorWalls"), new Vector3(0, -5, 0))); //was at y=-2
-            //avatars.Add(new Avatar(Content.Load<Model>("Countertop"), new Vector3(60, 0, 100)));
-            //avatars.Add(new Avatar(Content.Load<Model>("CountertopSink"), new Vector3(105, 0, 100)));
-            //avatars.Add(new Avatar(Content.Load<Model>("Shower"), new Vector3(330, 0, -105)));
-            //avatars.Add(new Avatar(Content.Load<Model>("Toilet"), new Vector3(285, 0, -55)));
-            //avatars.Add(new Avatar(Content.Load<Model>("Bookcase"), new Vector3(70, 0, 5)));
-            //avatars.Add(new Avatar(Content.Load<Model>("Fridge"), new Vector3(155, 0, 100)));
-            //avatars.Add(new Avatar(Content.Load<Model>("Sink"), new Vector3(230, 0, -115)));
-            //avatars.Add(new Avatar(Content.Load<Model>("Dresser"), new Vector3(215, 0, 70)));
-            //avatars.Add(new Avatar(Content.Load<Model>("Chair"), new Vector3(45, 0, 55)));
-            //avatars.Add(new Avatar(Content.Load<Model>("Chair"), new Vector3(85, 0, 55)));
-            //avatars.Add(new Avatar(Content.Load<Model>("Table"), new Vector3(50, 0, 55)));
-            //avatars.Add(new Avatar(Content.Load<Model>("EndTable"), new Vector3(330, 0, 40)));
-            //avatars.Add(new Avatar(Content.Load<Model>("Bin"), new Vector3(180, 0, 75)));
-            //avatars.Add(new Avatar(Content.Load<Model>("Sofa"), new Vector3(90, 0, -105)));
-            //avatars.Add(new Avatar(Content.Load<Model>("Oven"), new Vector3(25, 0, 100)));
-            //avatars.Add(new Avatar(Content.Load<Model>("TV"), new Vector3(105, 0, -50)));
-          
+                                                                                                       //avatars.Add(new Avatar(Content.Load<Model>("Countertop"), new Vector3(60, 0, 100)));
+                                                                                                       //avatars.Add(new Avatar(Content.Load<Model>("CountertopSink"), new Vector3(105, 0, 100)));
+                                                                                                       //avatars.Add(new Avatar(Content.Load<Model>("Shower"), new Vector3(330, 0, -105)));
+                                                                                                       //avatars.Add(new Avatar(Content.Load<Model>("Toilet"), new Vector3(285, 0, -55)));
+                                                                                                       //avatars.Add(new Avatar(Content.Load<Model>("Bookcase"), new Vector3(70, 0, 5)));
+                                                                                                       //avatars.Add(new Avatar(Content.Load<Model>("Fridge"), new Vector3(155, 0, 100)));
+                                                                                                       //avatars.Add(new Avatar(Content.Load<Model>("Sink"), new Vector3(230, 0, -115)));
+                                                                                                       //avatars.Add(new Avatar(Content.Load<Model>("Dresser"), new Vector3(215, 0, 70)));
+                                                                                                       //avatars.Add(new Avatar(Content.Load<Model>("Chair"), new Vector3(45, 0, 55)));
+                                                                                                       //avatars.Add(new Avatar(Content.Load<Model>("Chair"), new Vector3(85, 0, 55)));
+                                                                                                       //avatars.Add(new Avatar(Content.Load<Model>("Table"), new Vector3(50, 0, 55)));
+                                                                                                       //avatars.Add(new Avatar(Content.Load<Model>("EndTable"), new Vector3(330, 0, 40)));
+                                                                                                       //avatars.Add(new Avatar(Content.Load<Model>("Bin"), new Vector3(180, 0, 75)));
+                                                                                                       //avatars.Add(new Avatar(Content.Load<Model>("Sofa"), new Vector3(90, 0, -105)));
+                                                                                                       //avatars.Add(new Avatar(Content.Load<Model>("Oven"), new Vector3(25, 0, 100)));
+                                                                                                       //avatars.Add(new Avatar(Content.Load<Model>("TV"), new Vector3(105, 0, -50)));
+
 
 
 
@@ -410,6 +350,10 @@ namespace Game1
             //        }
             //    }
             //}
+
+
+
+            UIHandler.BuildToolbarButtons(graphicsManager, player);
 
 
             gameState = GameStates.States.Playing;
@@ -465,20 +409,7 @@ namespace Game1
                     person.Update(gameTime, GraphicsDevice, camera.projection, camera.view, this);
                 }
 
-                if (displayTextbox)
-                {
-                    if (currentTextbox == null) 
-                    {
-                        currentTextbox = new Textbox(new Vector2(graphicsManager.GraphicsDevice.Viewport.Width/2 - Textbox.defaultTextboxTexture.Width/2, graphicsManager.GraphicsDevice.Viewport.Height/3 ));
-                      
-                    }
-                    currentTextbox.Update();
-                    TextboxInputHandler.HandleInput(gameTime, currentTextbox);
-                    
-
-                    
-                    
-                }
+                UIHandler.Update(gameTime, graphicsManager, player);
 
             }
 
@@ -490,15 +421,13 @@ namespace Game1
             }
 
 
-            if (!displayTextbox)
+            if (!UIHandler.displayTextbox)
             {
                 camera.Update(gameTime);
 
             }
             
 
-
-            //buttons.AddRange(toolbarButtons);
             base.Update(gameTime);
         }
 
@@ -519,29 +448,7 @@ namespace Game1
 
                 spriteBatch.Begin();
 
-                foreach (Button button in buttons)
-                {
-
-                    spriteBatch.Draw(button.buttonTexture, button.position); 
-
-                    if (button.buttonLabel != null)
-                    {
-                        spriteBatch.DrawString(spriteFont, button.buttonLabel, new Vector2( button.position.X + button.buttonTexture.Width/4, button.position.Y + button.buttonTexture.Height/20), Color.Black);
-
-                    }
-                    
-                }
-
-                foreach (ToolbarButton button in toolbarButtons)
-                {
-                    spriteBatch.Draw(button.buttonTexture, button.position);
-
-                }
-
-                if (displayTextbox)
-                {
-                    currentTextbox.Draw(spriteBatch);
-                }
+                UIHandler.Draw(spriteBatch, spriteFont);
 
 
 

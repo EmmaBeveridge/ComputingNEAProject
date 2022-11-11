@@ -16,7 +16,7 @@ namespace Game1.GOAP
         /// <summary>
         /// The cost so far.
         /// </summary>
-        public int CostSoFar;
+        public float CostSoFar;
 
         /// <summary>
         /// The heuristic for remaining cost (don't overestimate!)
@@ -26,7 +26,7 @@ namespace Game1.GOAP
         /// <summary>
         /// costSoFar + heuristicCost (g+h) combined.
         /// </summary>
-        public int CostSoFarAndHeuristicCost;
+        public float CostSoFarAndHeuristicCost;
 
         /// <summary>
         /// the Action associated with this node

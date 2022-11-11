@@ -66,7 +66,7 @@ namespace Game1.GOAP
                 // all done. we reached our goal
                 if (goal.Equals(currentNode.WorldState))
                 {           
-                    var plan = ReconstructPlan(currentNode, selectedNodes);
+                    var plan = ReconstructPlan(currentNode, selectedNodes, ap);
                     Storage.Clear();
                     return plan;
                 }
@@ -119,7 +119,7 @@ namespace Game1.GOAP
         /// internal function to reconstruct the plan by tracing from last node to initial node
         /// </summary>
         /// <returns>The plan.</returns>
-        private static Stack<GOAPAction> ReconstructPlan(GOAPNode goalNode, List<GOAPNode> selectedNodes)
+        private static Stack<GOAPAction> ReconstructPlan(GOAPNode goalNode, List<GOAPNode> selectedNodes, ActionPlanner ap)
         {
             var totalActionsInPlan = goalNode.Depth - 1;
             var plan = new Stack<GOAPAction>(totalActionsInPlan);
@@ -130,6 +130,7 @@ namespace Game1.GOAP
                 // optionally add the node to the List if we have been passed one
                 selectedNodes?.Add(curnode.Clone());
                 plan.Push(curnode.Action);
+                ReserveItem(action: curnode.Action, actionPlanner: ap );
                 curnode = curnode.Parent;
             }
 
@@ -138,6 +139,26 @@ namespace Game1.GOAP
 
             return plan;
         }
+
+
+        private static void ReserveItem(GOAPAction action, ActionPlanner actionPlanner)
+        {
+            if (action.item != null)
+            {
+                action.item.IsAvailable = false;
+                action.doingAction.Enqueue(actionPlanner.person);
+            }
+        }
+
+
+
+
+
+
+
+
+
+
 
 
         /// <summary>

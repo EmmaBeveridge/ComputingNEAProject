@@ -48,8 +48,10 @@ namespace Game1.GOAP
                 var care = node.WorldState.DontCare ^ -1L;
                 if ((node.WorldState.Values & care) == (this.opened[i].WorldState.Values & care))
                 {
-                    this.lastFoundClosed = i;
-                    return this.closed[i];
+                    this.lastFoundOpened = i;
+                    return this.opened[i];
+
+                   
                 }
             }
             return null;
@@ -80,7 +82,9 @@ namespace Game1.GOAP
         public void RemoveOpened(GOAPNode node)
         {
             if (this.numOpened > 0)
+            {
                 this.opened[this.lastFoundOpened] = this.opened[this.numOpened - 1];
+            }
             this.numOpened--;
         }
 
@@ -88,7 +92,9 @@ namespace Game1.GOAP
         public void RemoveClosed(GOAPNode node)
         {
             if (this.numClosed > 0)
+            {
                 this.closed[this.lastFoundClosed] = this.closed[this.numClosed - 1];
+            }
             this.numClosed--;
         }
 
@@ -114,12 +120,13 @@ namespace Game1.GOAP
         public void AddToClosedList(GOAPNode node)
         {
             this.closed[this.numClosed++] = node;
+            
         }
 
 
         public GOAPNode RemoveCheapestOpenNode()
         {
-            var lowestVal = int.MaxValue;
+            var lowestVal = float.MaxValue;
             this.lastFoundOpened = -1;
             for (var i = 0; i < this.numOpened; i++)
             {

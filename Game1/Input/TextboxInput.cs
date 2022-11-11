@@ -1,4 +1,5 @@
-﻿using Game1.Characters;
+﻿
+using Game1.UI;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 using System;
@@ -92,6 +93,11 @@ namespace Game1
                     return;
                     
 
+                }
+
+                if (TextboxKeyboard.HasNotBeenPressed(Keys.Enter))
+                {
+                    textbox.Submit();
                 }
 
                 if (textbox.Selected && (((int)keys[0] >= 48 && (int)keys[0] <= 105)|| keys[0] == Keys.RightShift||keys[0] == Keys.LeftShift||keys[0] == Keys.Space))

@@ -86,6 +86,7 @@ namespace Game1.NavMesh.TriangulatePolygon
                     if (hole.Max( h => h.X) > maxX)
                     {
                         nextHole = hole;
+                        maxX = hole.Max(h => h.X);
                     }
                 }
 

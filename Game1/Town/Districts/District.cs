@@ -15,15 +15,11 @@ namespace Game1.Town.Districts
         [JsonProperty("id")]
         public string id;
 
-        [JsonProperty("townLocationX")]
-        public string townLocationX { set { townLocation.X = int.Parse(value); } }
-
-        [JsonProperty("townLocationZ")]
-        public string townLocationZ { set { townLocation.Z = int.Parse(value); } }
+        [JsonProperty("townLocation")]
+        public Neo4j.Driver.Point townLoc { set { TownLocation.X = (float)value.X; TownLocation.Z = (float)value.Y; } }
 
 
-
-        public Vector3 townLocation;
+        public Vector3 TownLocation;
 
         public string districtClass;
 
@@ -40,7 +36,7 @@ namespace Game1.Town.Districts
         {
 
            
-            avatar = new Avatar(mapModel, townLocation);
+            avatar = new Avatar(mapModel, TownLocation);
 
 
            

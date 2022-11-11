@@ -7,7 +7,7 @@ using Game1.GOAP;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
-namespace Game1.Characters
+namespace Game1.UI
 {
     public class Button
     {

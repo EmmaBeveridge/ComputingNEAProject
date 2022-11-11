@@ -12,12 +12,13 @@ namespace Game1
 {
     public class Avatar
     {
-
+       
         
         public Model model;
         public Matrix worldMatrix;
         public int id;
         static int idCount;
+
 
 
 

@@ -13,6 +13,7 @@ using System.Text.RegularExpressions;
 using Game1.NavMesh;
 using Game1.GOAP;
 
+
 namespace Game1.Town
 
 {
@@ -24,14 +25,18 @@ namespace Game1.Town
         [JsonProperty("colourScheme")]
         public string colourScheme;
 
-        [JsonProperty("townLocationX")]
-        public string townLocationX { set { townLocation.X = int.Parse(value); } }
+        //[JsonProperty("townLocationX")]
+        //public string townLocationX { set { townLocation.X = int.Parse(value); } }
 
-        [JsonProperty("townLocationZ")]
-        public string townLocationZ { set { townLocation.Z = int.Parse(value); } }
+        //[JsonProperty("townLocationZ")]
+        //public string townLocationZ { set { townLocation.Z = int.Parse(value); } }
 
-        [JsonProperty("side")]
-        public string side;
+
+        [JsonProperty("townLocation")]
+        public Neo4j.Driver.Point townLoc { set { TownLocation.X = (float)value.X; TownLocation.Z = (float)value.Y; } }
+
+        [JsonProperty("leftSide")]
+        public bool side;
 
 
 
@@ -39,7 +44,7 @@ namespace Game1.Town
         public static List<House> houses = new List<House>();
 
 
-        public Vector3 townLocation;
+        public Vector3 TownLocation;
 
 
         public List<Room> rooms;
@@ -71,7 +76,7 @@ namespace Game1.Town
         public void GenerateAvatar()
         {
 
-            if (side == "left")
+            if (side)
             {
                 rotation += 180;
             }
@@ -79,13 +84,13 @@ namespace Game1.Town
             Matrix rotationMatrix = Matrix.CreateRotationY(MathHelper.ToRadians(rotation));
 
 
-            Matrix translationMatrix = Matrix.CreateTranslation(townLocation);
+            Matrix translationMatrix = Matrix.CreateTranslation(TownLocation);
 
             houseToTownTransformation = rotationMatrix * translationMatrix;
 
-            wallAvatars.Add(new Avatar(exteriorWallsModel, townLocation));
-            wallAvatars.Add(new Avatar(interiorWallsModel, townLocation));
-            wallAvatars.Add(new Avatar(roofModel, townLocation));
+            wallAvatars.Add(new Avatar(exteriorWallsModel, TownLocation));
+            wallAvatars.Add(new Avatar(interiorWallsModel, TownLocation));
+            wallAvatars.Add(new Avatar(roofModel, TownLocation));
 
             wallAvatars.ForEach(delegate (Avatar a) { a.worldMatrix = houseToTownTransformation; } );
             GeneratePlanes();

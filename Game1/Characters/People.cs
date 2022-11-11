@@ -29,10 +29,11 @@ namespace Game1
         beginMoving,
         selectingItemAction,
         selectingHouseAction,
-        typingChat
+        typingChat,
+        finishedTypingChat
     }
 
-
+    
 
     public class People
     {
@@ -55,6 +56,7 @@ namespace Game1
 
         
         public Avatar avatar;
+        public Texture2D icon;
 
         public PeopleMotionStates motionState;
         public PeopleActionStates actionState;
@@ -68,6 +70,7 @@ namespace Game1
         protected House goalHouse;
         protected Item selectedItem;
         protected People selectedPerson;
+        
         public Town.Town town;
         protected Game1 game;
 
@@ -80,10 +83,11 @@ namespace Game1
         public BoundingBox boundingBox { get { return avatar.UpdateBoundingBox(); } }
 
 
+        public Dictionary<People, int> Relationships;
+        public Dictionary<NeedNames, Need> Needs;
 
 
-
-        public People(Model _model, Vector3 _position, Mesh argMesh, Town.Town argTown, Game1 argGame)
+        public People(Model _model, Vector3 _position, Mesh argMesh, Town.Town argTown, Game1 argGame, Texture2D argIcon, bool _isPlayer = false)
         {
             position = _position;
             avatar = new Avatar (_model, _position);
@@ -100,14 +104,34 @@ namespace Game1
             pathPoints = new List<Vector3>();
             town = argTown;
             game = argGame;
+            icon = argIcon;
+
+            Relationships = new Dictionary<People, int>();
+
+
+            ConstructNeeds(_isPlayer);
+
 
             goapPerson = new GOAPPerson(this);
             goapStateMachine = goapPerson.BuildAI();
-            
-            
+
+
+
 
         }
 
+        private void ConstructNeeds(bool _generateNeedsBar) //only generate needsbar display if player
+        {
+            Needs = new Dictionary<NeedNames, Need>();
+            //Needs.Add(NeedNames.Hunger, new Need(_name: NeedNames.Hunger, _priroty: NeedPriority.High, generateNeedBar: _generateNeedsBar));
+            Needs.Add(NeedNames.Sleep, new Need(_name: NeedNames.Sleep, _priority: NeedPriority.High, generateNeedBar: _generateNeedsBar));
+            Needs.Add(NeedNames.Toilet, new Need(_name: NeedNames.Toilet, _priority: NeedPriority.High, generateNeedBar: _generateNeedsBar));
+            //Needs.Add(NeedNames.Hygiene, new Need(_name: NeedNames.Toilet, _priroty: NeedPriority.Mid, generateNeedBar: _generateNeedsBar));
+            //Needs.Add(NeedNames.Social, new Need(_name: NeedNames.Toilet, _priroty: NeedPriority.Low, generateNeedBar: _generateNeedsBar));
+            //Needs.Add(NeedNames.Fun, new Need(_name: NeedNames.Toilet, _priroty: NeedPriority.Low, generateNeedBar: _generateNeedsBar));
+
+
+        }
 
 
        
@@ -196,7 +220,7 @@ namespace Game1
                 
                 mesh = Town.Town.navMesh;
                 pathFinder = new Path(mesh);
-                pathFinder.FindPath(position, goalHouse.townLocation, ref pathToHouse);
+                pathFinder.FindPath(position, goalHouse.TownLocation, ref pathToHouse);
                 pathPoints.AddRange(pathToHouse);
 
                 List<Vector3> houseToGoal = new List<Vector3>();
@@ -235,7 +259,7 @@ namespace Game1
 
                 mesh = Town.Town.navMesh;
                 pathFinder = new Path(mesh);
-                pathFinder.FindPath(currentHouse.townLocation, goal, ref outsideToGoal);
+                pathFinder.FindPath(currentHouse.TownLocation, goal, ref outsideToGoal);
 
                 pathPoints.AddRange(outsideToGoal);
 
@@ -290,7 +314,7 @@ namespace Game1
 
                     mesh = Town.Town.navMesh;
                     pathFinder = new Path(mesh);
-                    pathFinder.FindPath(currentHouse.townLocation, goalHouse.townLocation, ref outsideToGoalHouse);
+                    pathFinder.FindPath(currentHouse.TownLocation, goalHouse.TownLocation, ref outsideToGoalHouse);
 
                     pathPoints.AddRange(outsideToGoalHouse);
 

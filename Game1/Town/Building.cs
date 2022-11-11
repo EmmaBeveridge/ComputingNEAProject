@@ -15,17 +15,14 @@ namespace Game1.Town
         [JsonProperty("id")]
         public string id;
 
-        [JsonProperty("townLocationX")]
-        public string townLocationX { set { townLocation.X = int.Parse(value); } }
-
-        [JsonProperty("townLocationZ")]
-        public string townLocationZ { set { townLocation.Z = int.Parse(value); } }
+        [JsonProperty("townLocation")]
+        public Neo4j.Driver.Point townLoc { set { TownLocation.X = (float)value.X; TownLocation.Z = (float)value.Y; } }
 
         [JsonProperty("class")]
         public string buildingClass;
 
 
-        public Vector3 townLocation;
+        public Vector3 TownLocation;
 
         public float rotation;
 

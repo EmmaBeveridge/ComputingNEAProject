@@ -17,12 +17,14 @@ namespace Game1.Rooms
         public string id;
 
 
-        [JsonProperty ("relativeLocationX")]
-        string locationX;
+        Vector3 relativeLocation;
+        public Vector3 townLocation = new Vector3();
 
-        [JsonProperty("relativeLocationZ")]
-        public string locationZ;
 
+        [JsonProperty("relativeLocation")]
+        public Neo4j.Driver.Point relativeLoc { set { relativeLocation = new Vector3((float) value.X, 0, (float) value.Y); } }
+
+        
 
 
         [JsonProperty ("class")]
@@ -44,7 +46,19 @@ namespace Game1.Rooms
         }
 
 
+        public void SetLocation()
+        {
+            Matrix rotationMatrix = Matrix.CreateRotationY(MathHelper.ToRadians(house.rotation));
 
+
+            Matrix relativeTransformation = Matrix.CreateTranslation(new Vector3((float)relativeLocation.X, 0, (float)relativeLocation.Y)) * rotationMatrix;
+
+            Matrix translationMatrix = Matrix.CreateTranslation(house.TownLocation);
+
+            townLocation = (relativeTransformation * translationMatrix).Translation;
+
+
+        }
 
 
 

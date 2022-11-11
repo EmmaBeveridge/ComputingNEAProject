@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Game1.Actions;
 using Game1.GOAP;
 using Microsoft.Xna.Framework;
 
@@ -17,95 +18,92 @@ namespace Game1.Items
 
             DefineActions();
 
-            
-
-
-            
 
         }
 
         public override void DefineActions()
         {
-            
-            var sleep = new GOAPAction("sleep");
-            sleep.SetPrecondition(GOAPPerson.IsTired, true);
-            sleep.SetPrecondition("Available", true);
-            sleep.SetPostcondition(GOAPPerson.IsTired, false);
-            sleep.item = this;
-            GOAPActions.Add(sleep);
-            actionLabels.Add("sleep", sleep);
-            
 
-            var nap = new GOAPAction("nap");
-            nap.SetPrecondition(GOAPPerson.IsTired, true);
-            nap.SetPostcondition(GOAPPerson.IsTired, false); 
-            nap.item = this;
-            GOAPActions.Add(nap);
-            actionLabels.Add("nap", nap);
+            SleepAction sleep = new SleepAction(this);
+            GOAPAction sleepGOAP = sleep.DefineGOAPAction();
+            GOAPActions.Add(sleepGOAP);
+            actionLabels.Add("sleep", sleepGOAP);
+
+            NapAction nap = new NapAction(this);
+            GOAPAction napGOAP = nap.DefineGOAPAction();
+            GOAPActions.Add(napGOAP);
+            actionLabels.Add("nap", napGOAP);
+
         }
 
 
-        public override Action<GameTime> BeginAction(string actionName, People person)
-        {
-            actionComplete = false;
+        //public override Action<GameTime> BeginAction(string actionName, People person)
+        //{
+        //    actionComplete = false;
 
-            interactingWithPerson = person;
-            Action<GameTime> currentAction = null;
-            switch (actionName)
-            {
-                case "sleep":
-                    currentAction = sleep;
+        //    interactingWithPerson = person;
+        //    Action<GameTime> currentAction = null;
+        //    switch (actionName)
+        //    {
+        //        case "sleep":
+        //            currentAction = Sleep;
                    
-                    break;
+        //            break;
 
-                case "nap":
-                    currentAction = nap;
+        //        case "nap":
+        //            currentAction = Nap;
                     
-                    break;
+        //            break;
 
 
-                default:
-                    break;
-            }
+        //        default:
+        //            break;
+        //    }
 
-            return currentAction;
+        //    return currentAction;
 
-        }
+        //}
 
-        public void sleep(GameTime timer) 
-        {
-            const float actionTime = 10;
+
+
+
+
+
+
+        //public void Sleep(GameTime timer) 
+        //{
+        //    const float minActionTime = 20;
             
-            actionTimeElapsed += timer.ElapsedGameTime.TotalSeconds;
+        //    actionTimeElapsed += timer.ElapsedGameTime.TotalSeconds;
 
-            if (actionTimeElapsed >= actionTime)
-            {
-                actionComplete = true;
-                actionTimeElapsed = 0;
-                return;
-            }
+        //    if (actionTimeElapsed >= actionTime)
+        //    {
+        //        actionComplete = true;
+        //        actionTimeElapsed = 0;
+        //        return;
+        //    }
 
-            Console.WriteLine("sleeping");
-            interactingWithPerson.goapPerson.goapPersonState.personState.Sleep++;
+        //    Console.WriteLine("sleeping");
+        //    interactingWithPerson.goapPerson.goapPersonState.personState.Sleep++;
         
-        }
+        //}
 
-        public void nap(GameTime timer) 
-        { 
-            const float actionTime = 3;
-            actionTimeElapsed += timer.ElapsedGameTime.TotalSeconds;
+        //public void Nap(GameTime timer) 
+        //{ 
+        //    const float actionTime = 3;
+        //    actionTimeElapsed += timer.ElapsedGameTime.TotalSeconds;
 
-            if (actionTimeElapsed >= actionTime)
-            {
-                actionComplete = true;
-                actionTimeElapsed = 0;
-                return;
-            }
+        //    if (actionTimeElapsed >= actionTime)
+        //    {
+        //        actionComplete = true;
+        //        actionTimeElapsed = 0;
+        //        return;
+        //    }
 
 
-            Console.WriteLine("napping");
-            interactingWithPerson.goapPerson.goapPersonState.personState.Sleep++;
-        }
+        //    Console.WriteLine("napping");
+        //    interactingWithPerson.goapPerson.goapPersonState.personState.Sleep++;
+        //}
 
 
 

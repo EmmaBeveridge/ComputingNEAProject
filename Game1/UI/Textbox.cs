@@ -7,7 +7,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 
-namespace Game1.Characters
+namespace Game1.UI
 {
     class Textbox
     {
@@ -30,6 +30,9 @@ namespace Game1.Characters
 
 
         private Stack<int> lineEndXValue = new Stack<int>();
+
+
+        public bool Submitted { get; private set; }
 
 
 
@@ -59,6 +62,7 @@ namespace Game1.Characters
             Selected = false;
             font = _font;
             CurrentText = _text;
+            Submitted = false;
         }
 
         public Textbox(Vector2 _position)
@@ -78,10 +82,11 @@ namespace Game1.Characters
             Selected = false;
             font = defaultFont;
             CurrentText = string.Empty;
+            Submitted = false;
         }
 
 
-
+        public void Submit() { Submitted = true; }
 
 
 
@@ -158,6 +163,7 @@ namespace Game1.Characters
 
         }
 
+        
         public void Draw(SpriteBatch spriteBatch)
         {
             if (Visible)

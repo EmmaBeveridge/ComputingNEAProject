@@ -1,4 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,33 +18,58 @@ namespace Game1.GOAP
         /// <summary>
         /// The cost of performing the action: currently uses Euclidean Distance to item only
         /// </summary>
-        public int Cost; ///esitmate so high accuracy not necessary
+        public float Cost; ///esitmate so high accuracy not necessary
 
         public Item item;
 
+        public ActionAbstract Action;
+
+
+        //public bool WaitToStart = false;
 
         internal HashSet<Tuple<string, bool>> PreConditions = new HashSet<Tuple<string, bool>>();
 
         internal HashSet<Tuple<string, bool>> PostConditions = new HashSet<Tuple<string, bool>>();
 
-
+        public Queue<People> doingAction = new Queue<People>();
         public GOAPAction()
         { }
 
 
-        public GOAPAction(string name)
+        public GOAPAction(ActionAbstract _action)
         {
-            this.Name = name;
+
+
+            Action = _action;
+            Name = _action.Name;
+
+            
+               
         }
 
 
-        public void UpdateCost(Vector3 personPosition)
+        public void UpdateCost(People person, Dictionary<NeedNames, Need> needs)
         {
-            Cost = (int)Math.Sqrt(Math.Pow(MathHelper.Distance(personPosition.X, item.townLocation.X), 2) + Math.Pow(MathHelper.Distance(personPosition.Z, item.townLocation.Z), 2));
+            Cost = (float) Math.Sqrt(Math.Pow(MathHelper.Distance(person.position.X, item.townLocation.X), 2) + Math.Pow(MathHelper.Distance(person.position.Z, item.townLocation.Z), 2));
+
+            var selectedNeed = from need in needs
+                               where need.Key == Action.NeedAffected
+                               select need.Value;
+
+            Cost += Action.Cost(selectedNeed.FirstOrDefault<Need>());
+
+           
+
+            if (doingAction.FirstOrDefault()!=person)
+            {
+                Cost += Action.EstTimeToFinish + Action.Duration*(doingAction.Count-1);
+            }
+
+            
         }
 
 
-        public GOAPAction(string name, int cost) : this(name)
+        public GOAPAction(ActionAbstract _action, int cost) : this(_action)
         {
             this.Cost = cost;
         }
@@ -67,8 +93,18 @@ namespace Game1.GOAP
         /// </summary>
         public virtual bool Validate()
         {
+
+            //check if item is available herre???
+
+
+           
+
             return true;
+
+            
         }
+
+       
 
 
         public override string ToString()
