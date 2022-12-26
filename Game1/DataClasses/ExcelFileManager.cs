@@ -18,6 +18,7 @@ namespace Game1.DataClasses
 
         public static DataTable ReadExcelFile (string fileName)
         {
+            fileName = Directory.GetParent(Directory.GetCurrentDirectory()).Parent.Parent.Parent.Parent.FullName + "/Data/" + fileName;
             WorkBook workBook = WorkBook.Load(fileName);
             WorkSheet workSheet = workBook.DefaultWorkSheet;
             return workSheet.ToDataTable(true);

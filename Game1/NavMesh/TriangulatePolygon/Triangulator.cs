@@ -13,7 +13,7 @@ namespace Game1.NavMesh.TriangulatePolygon
 {
     class Triangulator
     {
-         string housePolygonVerticesFileName = Directory.GetParent(Directory.GetCurrentDirectory()).Parent.Parent.Parent.Parent.FullName + "/Data/Polygon data.xlsx";
+         string housePolygonVerticesFileName = "Polygon data.xlsx";
          public List<Vector2> shapeVertices = new List<Vector2>();
          public List<Vector2> holeVertices = new List<Vector2>();
 

@@ -72,15 +72,27 @@ namespace Game1.GOAP
                 //do you want to use decision tree or ID3 - need to get data for ID3 but could generate prpgramatically like write a quick python prgram using decision tree in teams doc - outcome being if it should be added to random pool or not?
 
 
-                if(Needs[NeedNames.Toilet].Level == NeedLevel.Low)
-                {
-                    goalState.Set(LowToilet, false);
-                }
-                else if (Needs[NeedNames.Sleep].Level == NeedLevel.Low)
-                {
-                    goalState.Set(LowSleep, false);
 
-                }
+
+
+
+
+
+
+
+
+
+
+
+                //if(Needs[NeedNames.Toilet].Level == NeedLevel.Low)
+                //{
+                //    goalState.Set(LowToilet, false);
+                //}
+                //else if (Needs[NeedNames.Sleep].Level == NeedLevel.Low)
+                //{
+                //    goalState.Set(LowSleep, false);
+
+                //}
                 
 
 
@@ -198,6 +210,7 @@ namespace Game1.GOAP
                 var action = this.Context.actionPlan.Peek();
                 
                 item = action.item;
+                person = this.Context.planner.person;
 
                 if (action.doingAction.FirstOrDefault() != person)
                 {
@@ -216,7 +229,7 @@ namespace Game1.GOAP
                
                 this.Context.destinationLocation = location;
                 
-                person = this.Context.planner.person;
+               
                 
                 person.actionState = PeopleActionStates.beginMoving;
                 person.goal = location;
@@ -232,14 +245,15 @@ namespace Game1.GOAP
                 {
                     transitionOnNextTick = true;
 
-                    if (this.Context.actionPlan.Peek().doingAction.FirstOrDefault()!=person)
+                    if (this.Context.actionPlan.Peek().doingAction.FirstOrDefault() != person)
                     {
                         this.Machine.SetNextState<Wait>();
                     }
 
-
-                    this.Machine.SetNextState<PerformAction>();
-
+                    else //not tested but think putting else here is right??
+                    {
+                        this.Machine.SetNextState<PerformAction>();
+                    }
                 }
 
 

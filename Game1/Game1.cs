@@ -13,6 +13,9 @@ using Game1.Town.Districts;
 
 using Game1.ML;
 using Game1.UI;
+using System.Data;
+using Game1.DataClasses;
+using Game1.ID3;
 
 namespace Game1
 
@@ -162,7 +165,15 @@ namespace Game1
 
                     district.streets = await cloudDBHandler.GetStreetsInDistrict(district);
                     district.streets = await cloudDBHandler.SetStreetPointers(district.streets);
-                    
+
+                    district.BuildStreets();
+
+
+                    Console.WriteLine( $"{district.streets[0].id} and {district.streets[8].id} LCA: {district.StreetTree.FindLowestCommonAncestor(district.streets[0], district.streets[8]).id}");
+  
+
+
+
 
 
                     foreach (Street street in district.streets)
@@ -318,22 +329,22 @@ namespace Game1
             avatars.Add(new Avatar(Content.Load<Model>("Grass"), new Vector3(0, -12, 0))); // was at y=-12
             avatars.Add(new Avatar(Content.Load<Model>("HouseInteriorWalls"), new Vector3(0, -5, 0))); //was at y=-2
             avatars.Add(new Avatar(Content.Load<Model>("HouseExteriorWalls"), new Vector3(0, -5, 0))); //was at y=-2
-                                                                                                       //avatars.Add(new Avatar(Content.Load<Model>("Countertop"), new Vector3(60, 0, 100)));
-                                                                                                       //avatars.Add(new Avatar(Content.Load<Model>("CountertopSink"), new Vector3(105, 0, 100)));
-                                                                                                       //avatars.Add(new Avatar(Content.Load<Model>("Shower"), new Vector3(330, 0, -105)));
-                                                                                                       //avatars.Add(new Avatar(Content.Load<Model>("Toilet"), new Vector3(285, 0, -55)));
-                                                                                                       //avatars.Add(new Avatar(Content.Load<Model>("Bookcase"), new Vector3(70, 0, 5)));
-                                                                                                       //avatars.Add(new Avatar(Content.Load<Model>("Fridge"), new Vector3(155, 0, 100)));
-                                                                                                       //avatars.Add(new Avatar(Content.Load<Model>("Sink"), new Vector3(230, 0, -115)));
-                                                                                                       //avatars.Add(new Avatar(Content.Load<Model>("Dresser"), new Vector3(215, 0, 70)));
-                                                                                                       //avatars.Add(new Avatar(Content.Load<Model>("Chair"), new Vector3(45, 0, 55)));
-                                                                                                       //avatars.Add(new Avatar(Content.Load<Model>("Chair"), new Vector3(85, 0, 55)));
-                                                                                                       //avatars.Add(new Avatar(Content.Load<Model>("Table"), new Vector3(50, 0, 55)));
-                                                                                                       //avatars.Add(new Avatar(Content.Load<Model>("EndTable"), new Vector3(330, 0, 40)));
-                                                                                                       //avatars.Add(new Avatar(Content.Load<Model>("Bin"), new Vector3(180, 0, 75)));
-                                                                                                       //avatars.Add(new Avatar(Content.Load<Model>("Sofa"), new Vector3(90, 0, -105)));
-                                                                                                       //avatars.Add(new Avatar(Content.Load<Model>("Oven"), new Vector3(25, 0, 100)));
-                                                                                                       //avatars.Add(new Avatar(Content.Load<Model>("TV"), new Vector3(105, 0, -50)));
+                //avatars.Add(new Avatar(Content.Load<Model>("Countertop"), new Vector3(60, 0, 100)));
+                //avatars.Add(new Avatar(Content.Load<Model>("CountertopSink"), new Vector3(105, 0, 100)));
+                //avatars.Add(new Avatar(Content.Load<Model>("Shower"), new Vector3(330, 0, -105)));
+                //avatars.Add(new Avatar(Content.Load<Model>("Toilet"), new Vector3(285, 0, -55)));
+                //avatars.Add(new Avatar(Content.Load<Model>("Bookcase"), new Vector3(70, 0, 5)));
+                avatars.Add(new Avatar(Content.Load<Model>("Fridge"), new Vector3(155, 0, 100)));
+                //avatars.Add(new Avatar(Content.Load<Model>("Sink"), new Vector3(230, 0, -115)));
+                //avatars.Add(new Avatar(Content.Load<Model>("Dresser"), new Vector3(215, 0, 70)));
+                //avatars.Add(new Avatar(Content.Load<Model>("Chair"), new Vector3(45, 0, 55)));
+                //avatars.Add(new Avatar(Content.Load<Model>("Chair"), new Vector3(85, 0, 55)));
+                //avatars.Add(new Avatar(Content.Load<Model>("Table"), new Vector3(50, 0, 55)));
+                //avatars.Add(new Avatar(Content.Load<Model>("EndTable"), new Vector3(330, 0, 40)));
+                //avatars.Add(new Avatar(Content.Load<Model>("Bin"), new Vector3(180, 0, 75)));
+                //avatars.Add(new Avatar(Content.Load<Model>("Sofa"), new Vector3(90, 0, -105)));
+                //avatars.Add(new Avatar(Content.Load<Model>("Oven"), new Vector3(25, 0, 100)));
+                //avatars.Add(new Avatar(Content.Load<Model>("TV"), new Vector3(105, 0, -50)));
 
 
 
@@ -356,6 +367,7 @@ namespace Game1
             UIHandler.BuildToolbarButtons(graphicsManager, player);
 
 
+            People.BuildDecisionTree();
             gameState = GameStates.States.Playing;
             
 

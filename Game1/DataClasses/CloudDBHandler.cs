@@ -34,7 +34,7 @@ namespace Game1
 
         public async Task CreateTownInDBAsync()
         {
-            string query = ReadInQuery("Cypher.txt");
+            string query = ReadInQuery("CypherCleaned.txt");
 
             var session = driver.AsyncSession();
             try
@@ -214,7 +214,7 @@ namespace Game1
                 var sessionParent = driver.AsyncSession();
 
 
-                string getParentQuery = $"MATCH (p:Street)-[:PARENT]-(s:Street) WHERE s.id='{street.id}' RETURN p.id";
+                string getParentQuery = $"MATCH (p:Street)<-[:PARENT]-(s:Street) WHERE s.id='{street.id}' RETURN p.id";
                 try
                 {
                     var readResults = await sessionParent.ReadTransactionAsync(async tx =>
@@ -227,7 +227,7 @@ namespace Game1
                     {
 
 
-                        string parentID = result.ToString();
+                        string parentID = result.Values.Values.ToList()[0].ToString();
 
                         if (streets.Exists(s => s.id == parentID))
                         {

@@ -11,6 +11,10 @@ using Game1.NavMesh;
 using Game1.AStar;
 using Game1.Town;
 using Game1.GOAP;
+using Game1.Town.Districts;
+using Game1.ID3;
+using System.Data;
+using Game1.DataClasses;
 
 namespace Game1
 {
@@ -87,6 +91,10 @@ namespace Game1
         public Dictionary<NeedNames, Need> Needs;
 
 
+
+        public static Tree decisionTree;
+
+
         public People(Model _model, Vector3 _position, Mesh argMesh, Town.Town argTown, Game1 argGame, Texture2D argIcon, bool _isPlayer = false)
         {
             position = _position;
@@ -119,6 +127,21 @@ namespace Game1
 
 
         }
+
+        public static void BuildDecisionTree()
+        {
+            DataTable ID3Data = ExcelFileManager.ReadExcelFile("ID3DataShort.xlsx");
+            decisionTree = new Tree();
+            DataTable discreteData = decisionTree.DiscretiseData(ID3Data);
+
+            decisionTree.Root = decisionTree.Learn(discreteData, "");
+
+
+
+
+            
+        }
+
 
         private void ConstructNeeds(bool _generateNeedsBar) //only generate needsbar display if player
         {
@@ -310,6 +333,12 @@ namespace Game1
                         pathPoints.Add((Matrix.CreateTranslation(point) * currentHouse.houseToTownTransformation).Translation);
                     }
 
+
+
+
+
+
+                    /* using roads here 
                     List<Vector3> outsideToGoalHouse = new List<Vector3>();
 
                     mesh = Town.Town.navMesh;
@@ -317,6 +346,22 @@ namespace Game1
                     pathFinder.FindPath(currentHouse.TownLocation, goalHouse.TownLocation, ref outsideToGoalHouse);
 
                     pathPoints.AddRange(outsideToGoalHouse);
+                    */
+
+                    //for now, assumes both in residential district
+
+                    //NEED TO CHANGE WHEN IT DECIDES ITS INSIDE THE CURRENT HOUSE AS IF JUST GO TO FRONT DOOR, DOESN'T THINK ITS IN THE HOUSE SO IT WONT GO TO ANOTHER HOUSE VIA THE ROADS.
+
+                    District startDistrict = town.districts.Find(x => x.streets.Contains(currentHouse.street));
+
+                    pathPoints.AddRange(startDistrict.FindStreetPathPoints(currentHouse, goalHouse));
+
+
+
+
+
+
+
 
                     List<Vector3> houseToGoal = new List<Vector3>();
                     mesh = House.navMesh;

@@ -20,29 +20,64 @@ namespace Game1.Town
         //public string directionZ;
 
 
-        Vector3 direction = new Vector3();
+        public Vector3 End = new Vector3();
 
-        [JsonProperty("direction")]
-        public Neo4j.Driver.Point dir { set { direction.X = (float)value.X; direction.Z = (float)value.Y; } }
+        [JsonProperty("end")]
+        public Neo4j.Driver.Point endPoint { set { End.X = (float)value.X; End.Z = (float)value.Y; } }
 
 
-        Vector3 TownLocation;
+        public Vector3 Start = new Vector3();
 
-        [JsonProperty("townLocation")]
-        public Neo4j.Driver.Point townLoc { set { TownLocation.X = (float)value.X; TownLocation.Z = (float)value.Y; } }
+        [JsonProperty("start")]
+        public Neo4j.Driver.Point startPoint { set { Start.X = (float)value.X; Start.Z = (float)value.Y; } }
 
 
         [JsonProperty("rotation")]
         public float rotation;
         
-        [JsonProperty("length")]
-        public float length;
-
+        
 
         public List<Street> children = new List<Street>();
         public Street parent;
         public List<House> houses;
         public List<Building> buildings;
+
+
+
+
+        public Vector3 FindClosestPointOnStreet(Vector3 point)
+        {
+            //uses projection formula explained here : https://www.cuemath.com/geometry/projection-vector/
+
+            Vector2 point2D = new Vector2(point.X, point.Z);
+            Vector2 streetVector = new Vector2(End.X - Start.X, End.Z - Start.Z);
+            Vector2 startToPoint = new Vector2(point2D.X - Start.X, point2D.Y - Start.Z);
+            float magnitudeStreet = streetVector.LengthSquared();
+            float dot = Vector2.Dot(streetVector, startToPoint);
+            float projectionLength = dot / magnitudeStreet;
+
+            if (projectionLength< 0)
+            {
+                return Start;
+            }
+            else if (projectionLength > 1)
+            {
+                return End;
+            }
+            else
+            {
+                return Start + (End - Start) * projectionLength;
+            }
+
+
+
+
+
+
+
+        }
+
+
 
 
 

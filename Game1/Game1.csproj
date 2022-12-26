@@ -56,7 +56,13 @@
     <Compile Include="AStar\Path.cs" />
     <Compile Include="AStar\PriorityQueue.cs" />
     <Compile Include="DataClasses\PointConverter.cs" />
-    <Compile Include="Need.cs" />
+    <Compile Include="Characters\Need.cs" />
+    <Compile Include="ID3\Cut.cs" />
+    <Compile Include="ID3\NodeAttribute.cs" />
+    <Compile Include="ID3\Tree.cs" />
+    <Compile Include="ID3\TreeNode.cs" />
+    <Compile Include="StreetTraversal\BinaryTree.cs" />
+    <Compile Include="StreetTraversal\TreeNode.cs" />
     <Compile Include="UI\Button.cs" />
     <Compile Include="UI\RelationshipBar.cs" />
     <Compile Include="UI\Textbox.cs" />
@@ -189,6 +195,7 @@
     </Reference>
     <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Data" />
+    <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="System.Memory, Version=4.0.1.1, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
       <HintPath>..\packages\System.Memory.4.5.3\lib\netstandard2.0\System.Memory.dll</HintPath>
     </Reference>
