@@ -242,11 +242,11 @@ namespace Game1
                     game.RemoveAvatar(nextHouse.wallAvatars.Find(a => a.model == nextHouse.roofModel));
                 }
 
-                if (!(targetVector.X == 0 && targetVector.Z == 0))
+                if (!(targetVector.X == 0 && targetVector.Z == 0)) //need margin of error here???
                 {
                     motionState = PeopleMotionStates.rotating;
 
-                    getNewRotationMatrix(gameTime);
+                    //getNewRotationMatrix(gameTime);
 
                 }
 

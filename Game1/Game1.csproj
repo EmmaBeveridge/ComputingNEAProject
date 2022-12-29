@@ -47,8 +47,11 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Actions\Action.cs" />
+    <Compile Include="Actions\EatFromFridgeAction.cs" />
     <Compile Include="Actions\NapAction.cs" />
+    <Compile Include="Actions\ReadBookAction.cs" />
     <Compile Include="Actions\SleepAction.cs" />
+    <Compile Include="Actions\TakeShowerAction.cs" />
     <Compile Include="Actions\ToiletAction.cs" />
     <Compile Include="AStar\AStar.cs" />
     <Compile Include="AStar\NodeCollection.cs" />

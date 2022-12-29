@@ -16,6 +16,163 @@ namespace Game1.ID3
 
          public Dictionary<string, Dictionary<int, int>> needDiscreteCategoryBoundaryValues = new Dictionary<string, Dictionary<int, int>>();
 
+
+        public Dictionary<string, NeedNames> NeedStringToEnum = new Dictionary<string, NeedNames>() { { "HUNGER", NeedNames.Hunger }, { "TOILET", NeedNames.Toilet }, { "SLEEP", NeedNames.Sleep }, { "FUN", NeedNames.Fun }, { "SOCIAL", NeedNames.Social }, { "HYGIENE", NeedNames.Hygiene } };
+
+
+
+        /// <summary>
+        /// Returns name (as NeedNames enum object) of the next need to be fulfilled given the current Need stats of the person
+        /// </summary>
+        /// <param name="QueryData"> DIctionary containing current Need values for the person </param>
+        /// <returns></returns>
+        public NeedNames GetResult(Dictionary<NeedNames, Need> QueryData)
+        {
+            
+            Dictionary<string, string> QueryDict = MakeQueryDict(QueryData);
+            string result = CalculateResult(Root, QueryDict, "");
+
+            if (result != "Attribute not found")
+            {
+                return NeedStringToEnum[result];
+            }
+
+            return NeedNames.Null;
+
+
+        }
+
+
+        private string CalculateResult (TreeNode root, Dictionary<string, string> QueryDict, string result)
+        {
+            
+            bool valueFound = false;
+            //result += root.Name.ToUpper() + " -- ";
+
+
+
+            if (root.IsLeaf)
+            {
+
+                //result = root.Edge.ToLower() + " --> " + root.Name.ToUpper();
+
+                result = root.Name.ToUpper();
+
+                valueFound = true;
+                
+            }
+
+            else
+            {
+
+                string entry = QueryDict[root.Name];
+
+                Console.WriteLine("\n\n\nEntry"+entry);
+
+                foreach (TreeNode childNode in root.Children)
+                {
+                    Console.WriteLine("Edge: "+childNode.Edge);
+
+                    
+                    if (childNode.Edge.ToUpper().Equals(entry.ToUpper()))
+                    {
+                        QueryDict.Remove(root.Name);
+
+                        //return result + CalculateResult(childNode, QueryDict, $"{childNode.Edge.ToLower()} --> ");
+
+                        return CalculateResult(childNode, QueryDict, "");
+
+                    }
+
+
+
+                    
+
+                }
+
+
+
+
+
+                //foreach (TreeNode childNode in root.Children)
+                //{
+
+                //    foreach (KeyValuePair<string, string> entry in QueryDict)
+                //    {
+                //        if (childNode.Edge.ToUpper().Equals(entry.Value.ToUpper()) && root.Name.ToUpper().Equals(entry.Key.ToUpper()))
+                //        {
+                //            QueryDict.Remove(entry.Key);
+
+                //            return result + CalculateResult(childNode, QueryDict, $"{childNode.Edge.ToLower()} --> ");
+                //        }
+
+
+
+                //    }
+
+                //}
+            }
+
+            if (!valueFound)
+            {
+                result = "Attribute Not Found";
+            }
+
+            return result;
+        }
+
+
+        private Dictionary<string, string> MakeQueryDict(Dictionary<NeedNames, Need> QueryData)
+        {
+
+            Dictionary<string, string> QueryDict = new Dictionary<string, string>();
+
+            foreach (KeyValuePair<NeedNames, Need> need in QueryData)
+            {
+                string NeedName = need.Key.ToString().ToUpper();
+                int NeedDiscrete = MakeQueryNeedDiscrete(NeedName, (int)need.Value.CurrentNeed);
+
+                QueryDict.Add(NeedName, NeedDiscrete.ToString());
+               
+                if (need.Key != NeedNames.Toilet) //no option to prioritise toilet need
+                {
+                    QueryDict.Add(NeedName + "_PRIORITISED", need.Value.Prioritised ? "1" : "0");
+
+
+                }
+
+            }
+
+
+            return QueryDict;
+
+
+        }
+
+
+        private int MakeQueryNeedDiscrete(string NeedName, int NeedContValue)
+        {
+
+            Dictionary<int, int> DiscreteBoundaries = needDiscreteCategoryBoundaryValues[NeedName];
+
+            KeyValuePair<int, int> MaxBoundary = DiscreteBoundaries.OrderBy(key => key.Value).First(key => NeedContValue <= key.Value);  //VALUES IN DATATABLE ARE 2*+1 VALUES IN DISCRETEBOUNDARY DICTIONARY FIX IT
+
+            return MaxBoundary.Key;
+
+
+        }  
+
+            
+
+
+
+
+
+
+
+
+
+
         public TreeNode Learn(DataTable data, string edgeName)
         {
             TreeNode root = GetRootNode(data, edgeName);
@@ -30,7 +187,10 @@ namespace Game1.ID3
                 if (!isLeaf)
                 {
                     DataTable reducedTable = ReduceTable(data, edge, root.TableIndex);
-                    root.Children.Add(Learn(reducedTable, edge));
+
+                    var newChild = Learn(reducedTable, edge);
+                    
+                    root.Children.Add(newChild);
                 }
 
             }
@@ -46,15 +206,15 @@ namespace Game1.ID3
             List<string> allEndValues = new List<string>();
             for (int i = 0; i < data.Rows.Count; i++)
             {
-                Console.WriteLine(i);
+                //Console.WriteLine(i);
                 if (data.Rows[i][root.TableIndex].ToString().Equals(attributeToCheck))
                 {
-                    allEndValues.Add(data.Rows[i]["SELECTED_NEED"].ToString()); 
+                    allEndValues.Add(data.Rows[i]["SELECTED_NEED"].ToString());
                 }
 
             }
 
-            if (allEndValues.Count>0 && allEndValues.Any(x => x !=allEndValues[0])){ isLeaf = false; } //checks if all end values the same for given attribute -if not, attrbute is not a leaf
+            if (allEndValues.Count>0 && allEndValues.Any(x => x != allEndValues[0])){ isLeaf = false; } //checks if all end values the same for given attribute -if not, attrbute is not a leaf
 
             if (isLeaf) { root.Children.Add(new TreeNode(true, allEndValues[0], attributeToCheck)); }
             return isLeaf;
@@ -230,7 +390,7 @@ namespace Game1.ID3
             
             //int uniqueResults = columnData.DefaultView.ToTable(true, columnData.Columns[2].ColumnName).Rows.Count;
 
-            return CutColumn(columnData, 0, ref discreteBoundaries);
+            return CutColumn(columnData, 0, 100, ref discreteBoundaries); //previous split value set to 100 as max value of needs
 
 
             
@@ -239,7 +399,7 @@ namespace Game1.ID3
 
         }
 
-        private DataTable CutColumn(DataTable partition, int cutCount, ref Dictionary<int, int> discreteBoundaries)
+        private DataTable CutColumn(DataTable partition, int cutCount, int previousSplitValue, ref Dictionary<int, int> discreteBoundaries)
         {
            Cut bestCut = FindBestCut(partition);
             DataTable mergedTable = new DataTable();
@@ -253,17 +413,44 @@ namespace Game1.ID3
 
 
                 int newCutCount = new int();
-                newCutCount = 2*cutCount;   //uses binary tree indexing to ensure unique cut count key for each recursive call - at most 2 further calls made each time, these calls have cutcount of index of left and right child nodes in binary tree
-                discreteBoundaries.Add(cutCount, bestCut.splitValue);
-                foreach (DataTable subPartition in partitionTables)
+                newCutCount = 2*cutCount+1;   //uses binary tree indexing to ensure unique cut count key for each recursive call - at most 2 further calls made each time, these calls have cutcount of index of left and right child nodes in binary tree
+                
+                
+                
+                
+                if (int.Parse(partitionTables[0].Rows[0]["ORDERED_ID"].ToString()) > int.Parse( partitionTables[1].Rows[0]["ORDERED_ID"].ToString())) //if left partition, smaller orderedid, not in index 0 of partitionTables
                 {
-                    newCutCount++;
-                    
-                    mergedTable.Merge(CutColumn(subPartition, newCutCount, ref discreteBoundaries)); //need to fix cut count when collapses back down
+                    DataTable temp = partitionTables[0];
+                    partitionTables[0] = partitionTables[1];
+                    partitionTables[1] = temp;
 
-                    Console.WriteLine($"New Cut count:{newCutCount} Cut COunt:{cutCount}");
 
                 }
+
+                mergedTable.Merge(CutColumn(partitionTables[0], newCutCount, bestCut.splitValue, ref discreteBoundaries));
+
+                newCutCount++;
+
+                mergedTable.Merge(CutColumn(partitionTables[1], newCutCount, previousSplitValue, ref discreteBoundaries));
+
+
+
+
+                
+
+
+                //foreach (DataTable subPartition in partitionTables)
+                //{
+                //    newCutCount++;
+                    
+                //    mergedTable.Merge(CutColumn(subPartition, newCutCount, ref discreteBoundaries)); //need to fix cut count when collapses back down
+                    
+                  
+                //}
+                
+               
+
+
 
                 return mergedTable;
 
@@ -271,13 +458,16 @@ namespace Game1.ID3
             else
             {
                 
-                
+                //not adding final recursive cut to dictionary do it 
                 
                 foreach (DataRow row in partition.Rows)
                 {
                     row[1] = cutCount;//sets all rows to categoric value
 
                 }
+
+                discreteBoundaries.Add(cutCount, previousSplitValue);
+                
 
                 return partition;
             }

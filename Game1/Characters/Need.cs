@@ -13,7 +13,7 @@ namespace Game1
 
     public enum NeedNames
     {
-        Hunger, Sleep, Toilet, Social, Hygiene, Fun
+        Null, Hunger, Sleep, Toilet, Social, Hygiene, Fun
     }
 
 
@@ -26,15 +26,17 @@ namespace Game1
         public NeedPriority Priority;
         public NeedBar NeedBar = null;
         public float Percent;
+        public bool Prioritised;
 
 
 
-        public Need(NeedNames _name, NeedPriority _priority, int _maxNeed = 100, int _currentNeed = 10, bool generateNeedBar = false)
+        public Need(NeedNames _name, NeedPriority _priority, int _maxNeed = 100, int _currentNeed = 10, bool generateNeedBar = false, bool _prioritised = false)
         {
             Name = _name;
             Priority = _priority;
             MaxNeed = _maxNeed;
             CurrentNeed = _currentNeed;
+            Prioritised = _prioritised;
             if (generateNeedBar) { NeedBar = new NeedBar(this); }
             Update();
 

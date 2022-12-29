@@ -141,7 +141,7 @@ namespace Game1.GOAP
         }
 
 
-        private static void ReserveItem(GOAPAction action, ActionPlanner actionPlanner)
+        public static void ReserveItem(GOAPAction action, ActionPlanner actionPlanner)
         {
             if (action.item != null)
             {

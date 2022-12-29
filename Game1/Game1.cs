@@ -305,7 +305,7 @@ namespace Game1
             MLMain.BuildML();
 
 
-
+            People.BuildDecisionTree();
 
             Model woman2 = Content.Load<Model>("woman4");
             Model man2 = Content.Load<Model>("man4");
@@ -321,6 +321,8 @@ namespace Game1
 
 
             avatars.AddRange(people.Select(people => people.avatar));
+
+            People.people.AddRange(people);
 
 
             //avatars.Add(new Avatar(Content.Load<Model>("houseBake6"), new Vector3(0, 41, 0)));
@@ -367,7 +369,9 @@ namespace Game1
             UIHandler.BuildToolbarButtons(graphicsManager, player);
 
 
-            People.BuildDecisionTree();
+            
+            
+
             gameState = GameStates.States.Playing;
             
 

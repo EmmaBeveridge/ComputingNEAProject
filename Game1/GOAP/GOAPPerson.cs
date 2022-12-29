@@ -47,7 +47,7 @@ namespace Game1.GOAP
             {
                 var worldState = this.planner.CreateWorldState();
 
-                //worldState.Set(LowHunger, Needs[NeedNames.Hunger].Level == NeedLevel.Low);
+                worldState.Set(LowHunger, Needs[NeedNames.Hunger].Level == NeedLevel.Low);
                 worldState.Set(LowSleep, Needs[NeedNames.Sleep].Level == NeedLevel.Low);
                 worldState.Set(LowToilet, Needs[NeedNames.Toilet].Level == NeedLevel.Low);
                 //worldState.Set(LowHygiene, Needs[NeedNames.Hygiene].Level == NeedLevel.Low);
@@ -65,11 +65,44 @@ namespace Game1.GOAP
             }
 
             public override WorldState GetGoalState() 
-            {//will change later to use more complex way of selecting next goal state i.e next need to fulfil
+            {
+                
                 var goalState = this.planner.CreateWorldState();
 
 
-                //do you want to use decision tree or ID3 - need to get data for ID3 but could generate prpgramatically like write a quick python prgram using decision tree in teams doc - outcome being if it should be added to random pool or not?
+                NeedNames need = People.decisionTree.GetResult(Needs);
+
+
+                // need to change to accomodate all needs
+
+                switch (need)
+                {
+                    
+                    case NeedNames.Sleep:
+                        goalState.Set(LowSleep, false);
+                        break;
+                    case NeedNames.Toilet:
+                        goalState.Set(LowToilet, false);
+                        break;
+                    case NeedNames.Hunger:
+                        goalState.Set(LowHunger, false);
+                        break;
+                    case NeedNames.Hygiene:
+                        goalState.Set(LowHygiene, false);
+                        break;
+                    case NeedNames.Fun:
+                        goalState.Set(LowFun, false);
+                        break;
+                    case NeedNames.Social:
+
+                        
+                    
+                    default:
+                        break;
+                }
+
+
+
 
 
 
@@ -93,7 +126,7 @@ namespace Game1.GOAP
                 //    goalState.Set(LowSleep, false);
 
                 //}
-                
+
 
 
 
@@ -145,7 +178,8 @@ namespace Game1.GOAP
                 goapPersonState.actionPlan.Push(current);
 
             }
-           
+
+            GOAPWorld.ReserveItem(action, goapPersonState.planner);
 
             
         }
@@ -212,7 +246,7 @@ namespace Game1.GOAP
                 item = action.item;
                 person = this.Context.planner.person;
 
-                if (action.doingAction.FirstOrDefault() != person)
+                if (action.doingAction.FirstOrDefault() != person && action.doingAction.Count != 0)
                 {
                     location = item.room.townLocation;
                     
@@ -245,7 +279,7 @@ namespace Game1.GOAP
                 {
                     transitionOnNextTick = true;
 
-                    if (this.Context.actionPlan.Peek().doingAction.FirstOrDefault() != person)
+                    if (this.Context.actionPlan.Peek().doingAction.FirstOrDefault() != person && this.Context.actionPlan.Peek().doingAction.Count != 0)
                     {
                         this.Machine.SetNextState<Wait>();
                     }
@@ -277,10 +311,12 @@ namespace Game1.GOAP
         public class Wait : State<GOAPPersonState>
         {
             GOAPAction action;
+            People person;
             public Wait() { }
 
             public override void Begin()
             {
+                person = this.Context.planner.person;
                 transitionOnNextTick = false;
                 action = this.Context.actionPlan.Peek();
             }
@@ -288,7 +324,7 @@ namespace Game1.GOAP
             public override void Update(GameTime gameTime)
             {
                 
-                if (action.item.IsAvailable)
+                if (action.doingAction.FirstOrDefault()==person && action.item.IsAvailable)
                 {
                     transitionOnNextTick = true;
                     

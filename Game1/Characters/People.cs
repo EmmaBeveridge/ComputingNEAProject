@@ -93,7 +93,7 @@ namespace Game1
 
 
         public static Tree decisionTree;
-
+        public static List<People> people;
 
         public People(Model _model, Vector3 _position, Mesh argMesh, Town.Town argTown, Game1 argGame, Texture2D argIcon, bool _isPlayer = false)
         {
@@ -128,6 +128,74 @@ namespace Game1
 
         }
 
+
+
+
+        public People FindPersonToInteractWith()
+        {
+            //interaction score should be inversely proportional to distance and proportional to relationship score
+
+            float maxScore = float.MinValue;
+            People maxPerson = null;
+
+
+
+            foreach (People person in people)
+            {
+                float currentScore = 0;
+
+                if (Relationships.ContainsKey(person))
+                {
+                    currentScore = Relationships[person];
+                }
+
+                else
+                {
+                    currentScore = 50;
+                }
+
+
+                currentScore = currentScore / (EstCostOfWait(person) * DistanceToPerson(person));
+
+
+                if (currentScore > maxScore)
+                {
+                    maxScore = currentScore;
+                    maxPerson = person;
+                }
+
+
+
+
+
+            }
+
+
+
+            return maxPerson;
+
+
+        }
+
+
+        private float EstCostOfWait(People person)
+        {
+            Stack<GOAPAction> personActionPlan = person.goapPerson.goapPersonState.actionPlan;
+
+            float cost = personActionPlan.Sum(a => a.Cost);
+
+            return cost;
+
+        }
+
+        private float DistanceToPerson(People person)
+        {
+            Vector3 v = person.position - position;
+            return v.Length();
+        }
+
+
+
         public static void BuildDecisionTree()
         {
             DataTable ID3Data = ExcelFileManager.ReadExcelFile("ID3DataShort.xlsx");
@@ -146,12 +214,12 @@ namespace Game1
         private void ConstructNeeds(bool _generateNeedsBar) //only generate needsbar display if player
         {
             Needs = new Dictionary<NeedNames, Need>();
-            //Needs.Add(NeedNames.Hunger, new Need(_name: NeedNames.Hunger, _priroty: NeedPriority.High, generateNeedBar: _generateNeedsBar));
+            Needs.Add(NeedNames.Hunger, new Need(_name: NeedNames.Hunger, _priority: NeedPriority.High, generateNeedBar: _generateNeedsBar));
             Needs.Add(NeedNames.Sleep, new Need(_name: NeedNames.Sleep, _priority: NeedPriority.High, generateNeedBar: _generateNeedsBar));
             Needs.Add(NeedNames.Toilet, new Need(_name: NeedNames.Toilet, _priority: NeedPriority.High, generateNeedBar: _generateNeedsBar));
-            //Needs.Add(NeedNames.Hygiene, new Need(_name: NeedNames.Toilet, _priroty: NeedPriority.Mid, generateNeedBar: _generateNeedsBar));
-            //Needs.Add(NeedNames.Social, new Need(_name: NeedNames.Toilet, _priroty: NeedPriority.Low, generateNeedBar: _generateNeedsBar));
-            //Needs.Add(NeedNames.Fun, new Need(_name: NeedNames.Toilet, _priroty: NeedPriority.Low, generateNeedBar: _generateNeedsBar));
+            Needs.Add(NeedNames.Hygiene, new Need(_name: NeedNames.Hygiene, _priority: NeedPriority.Mid, generateNeedBar: _generateNeedsBar));
+            Needs.Add(NeedNames.Social, new Need(_name: NeedNames.Social, _priority: NeedPriority.Low, generateNeedBar: _generateNeedsBar));
+            Needs.Add(NeedNames.Fun, new Need(_name: NeedNames.Fun, _priority: NeedPriority.Low, generateNeedBar: _generateNeedsBar));
 
 
         }
@@ -212,6 +280,20 @@ namespace Game1
             position = avatar.worldMatrix.Translation; //adjusts position variable to position in model's world matrix
 
         }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -539,7 +621,8 @@ namespace Game1
                     pathPoints.RemoveAt(0);
 
 
-                    motionState = PeopleMotionStates.idle; //changes motion state back to idle as object completes its movement 
+                    
+                    //motionState = PeopleMotionStates.idle; //changes motion state back to idle as object completes its movement 
                     //actionState = PeopleActionStates.idle; //changes action state back to idle as object completes its movement
                     return targetVector; //returns the target vector of full length as all of vector can be moved through next frame
 
