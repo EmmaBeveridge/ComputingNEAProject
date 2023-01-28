@@ -21,7 +21,7 @@ namespace Game1.UI
 
         }
 
-        public static void Draw(SpriteBatch spriteBatch, Vector2 position, int Score )
+        public static void Draw(SpriteBatch spriteBatch, Vector2 position, float Score )
         {
 
             float length = (Score - 50) * 10;

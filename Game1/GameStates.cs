@@ -6,12 +6,13 @@ using System.Threading.Tasks;
 
 namespace Game1
 {
-    class GameStates
+    public class GameStates
     {
         public enum States
         {
 
-            StartMenu,
+            MainMenu,
+            CharacterSelection,
             Loading,
             Playing,
             Paused

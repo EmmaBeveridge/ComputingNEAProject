@@ -12,8 +12,9 @@ namespace Game1
     {
 
         public string Name;
-        public Item Item;
-        public Action<GameTime, Dictionary<NeedNames, Need>> ActionMethod;
+        public Item Item = null;
+        public People PersonToInteractWith = null;
+        public Action<GameTime, Dictionary<NeedNames, Need>, People> ActionMethod;
         protected float minActionTime;
         protected float rateOfNeedIncrease;
         protected double actionTimeElapsed;
@@ -23,9 +24,27 @@ namespace Game1
         public float EstTimeToFinish;
         public float Duration;
 
+
+        /// <summary>
+        /// Person who selected the action via GOAP planner
+        /// </summary>
+        public People initiator;
+        /// <summary>
+        /// stores if action initiator has reached persontointeractwith location so conversation can begin
+        /// </summary>
+        public bool initiatorReachedGoal = false;
         
 
-        public float Cost(Need need)
+
+        /// <summary>
+        /// Updates variable for non-initiators action object so they know initiator has reached them
+        /// </summary>
+        public virtual void NotifyInitiatorReachedGoal()
+        {
+
+        }
+
+        public virtual float Cost(Need need)
         {
            
             float estTimeToFulfil = (need.MaxNeed - need.CurrentNeed) / rateOfNeedIncrease;
@@ -40,7 +59,7 @@ namespace Game1
         }
 
 
-        public void BeginAction()
+        public virtual void BeginAction()
         {
             ActionComplete = false;
             actionTimeElapsed = 0;
@@ -49,7 +68,7 @@ namespace Game1
 
 
 
-        public void CompleteAction()
+        public virtual void CompleteAction()
         {
             ActionComplete = true;
             Item.IsAvailable = true;

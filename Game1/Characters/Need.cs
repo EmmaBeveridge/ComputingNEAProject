@@ -23,17 +23,17 @@ namespace Game1
         public float CurrentNeed;
         public int MaxNeed;
         public NeedLevel Level;
-        public NeedPriority Priority;
+        
         public NeedBar NeedBar = null;
         public float Percent;
         public bool Prioritised;
 
 
 
-        public Need(NeedNames _name, NeedPriority _priority, int _maxNeed = 100, int _currentNeed = 10, bool generateNeedBar = false, bool _prioritised = false)
+        public Need(NeedNames _name, int _maxNeed = 100, float _currentNeed = 10, bool generateNeedBar = false, bool _prioritised = false)
         {
             Name = _name;
-            Priority = _priority;
+            
             MaxNeed = _maxNeed;
             CurrentNeed = _currentNeed;
             Prioritised = _prioritised;
@@ -71,7 +71,27 @@ namespace Game1
 
 
 
+        public static NeedNames GetNeedNamefromString (string nameString)
+        {
+            switch (nameString.ToLower())
+            {
+                case "hunger":
+                    return NeedNames.Hunger;
+                case "toilet":
+                    return NeedNames.Toilet;
+                case "sleep":
+                    return NeedNames.Sleep;
+                case "social":
+                    return NeedNames.Social;
+                case "fun":
+                    return NeedNames.Fun;
+                case "hygiene":
+                    return NeedNames.Hygiene;
 
+                default:
+                    return NeedNames.Null;
+            }
+        }
 
 
 

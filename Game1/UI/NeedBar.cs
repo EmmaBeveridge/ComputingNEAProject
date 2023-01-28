@@ -14,13 +14,13 @@ namespace Game1.UI
 
 
 
-        static float HungerBarHeight = 200;
+        static float HungerBarHeight = 150;
         static float ToiletBarHeight = 250;
         static float SleepBarHeight = 300;
-        static float HygieneBarHeight = 200;
-        static float FunBarHeight = 200;
+        static float HygieneBarHeight = 350;
+        static float FunBarHeight = 400;
         static float SocialBarHeight = 200;
-        static int BarX = 625;
+        static int BarX = 640;
 
         
         static int width = 25;
@@ -71,7 +71,7 @@ namespace Game1.UI
 
         public void Draw(SpriteBatch spriteBatch, SpriteFont spriteFont)
         {
-            spriteBatch.DrawString(spriteFont, need.Name.ToString(), new Vector2(position.X-75, position.Y-1), Color.Black);
+            spriteBatch.DrawString(spriteFont, need.Name.ToString(), new Vector2(position.X-100, position.Y-1), Color.Black);
 
 
             spriteBatch.Draw(texture: whiteRectangle, position: position, scale: new Vector2(need.Percent*150, width), color: need.Level == NeedLevel.Low ? Color.Red : (need.Level == NeedLevel.Mid ? Color.Orange : Color.Green), layerDepth:1f);

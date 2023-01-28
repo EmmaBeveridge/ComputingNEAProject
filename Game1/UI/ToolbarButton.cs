@@ -47,7 +47,7 @@ namespace Game1.UI
 
         public static Texture2D defaultTexture;
 
-        public RelationshipsButton(string argLabel, Vector2 argPosition, Dictionary<People, int> argRelationships) : base(argLabel, argPosition, defaultTexture)
+        public RelationshipsButton(string argLabel, Vector2 argPosition, Dictionary<People, float> argRelationships) : base(argLabel, argPosition, defaultTexture)
         {
             panel = new RelationshipsPanel(argRelationships);
         }

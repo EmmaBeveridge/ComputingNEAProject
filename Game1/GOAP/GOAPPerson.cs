@@ -1,4 +1,5 @@
-﻿using Microsoft.Xna.Framework;
+﻿using Game1.Town;
+using Microsoft.Xna.Framework;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -42,20 +43,61 @@ namespace Game1.GOAP
 
 
 
+            public string GetConditionNameFromNeedName(NeedNames needName)
+            {
+                switch (needName)
+                {
+                    
+                    case NeedNames.Hunger:
+                        return LowHunger;
+                        break;
+                    case NeedNames.Sleep:
+                        return LowSleep;
+                        break;
+                    case NeedNames.Toilet:
+                        return LowToilet;
+                        break;
+                    case NeedNames.Social:
+                        return LowSocial;
+                        break;
+                    case NeedNames.Hygiene:
+                        return LowHygiene;
+                        break;
+                    case NeedNames.Fun:
+                        return LowFun;
+                        break;
+                    default:
+                        return null;
+                        break;
+                }
+            }
+
+
+            public WorldState GetWorldState(NeedNames needToFulfill)
+            {
+                //doesnt deal with chance of needToFulfill being null
+                var worldState = this.planner.CreateWorldState();
+                worldState.Set(GetConditionNameFromNeedName(needToFulfill), true);
+                return worldState;
+
+            }
 
             public override WorldState GetWorldState()
             {
                 var worldState = this.planner.CreateWorldState();
 
+
+
+
+
                 worldState.Set(LowHunger, Needs[NeedNames.Hunger].Level == NeedLevel.Low);
                 worldState.Set(LowSleep, Needs[NeedNames.Sleep].Level == NeedLevel.Low);
                 worldState.Set(LowToilet, Needs[NeedNames.Toilet].Level == NeedLevel.Low);
-                //worldState.Set(LowHygiene, Needs[NeedNames.Hygiene].Level == NeedLevel.Low);
-                //worldState.Set(LowFun, Needs[NeedNames.Fun].Level == NeedLevel.Low);
-                //worldState.Set(LowSocial, Needs[NeedNames.Social].Level == NeedLevel.Low);
+                worldState.Set(LowHygiene, Needs[NeedNames.Hygiene].Level == NeedLevel.Low);
+                worldState.Set(LowFun, Needs[NeedNames.Fun].Level == NeedLevel.Low);
+                worldState.Set(LowSocial, Needs[NeedNames.Social].Level == NeedLevel.Low);
 
-
-
+                
 
                 //worldState.Set(IsHungry, this.personState.Hunger <= PersonState.HUNGER_THRESHOLD);
                 //worldState.Set(IsTired, this.personState.Sleep <= PersonState.SLEEP_THRESHOLD);
@@ -64,7 +106,18 @@ namespace Game1.GOAP
                 return worldState;
             }
 
-            public override WorldState GetGoalState() 
+
+            public override WorldState GetGoalState()
+            {
+                NeedNames tempRef = NeedNames.Null;
+
+
+
+                return GetGoalState(ref tempRef);
+            }
+
+
+            public override WorldState GetGoalState(ref NeedNames needToFulfill) 
             {
                 
                 var goalState = this.planner.CreateWorldState();
@@ -73,13 +126,15 @@ namespace Game1.GOAP
                 NeedNames need = People.decisionTree.GetResult(Needs);
 
 
-                // need to change to accomodate all needs
+                needToFulfill = need;
+
 
                 switch (need)
                 {
-                    
+
                     case NeedNames.Sleep:
                         goalState.Set(LowSleep, false);
+                       
                         break;
                     case NeedNames.Toilet:
                         goalState.Set(LowToilet, false);
@@ -94,16 +149,19 @@ namespace Game1.GOAP
                         goalState.Set(LowFun, false);
                         break;
                     case NeedNames.Social:
+                        goalState.Set(LowSocial, false);
+                        break;
 
-                        
-                    
+
+
+
                     default:
                         break;
                 }
 
 
-
-
+                //goalState.Set(LowSocial, false);
+                
 
 
 
@@ -159,7 +217,8 @@ namespace Game1.GOAP
             stateMachine = new StateMachine<GOAPPersonState>(goapPersonState, new Idle());
             stateMachine.AddState(new GoTo());
             stateMachine.AddState(new PerformAction());
-            stateMachine.AddState(new Wait());
+            stateMachine.AddState(new WaitForItem());
+            stateMachine.AddState(new WaitForPerson());
             return stateMachine;
 
         }
@@ -179,8 +238,12 @@ namespace Game1.GOAP
 
             }
 
-            GOAPWorld.ReserveItem(action, goapPersonState.planner);
+            if (action.GetType() == typeof(GOAPActionWithItem))
+            {              
+                GOAPWorld.ReserveItem(action, goapPersonState.planner); //hopefully fixes reassigning initiator
+            }
 
+           
             
         }
 
@@ -189,7 +252,7 @@ namespace Game1.GOAP
 
         public class Idle: State<GOAPPersonState>
         {
-            
+            People person;
             public Idle()
             {
                 
@@ -198,15 +261,35 @@ namespace Game1.GOAP
             {
                 transitionOnNextTick = false;
 
+                person = this.Context.planner.person;
+
                 Console.WriteLine("Beginning planning");
-                this.Context.actionPlan = this.Context.planner.Plan(this.Context.GetWorldState(), this.Context.GetGoalState());
+
+                NeedNames needToFulfill = NeedNames.Null;
+                WorldState goalState = this.Context.GetGoalState(ref needToFulfill);
+
+                this.Context.actionPlan = this.Context.planner.Plan(this.Context.GetWorldState(needToFulfill), goalState);
+
+
+
+                if (this.Context.actionPlan!= null && this.Context.actionPlan.Any(x => x.GetType() == typeof(GOAPActionWithPerson)))
+                {
+                    GOAPAction personAction = this.Context.actionPlan.First(x => x.GetType() == typeof(GOAPActionWithPerson));
+
+                    person.SendRSVP(personAction);
+
+
+                }
+
+                
+
 
                 //if (this.Context.actionPlan != null && this.Context.actionPlan.Count>0)
                 //{
                 //    this.Machine.ChangeState<GoTo>();
                 //    person.actionState = PeopleActionStates.moving;
-                   
-                //}
+
+                    //}
 
             }
 
@@ -241,22 +324,50 @@ namespace Game1.GOAP
             {
                 transitionOnNextTick = false;
 
-                var action = this.Context.actionPlan.Peek();
-                
-                item = action.item;
+                var action = this.Context.actionPlan.Peek();                
                 person = this.Context.planner.person;
 
-                if (action.doingAction.FirstOrDefault() != person && action.doingAction.Count != 0)
+
+                if (action.GetType() == typeof(GOAPActionWithItem))
                 {
-                    location = item.room.townLocation;
+                    
+                    item = action.item;
+
+                    if (action.doingAction.FirstOrDefault() != person && action.doingAction.Count != 0)
+                    {
+                        location = item.room.townLocation;
                     
 
+                    }
+
+                    else
+                    {
+                        location = item.townLocation;
+                    }
+
                 }
 
-                else
+                
+
+                else if (action.GetType() == typeof(GOAPActionWithPerson))
                 {
-                    location = item.townLocation;
+                    //check if they chose to start interaction, i.e. should go to the person or stay still
+                    
+                    if (action.Action.initiator == person)
+                    {
+                        location = action.interactionPerson.position;
+                    }
+                    else
+                    {
+                        location = person.position;
+                    }
+
+
+
+
+
                 }
+
 
                 
                 
@@ -275,28 +386,90 @@ namespace Game1.GOAP
             {
                 this.Context.currentLocation = person.position;
 
-                if (person.reachedGoal)
+                var action = this.Context.actionPlan.Peek();
+
+
+                if (action.GetType() == typeof(GOAPActionWithItem))
                 {
-                    transitionOnNextTick = true;
 
-                    if (this.Context.actionPlan.Peek().doingAction.FirstOrDefault() != person && this.Context.actionPlan.Peek().doingAction.Count != 0)
+
+                    if (person.reachedGoal)
                     {
-                        this.Machine.SetNextState<Wait>();
+                        transitionOnNextTick = true;
+
+                        if (this.Context.actionPlan.Peek().doingAction.FirstOrDefault() != person && this.Context.actionPlan.Peek().doingAction.Count != 0)
+                        {
+                            this.Machine.SetNextState<WaitForItem>();
+                        }
+
+                        else //not tested but think putting else here is right??
+                        {
+                            this.Machine.SetNextState<PerformAction>();
+                        }
                     }
 
-                    else //not tested but think putting else here is right??
-                    {
-                        this.Machine.SetNextState<PerformAction>();
-                    }
                 }
+
+
+                else if (action.GetType() == typeof(GOAPActionWithPerson))
+                {
+                    if (action.Action.initiator != person) //not initiator so should stay still
+                    {
+                        transitionOnNextTick = true;
+                        if (action.Action.initiatorReachedGoal)
+                        {
+
+                            this.Machine.SetNextState<PerformAction>();
+                        }
+                        else
+                        {
+                            this.Machine.SetNextState<WaitForPerson>();
+                        }
+
+
+                    }
+
+                    else //is initiator
+                    {
+                        if (person.reachedGoal)
+                        {
+                            action.Action.initiatorReachedGoal = true;
+                            action.Action.NotifyInitiatorReachedGoal();
+                            transitionOnNextTick = true;
+                            if (action.interactionPerson.IsAvailable)
+                            {
+                                this.Machine.SetNextState<PerformAction>();
+
+                            }
+                            else
+                            {
+                                this.Machine.SetNextState<WaitForPerson>();
+                            }
+
+
+                        }
+                    }
+
+
+                }
+
 
 
             }
 
             public override void End()
             {
+                var action = this.Context.actionPlan.Peek();
 
-                person.currentHouse = item.house;
+                if (action.GetType() == typeof(GOAPActionWithItem))
+                {
+                    person.currentHouse = item.house;
+                }
+                else
+                {
+                    person.currentHouse = House.getHouseContainingPoint(location);
+                }
+                    
 
             }
 
@@ -308,11 +481,11 @@ namespace Game1.GOAP
         }
 
 
-        public class Wait : State<GOAPPersonState>
+        public class WaitForItem : State<GOAPPersonState>
         {
             GOAPAction action;
             People person;
-            public Wait() { }
+            public WaitForItem() { }
 
             public override void Begin()
             {
@@ -324,7 +497,7 @@ namespace Game1.GOAP
             public override void Update(GameTime gameTime)
             {
                 
-                if (action.doingAction.FirstOrDefault()==person && action.item.IsAvailable)
+                if (action.doingAction.FirstOrDefault()==person) //(action.doingAction.FirstOrDefault()==person && action.item.IsAvailable)
                 {
                     transitionOnNextTick = true;
                     
@@ -337,6 +510,54 @@ namespace Game1.GOAP
         }
 
 
+        public class WaitForPerson : State<GOAPPersonState>
+        {
+            GOAPAction action;
+            People person;
+            
+            public WaitForPerson() { }
+
+            public override void Begin()
+            {
+                person = this.Context.planner.person;
+                
+                transitionOnNextTick = false;
+                action = this.Context.actionPlan.Peek();
+                
+
+            }
+
+            public override void Update(GameTime gameTime)
+            {
+                if (action.Action.initiator != person) //not initiator so has to wait for initiator to reach goal
+                {
+
+                    if (action.Action.initiatorReachedGoal)
+                    {
+                        transitionOnNextTick = true;
+
+                        this.Machine.SetNextState<PerformAction>();
+
+                    }
+                }
+
+                else //is initiator so has to wait for other person to finish what they are doing
+                {
+                    if (action.interactionPerson.IsAvailable)
+                    {
+                        transitionOnNextTick = true;
+                        this.Machine.SetNextState<PerformAction>();
+                    }
+
+
+                }
+
+
+            }
+        }
+
+
+
 
 
 
@@ -345,12 +566,12 @@ namespace Game1.GOAP
 
             People person;
             GameTime timer;
-            Action<GameTime, Dictionary<NeedNames, Need>> currentActionMethod;
+            Action<GameTime, Dictionary<NeedNames, Need>, People> currentActionMethod;
 
 
 
             GOAPAction action;
-            Item actionItem;
+            //Item actionItem;
             public PerformAction()
             {
                 
@@ -361,9 +582,14 @@ namespace Game1.GOAP
             {
                 transitionOnNextTick = false;
 
+
+
                 action = this.Context.actionPlan.Peek();
-                actionItem = action.item;
+                //actionItem = action.item;
                 person = this.Context.planner.person;
+
+
+                person.IsAvailable = false;
 
                 currentActionMethod = action.Action.ActionMethod;
                 action.Action.BeginAction();
@@ -401,7 +627,7 @@ namespace Game1.GOAP
                 }
                 else
                 {
-                    currentActionMethod(gameTime, person.Needs);
+                    currentActionMethod(gameTime, person.Needs, person);
 
 
                 }
@@ -449,6 +675,7 @@ namespace Game1.GOAP
             public override void End()
             {
                 action.doingAction.Dequeue();
+                person.IsAvailable = true;
             }
 
 

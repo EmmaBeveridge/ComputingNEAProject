@@ -73,6 +73,28 @@ namespace Game1.Town
         public List<GOAPAction> GOAPActions = new List<GOAPAction>(); 
 
 
+
+
+
+
+        public static House GetHouseFromNumber(int houseNumber)
+        {
+
+
+            Regex houseIdMatch = new Regex(@"\S+H" + houseNumber + @"$");
+
+            return houses.Find(h => houseIdMatch.IsMatch(h.id));
+
+
+
+
+        }
+
+
+
+
+
+
         public void GenerateAvatar()
         {
 

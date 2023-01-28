@@ -34,6 +34,16 @@ namespace Game1
             previousMouseState = currentMouseState;
         }
 
+
+        public static bool WasLeftClicked()
+        {
+
+            GetState();
+            return currentMouseState.LeftButton == ButtonState.Pressed && previousMouseState.LeftButton == ButtonState.Released;
+        }
+
+
+
         public static bool IsPressed (bool left)
         {
             if (left) { return currentMouseState.LeftButton == ButtonState.Pressed; }
@@ -233,13 +243,23 @@ namespace Game1
             return false;
         }
 
-
-
-
-        public static Button  GetButtonPressed(List<Button> buttonsToCheck)
+        public static bool IsExitButtonPressed(ExitButton exitButton)
         {
-            //MouseState currentMouseState = Mouse.GetState();
-            Console.WriteLine(currentMouseState.X+" "+currentMouseState.Y);
+            return MouseOverButton(exitButton, currentMouseState);
+
+        }
+
+
+        public static Button GetButtonPressed(List<Button> buttonsToCheck)
+        {
+            currentMouseState = Mouse.GetState();
+            if (currentMouseState.X != 0 || currentMouseState.Y != 0)
+            {
+                
+                Console.WriteLine(currentMouseState.X+" "+currentMouseState.Y);
+
+            }
+            
             foreach (Button button in buttonsToCheck)
             {
 

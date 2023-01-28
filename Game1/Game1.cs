@@ -32,10 +32,17 @@ namespace Game1
 
         public List<People> people = new List<People>();
         
-        List<Town.Town> towns = new List<Town.Town>();
+        public List<Town.Town> towns = new List<Town.Town>();
         
         List<Texture2D> loadingScreens = new List<Texture2D>();
 
+        Texture2D mainMenuScreen;
+
+
+
+
+        public Dictionary<string, Model> modelDictionary = new Dictionary<string, Model>();
+        public Dictionary<string, Texture2D> iconDictionary = new Dictionary<string, Texture2D>();
         
 
 
@@ -46,14 +53,17 @@ namespace Game1
 
         Camera camera;
 
-        Player player;
+        public Player player;
 
 
 
-        GameStates.States gameState = GameStates.States.Loading;
+        public GameStates.States gameState = GameStates.States.MainMenu;
         bool isLoading=false;
-        
 
+
+
+
+        Texture2D tempTexture;
 
        
 
@@ -99,7 +109,9 @@ namespace Game1
 
 
 
-
+        /// <summary>
+        /// Loads basic textures and those needed for main menu and loading screen
+        /// </summary>
         protected  override void LoadContent()
         {
             spriteBatch = new SpriteBatch(GraphicsDevice);
@@ -114,6 +126,22 @@ namespace Game1
             loadingScreens.Add(Content.Load<Texture2D>("LoadingScreen6"));
             loadingScreens.Add(Content.Load<Texture2D>("LoadingScreen7"));
             loadingScreens.Add(Content.Load<Texture2D>("LoadingScreen8"));
+
+
+            mainMenuScreen = Content.Load<Texture2D>("MainMenu");
+
+            Texture2D exitMainTexture = Content.Load<Texture2D>("ExitMainButtonSized");
+            Texture2D newGameTexture = Content.Load<Texture2D>("NewGameButtonSized");
+            Texture2D resumeGameTexture = Content.Load<Texture2D>("ResumeGameButtonSized");
+
+
+
+
+            ExitButton.Exit = Exit;
+
+            UIHandler.BuildMainMenuButton(graphicsManager, exitMainTexture, resumeGameTexture, newGameTexture);
+
+
 
             Button.defaultTexture = Content.Load<Texture2D>("BlueButton");
             spriteFont = Content.Load<SpriteFont>("buttonFont");
@@ -133,6 +161,9 @@ namespace Game1
             SkillsButton.defaultTexture = Content.Load<Texture2D>("SkillsButton2");
            
             CareerButton.defaultTexture = Content.Load<Texture2D>("CareerButton2");
+
+
+            ExitButton.defaultTexture = Content.Load<Texture2D>("ExitButton");
 
             NeedBar.GenerateTexture(GraphicsDevice);
             ToolbarPanel.GenerateTexture(GraphicsDevice);
@@ -169,9 +200,7 @@ namespace Game1
                     district.BuildStreets();
 
 
-                    Console.WriteLine( $"{district.streets[0].id} and {district.streets[8].id} LCA: {district.StreetTree.FindLowestCommonAncestor(district.streets[0], district.streets[8]).id}");
-  
-
+                   
 
 
 
@@ -274,7 +303,10 @@ namespace Game1
 
 
 
-
+        /// <summary>
+        /// Loads data for game. Loaded when loading screen displayed
+        /// </summary>
+        /// <returns></returns>
         async Task LoadGame()
         {
 
@@ -302,22 +334,41 @@ namespace Game1
             await BuildTownAsync().ConfigureAwait(false);
 
 
+
+            
+
+
+
+
             MLMain.BuildML();
 
 
             People.BuildDecisionTree();
 
-            Model woman2 = Content.Load<Model>("woman4");
-            Model man2 = Content.Load<Model>("man4");
-            Model woman5 = Content.Load<Model>("woman5");
-            Texture2D womanPurple = Content.Load<Texture2D>("WomanPurple");
-            Texture2D womanYellow = Content.Load<Texture2D>("WomanYellow");
-            player = new Player(woman2, new Vector3(10, 0, 0), Town.Town.navMesh, towns[0], this, womanPurple);
 
 
-            people.Add(player);
-            //people.Add(new People(man2, new Vector3(10, 5, 10), navMesh));
-            people.Add(new People(woman5, new Vector3(60, 0, 40), Town.Town.navMesh, towns[0], this, womanYellow));
+            //NEED TO RENAME MODELS AND ICONS!!!!!!
+            modelDictionary.Add("WomanPurple", Content.Load<Model>("WomanPurpleModel")); 
+            iconDictionary.Add("WomanPurple", Content.Load<Texture2D>("WomanPurpleIcon"));
+            modelDictionary.Add("WomanYellow", Content.Load<Model>("WomanYellowModel"));
+            iconDictionary.Add("WomanYellow", Content.Load<Texture2D>("WomanYellowIcon"));
+
+            //Model man2 = Content.Load<Model>("man4");
+            //Model woman5 = Content.Load<Model>("woman5");
+            //Texture2D womanPurple = Content.Load<Texture2D>("WomanPurple");
+            //Texture2D womanYellow = Content.Load<Texture2D>("WomanYellow");
+
+
+
+            ResumeGameButton.ResumeGame(this);
+
+            
+            //player = new Player(woman2, new Vector3(10, 0, 0), Town.Town.navMesh, towns[0], this, womanPurple);
+
+
+            //people.Add(player);
+            ////people.Add(new People(man2, new Vector3(10, 5, 10), navMesh));
+            //people.Add(new People(woman5, new Vector3(60, 0, 40), Town.Town.navMesh, towns[0], this, womanYellow));
 
 
             avatars.AddRange(people.Select(people => people.avatar));
@@ -325,8 +376,38 @@ namespace Game1
             People.people.AddRange(people);
 
 
+            foreach (People person in people)
+            {
+                towns[0].GOAPActions.Add(person.DefineActions()); //only one town but would need to change if added more
+
+            }
+
+
+            foreach (People person in people)
+            {
+                person.BuildAI();
+            }
+
+
+
+
+
+
+
+
+
             //avatars.Add(new Avatar(Content.Load<Model>("houseBake6"), new Vector3(0, 41, 0)));
             
+
+
+
+
+
+
+
+
+
+
             
             avatars.Add(new Avatar(Content.Load<Model>("Grass"), new Vector3(0, -12, 0))); // was at y=-12
             avatars.Add(new Avatar(Content.Load<Model>("HouseInteriorWalls"), new Vector3(0, -5, 0))); //was at y=-2
@@ -367,7 +448,7 @@ namespace Game1
 
 
             UIHandler.BuildToolbarButtons(graphicsManager, player);
-
+            UIHandler.BuildExitButton(graphicsManager);
 
             
             
@@ -403,8 +484,19 @@ namespace Game1
 
             }
 
+
+
+            if (gameState == GameStates.States.MainMenu)
+            {
+
+                bool transitionToLoading = UIHandler.HandleMainMenuInput();
+                if (transitionToLoading) { gameState = GameStates.States.Loading; }
+
+
+            }
+
             
-            if (gameState==GameStates.States.Loading && !isLoading)
+            else if (gameState==GameStates.States.Loading && !isLoading)
             {
                 //backgroundThread = new Thread(LoadGame);
                 isLoading = true;
@@ -480,11 +572,27 @@ namespace Game1
                 spriteBatch.Draw(loadingScreens[0], new Rectangle(0, 0, graphicsManager.PreferredBackBufferWidth, graphicsManager.PreferredBackBufferHeight), Color.White);
                 loadingScreens.Add(loadingScreens[0]);
                 loadingScreens.RemoveAt(0);
+
+                //spriteBatch.Draw(tempTexture, position:Vector2.Zero, scale: new Vector2(0.7f, 0.8f));
+
                 spriteBatch.End();
                 Thread.Sleep(65);
                 
 
            }
+
+
+
+            else if (gameState == GameStates.States.MainMenu)
+            {
+                spriteBatch.Begin();
+                
+                spriteBatch.Draw(mainMenuScreen, position: Vector2.Zero, scale: new Vector2 (0.7f, 0.8f));
+
+                UIHandler.DrawMainMenuButtons(spriteBatch);
+
+                spriteBatch.End();
+            }
 
             
 

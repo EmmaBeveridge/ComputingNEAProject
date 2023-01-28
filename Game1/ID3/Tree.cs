@@ -19,7 +19,7 @@ namespace Game1.ID3
 
         public Dictionary<string, NeedNames> NeedStringToEnum = new Dictionary<string, NeedNames>() { { "HUNGER", NeedNames.Hunger }, { "TOILET", NeedNames.Toilet }, { "SLEEP", NeedNames.Sleep }, { "FUN", NeedNames.Fun }, { "SOCIAL", NeedNames.Social }, { "HYGIENE", NeedNames.Hygiene } };
 
-
+        public Dictionary<NeedNames, string> EnumToNeedString = new Dictionary<NeedNames, string>() { { NeedNames.Hunger, "HUNGER" }, { NeedNames.Toilet, "TOILET" }, { NeedNames.Sleep, "SLEEP" }, { NeedNames.Fun, "FUN" }, { NeedNames.Social, "SOCIAL" }, { NeedNames.Hygiene, "HYGIENE" } };
 
         /// <summary>
         /// Returns name (as NeedNames enum object) of the next need to be fulfilled given the current Need stats of the person
@@ -30,7 +30,7 @@ namespace Game1.ID3
         {
             
             Dictionary<string, string> QueryDict = MakeQueryDict(QueryData);
-            string result = CalculateResult(Root, QueryDict, "");
+            string result = CalculateResult(Root, QueryDict, "", QueryData);
 
             if (result != "Attribute not found")
             {
@@ -42,9 +42,49 @@ namespace Game1.ID3
 
         }
 
+        /// <summary>
+        /// CHecks if a sensible need has been selected by ID3. Necessary due to imperfect data set
+        /// </summary>
+        /// <param name="selectedNode">Node selected by ID3</param>
+        
+        /// <param name="QueryData"></param>
+        /// <returns></returns>
 
-        private string CalculateResult (TreeNode root, Dictionary<string, string> QueryDict, string result)
+        private bool IsResultGood (TreeNode selectedNode, Dictionary<NeedNames, Need> QueryData)
         {
+            float acceptedDiffToMin = 20 + (QueryData[NeedStringToEnum[selectedNode.Name]].Prioritised ? 5 : 0);
+
+            NeedNames[] CanRepeatImmediately = new NeedNames[] { NeedNames.Fun, NeedNames.Social };
+
+            float valueOfSelectedNeed = QueryData[NeedStringToEnum[selectedNode.Name]].CurrentNeed;
+
+            if (valueOfSelectedNeed == 100 && !CanRepeatImmediately.Contains(NeedStringToEnum[selectedNode.Name]) )
+            {
+                return false;
+
+            }
+
+
+            if (Math.Abs(valueOfSelectedNeed - QueryData.Min(kvp => kvp.Value.CurrentNeed)) < acceptedDiffToMin )
+            {
+                return true;
+
+            }
+
+            return false;
+
+
+
+
+        }
+
+
+        private string CalculateResult (TreeNode root, Dictionary<string, string> QueryDict, string result, Dictionary<NeedNames, Need> QueryData)
+        {
+
+
+
+            //FIX DATA SET SO DOESNT RECOMMEND NEED WITH HIGH VALUE
             
             bool valueFound = false;
             //result += root.Name.ToUpper() + " -- ";
@@ -58,7 +98,16 @@ namespace Game1.ID3
 
                 result = root.Name.ToUpper();
 
-                valueFound = true;
+
+                if (IsResultGood(root, QueryData))
+                {
+                    valueFound = true;
+                
+                }
+
+                else { result = EnumToNeedString[QueryData.OrderBy(kvp => kvp.Value.CurrentNeed).First().Key]; valueFound = true; } //just returns need with lowest value
+
+
                 
             }
 
@@ -68,6 +117,19 @@ namespace Game1.ID3
                 string entry = QueryDict[root.Name];
 
                 Console.WriteLine("\n\n\nEntry"+entry);
+
+
+                //since don't have every possible combination of discrete categories in dataset, especially as data set gets large and discrete->continuous, must find a way to get closest edge from a given node
+
+                TreeNode bestNode = null;
+
+
+                //float closestEdgeDifference = Math.Abs(needDiscreteCategoryBoundaryValues[root.Name][int.Parse(root.Children[0].Edge)] - float.Parse(entry)); //fix this line
+
+
+
+                float closestEdgeDifference = float.MaxValue;
+
 
                 foreach (TreeNode childNode in root.Children)
                 {
@@ -80,15 +142,32 @@ namespace Game1.ID3
 
                         //return result + CalculateResult(childNode, QueryDict, $"{childNode.Edge.ToLower()} --> ");
 
-                        return CalculateResult(childNode, QueryDict, "");
+                        return CalculateResult(childNode, QueryDict, "", QueryData);
 
                     }
 
+                    else
+                    {
+                        float edgeDifference = Math.Abs(needDiscreteCategoryBoundaryValues[root.Name][int.Parse(childNode.Edge)] - QueryData[NeedStringToEnum[root.Name]].CurrentNeed); //edge refers to need value of root node name
+
+                        if (edgeDifference < closestEdgeDifference)
+                        {
+                            bestNode = childNode;
+                            closestEdgeDifference = edgeDifference;
+                        }
 
 
-                    
+
+
+                    }
 
                 }
+
+                //in case edge is not one of edges from root node
+
+
+                QueryDict.Remove(root.Name);
+                return CalculateResult(bestNode, QueryDict, "", QueryData);
 
 
 
@@ -112,6 +191,10 @@ namespace Game1.ID3
 
                 //}
             }
+
+
+            
+
 
             if (!valueFound)
             {
@@ -491,7 +574,7 @@ namespace Game1.ID3
             }
 
             double deltaATS = Math.Log(Math.Pow(3, bestCut.ResultClassesCount) - 2, 2) - (bestCut.ResultClassesCount * bestCut.ParentEntropy - weightedChildEntropySum);
-            double RHS = (1 / bestCut.ResultClassesCount) * (Math.Log(bestCut.ResultClassesCount - 1) + deltaATS);
+            double RHS = (1 / bestCut.ResultClassesCount) * (Math.Log(bestCut.ResultClassesCount - 1, 2) + deltaATS);
 
             if (bestCut.InformationGain>RHS) { return true; }
             else { return false; }

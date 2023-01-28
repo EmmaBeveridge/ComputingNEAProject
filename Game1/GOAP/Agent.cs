@@ -15,8 +15,14 @@ namespace Game1.GOAP
         public bool Plan(bool debugPlan = false)
         {
             List<GOAPNode> nodes = null;
+
             if (debugPlan)
+            {
                 nodes = new List<GOAPNode>();
+            }
+
+
+            
 
             this.Actions = this.Planner.Plan(this.GetWorldState(), this.GetGoalState(), nodes);
 
@@ -51,9 +57,11 @@ namespace Game1.GOAP
 
 
         /// <summary>
-        /// the goal state that the agent wants to achieve
+        /// Gets goal state
         /// </summary>
-        /// <returns>The goal state.</returns>
+        /// <param name="needToFulfill"> reference param, need determined as needing to be fulfilled</param>
+        /// <returns>Goal state agent wishes to achieve</returns>
+        public abstract WorldState GetGoalState(ref NeedNames needToFulfill);
         public abstract WorldState GetGoalState();
     }
 }

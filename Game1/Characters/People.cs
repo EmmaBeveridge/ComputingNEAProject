@@ -15,6 +15,9 @@ using Game1.Town.Districts;
 using Game1.ID3;
 using System.Data;
 using Game1.DataClasses;
+using Game1.Actions;
+using Game1.Careers;
+using Game1.Traits;
 
 namespace Game1
 {
@@ -37,11 +40,47 @@ namespace Game1
         finishedTypingChat
     }
 
-    
+    public struct DBPerson //halfway person, stores data about person from SQLite DataBase
+    {
+        public int DBID;
+        public string Name;
+        public bool IsPlayer;
+        public Career Career;
+        public House House;
+        public string ModelName;
+        
+
+
+        public DBPerson(int dbid, string name, bool isPlayer, Career career, House house, string modelName)
+        {
+            DBID = dbid;
+            Name = name;
+            IsPlayer = isPlayer;
+            Career = career;
+            House = house;
+            ModelName = modelName;
+        }
+
+
+
+
+    }
+
+
 
     public class People
     {
         protected MouseState prevMouseState = new MouseState();
+
+
+
+        public string Name;
+        public House House;
+        public Career Career;
+        public int DBID;
+        public bool isPlayer;
+
+
 
         public Vector3 position;
         //protected Vector3 targetPosition = Vector3.Zero;
@@ -61,6 +100,9 @@ namespace Game1
         
         public Avatar avatar;
         public Texture2D icon;
+        public string modelName;
+
+
 
         public PeopleMotionStates motionState;
         public PeopleActionStates actionState;
@@ -87,15 +129,24 @@ namespace Game1
         public BoundingBox boundingBox { get { return avatar.UpdateBoundingBox(); } }
 
 
-        public Dictionary<People, int> Relationships;
+        public Dictionary<People, float> Relationships;
         public Dictionary<NeedNames, Need> Needs;
+
+
+        public List<Trait> Traits = new List<Trait>();
 
 
 
         public static Tree decisionTree;
-        public static List<People> people;
+        public static List<People> people = new List<People>();
 
-        public People(Model _model, Vector3 _position, Mesh argMesh, Town.Town argTown, Game1 argGame, Texture2D argIcon, bool _isPlayer = false)
+
+
+        public bool IsAvailable = true;
+
+
+
+        public People(Model _model, Vector3 _position, Mesh argMesh, Town.Town argTown, Game1 argGame, Texture2D argIcon, int argDBID, string argName, House argHouse, Career argCareer, List<Trait> argTraits, Dictionary<NeedNames, Need> argNeeds, bool _isPlayer = false)
         {
             position = _position;
             avatar = new Avatar (_model, _position);
@@ -114,14 +165,51 @@ namespace Game1
             game = argGame;
             icon = argIcon;
 
-            Relationships = new Dictionary<People, int>();
+            DBID = argDBID;
+            Name = argName;
+            House = argHouse;
+            Career = argCareer;
+            isPlayer = _isPlayer;
 
 
-            ConstructNeeds(_isPlayer);
+
+            Relationships = new Dictionary<People, float>();
+
+
+
+            Traits = argTraits;
+            Needs = argNeeds;
+
+            //ConstructNeeds(_isPlayer); //need to move line somewhere else
 
 
             goapPerson = new GOAPPerson(this);
+            //goapStateMachine = goapPerson.BuildAI();
+
+
+
+
+        }
+
+
+        public void BuildAI()
+        {
+            //needs to be called after all talk to person actions created and added to town goap actions list
             goapStateMachine = goapPerson.BuildAI();
+        }
+
+
+
+
+        public void SendRSVP(GOAPAction recipientAction)
+        {
+            //should already be pushed onto initiator's action queue
+
+            recipientAction.interactionPerson.ReceiveRSVP(this);
+            recipientAction.Action.initiator = this;
+
+
+             
 
 
 
@@ -130,75 +218,69 @@ namespace Game1
 
 
 
-
-        public People FindPersonToInteractWith()
+        public void ReceiveRSVP(People sender)
         {
-            //interaction score should be inversely proportional to distance and proportional to relationship score
+            GOAPAction talkToSenderAction = town.GOAPActions.Find(a => a.interactionPerson == sender);
 
-            float maxScore = float.MinValue;
-            People maxPerson = null;
+            talkToSenderAction.Action.initiator = sender;
+
+            goapPerson.PushNewAction(talkToSenderAction);
 
 
 
-            foreach (People person in people)
+
+
+        }
+
+
+        public GOAPAction DefineActions()
+        {
+            TalkToPersonAction talk  = new TalkToPersonAction(this);
+            GOAPAction talkGOAP = talk.DefineGOAPAction();
+            return talkGOAP;
+            
+        }
+
+
+
+
+        public void UpdateRelationsAutonomous(People personInteractingWith) 
+        {
+            const float relationshipAdjustment = 0.01f; //should be small as applied every update frame
+
+
+            if (Relationships.ContainsKey(personInteractingWith))
             {
-                float currentScore = 0;
-
-                if (Relationships.ContainsKey(person))
+                if (Relationships[personInteractingWith] >= 50)
                 {
-                    currentScore = Relationships[person];
+                    Relationships[personInteractingWith] += relationshipAdjustment;
+
                 }
 
                 else
                 {
-                    currentScore = 50;
+                    Relationships[personInteractingWith] -= relationshipAdjustment;
                 }
 
+            }
 
-                currentScore = currentScore / (EstCostOfWait(person) * DistanceToPerson(person));
-
-
-                if (currentScore > maxScore)
-                {
-                    maxScore = currentScore;
-                    maxPerson = person;
-                }
-
-
-
-
-
+            else
+            {
+                Relationships[personInteractingWith] = 50 + relationshipAdjustment;
             }
 
 
 
-            return maxPerson;
-
 
         }
 
 
-        private float EstCostOfWait(People person)
-        {
-            Stack<GOAPAction> personActionPlan = person.goapPerson.goapPersonState.actionPlan;
-
-            float cost = personActionPlan.Sum(a => a.Cost);
-
-            return cost;
-
-        }
-
-        private float DistanceToPerson(People person)
-        {
-            Vector3 v = person.position - position;
-            return v.Length();
-        }
-
+        
 
 
         public static void BuildDecisionTree()
         {
-            DataTable ID3Data = ExcelFileManager.ReadExcelFile("ID3DataShort.xlsx");
+            DataTable ID3Data = ExcelFileManager.ReadExcelFile("ID3Data.xlsx");
             decisionTree = new Tree();
             DataTable discreteData = decisionTree.DiscretiseData(ID3Data);
 
@@ -214,12 +296,12 @@ namespace Game1
         private void ConstructNeeds(bool _generateNeedsBar) //only generate needsbar display if player
         {
             Needs = new Dictionary<NeedNames, Need>();
-            Needs.Add(NeedNames.Hunger, new Need(_name: NeedNames.Hunger, _priority: NeedPriority.High, generateNeedBar: _generateNeedsBar));
-            Needs.Add(NeedNames.Sleep, new Need(_name: NeedNames.Sleep, _priority: NeedPriority.High, generateNeedBar: _generateNeedsBar));
-            Needs.Add(NeedNames.Toilet, new Need(_name: NeedNames.Toilet, _priority: NeedPriority.High, generateNeedBar: _generateNeedsBar));
-            Needs.Add(NeedNames.Hygiene, new Need(_name: NeedNames.Hygiene, _priority: NeedPriority.Mid, generateNeedBar: _generateNeedsBar));
-            Needs.Add(NeedNames.Social, new Need(_name: NeedNames.Social, _priority: NeedPriority.Low, generateNeedBar: _generateNeedsBar));
-            Needs.Add(NeedNames.Fun, new Need(_name: NeedNames.Fun, _priority: NeedPriority.Low, generateNeedBar: _generateNeedsBar));
+            Needs.Add(NeedNames.Hunger, new Need(_name: NeedNames.Hunger, generateNeedBar: _generateNeedsBar));
+            Needs.Add(NeedNames.Sleep, new Need(_name: NeedNames.Sleep,  generateNeedBar: _generateNeedsBar));
+            Needs.Add(NeedNames.Toilet, new Need(_name: NeedNames.Toilet,  generateNeedBar: _generateNeedsBar));
+            Needs.Add(NeedNames.Hygiene, new Need(_name: NeedNames.Hygiene, generateNeedBar: _generateNeedsBar));
+            Needs.Add(NeedNames.Social, new Need(_name: NeedNames.Social,  generateNeedBar: _generateNeedsBar));
+            Needs.Add(NeedNames.Fun, new Need(_name: NeedNames.Fun, generateNeedBar: _generateNeedsBar));
 
 
         }

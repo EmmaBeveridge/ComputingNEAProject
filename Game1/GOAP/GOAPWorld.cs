@@ -143,11 +143,46 @@ namespace Game1.GOAP
 
         public static void ReserveItem(GOAPAction action, ActionPlanner actionPlanner)
         {
-            if (action.item != null)
+            //if (action.item != null)
+            //{
+            //    action.item.IsAvailable = false;
+            //    action.doingAction.Enqueue(actionPlanner.person);
+            //}
+
+            //if (action.interactionPerson != null)
+            //{
+            //    action.interactionPerson.IsAvailable = false;
+            //    action.doingAction.Enqueue(actionPlanner.person);
+            //}
+
+
+            if (action.GetType() == typeof(GOAPActionWithItem))
             {
                 action.item.IsAvailable = false;
                 action.doingAction.Enqueue(actionPlanner.person);
             }
+
+            else if (action.GetType() == typeof(GOAPActionWithPerson))
+            {
+                action.interactionPerson.IsAvailable = false;
+                action.doingAction.Enqueue(actionPlanner.person);
+                action.Action.initiator = actionPlanner.person;
+
+                GOAPAction actionForOtherPerson = actionPlanner.FindActionWithPerson(actionPlanner.person);
+
+                actionForOtherPerson.Action.initiator = actionPlanner.person;
+                actionForOtherPerson.doingAction.Enqueue(action.interactionPerson);
+
+
+
+
+               //do i need to add it so interactionPerson is in actionPlanner.persons talktopersonaction queue???
+
+
+            }
+
+
+
         }
 
 

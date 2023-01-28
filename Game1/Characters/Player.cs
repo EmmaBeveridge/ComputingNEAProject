@@ -12,13 +12,15 @@ using Game1.Town;
 
 using Game1.ML;
 using Game1.UI;
+using Game1.Careers;
+using Game1.Traits;
 
 namespace Game1
 {
     public class Player : People
     {
 
-        public Player(Model _model, Vector3 _position, Mesh argMesh, Town.Town argTown, Game1 argGame, Texture2D argIcon) : base(_model, _position, argMesh, argTown, argGame, argIcon, true)
+        public Player(Model _model, Vector3 _position, Mesh argMesh, Town.Town argTown, Game1 argGame, Texture2D argIcon, int argDBID, string argName, House argHouse, Career argCareer, List<Trait> argTraits, Dictionary<NeedNames, Need> argNeeds ) : base(_model, _position, argMesh, argTown, argGame, argIcon, argDBID, argName, argHouse, argCareer, argTraits, argNeeds, true)
         {
 
         }
@@ -34,11 +36,17 @@ namespace Game1
             MouseInput.GetState();
 
 
-            if (MouseInput.currentMouseState.LeftButton == ButtonState.Pressed && MouseInput.previousMouseState.LeftButton == ButtonState.Released && game.IsActive)
+            if (MouseInput.WasLeftClicked() && game.IsActive)
             {
                 ToolbarButton selectedToolBarButton = MouseInput.GetToolbarButton(game.UIHandler.toolbarButtons);
 
-                if (actionState == PeopleActionStates.selectingItemAction)
+                if (MouseInput.IsExitButtonPressed(game.UIHandler.exitButton))
+                {
+                    // End game, save game state
+                }
+
+
+                else if (actionState == PeopleActionStates.selectingItemAction)
                 {
                     Button selectedButton = MouseInput.GetButtonPressed(selectedItem.actionButtons);
                     if (selectedButton != null)

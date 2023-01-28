@@ -1,4 +1,5 @@
-﻿using Microsoft.Xna.Framework;
+﻿using Game1.DataClasses;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
@@ -13,6 +14,10 @@ namespace Game1.UI
 
         public List<Button> buttons;
         public List<ToolbarButton> toolbarButtons;
+
+        public List<Button> mainMenuButtons;
+
+        public ExitButton exitButton;
         public bool displayTextbox = false;
         Textbox currentTextbox;
 
@@ -24,6 +29,7 @@ namespace Game1.UI
         {
             buttons = new List<Button>();
             toolbarButtons = new List<ToolbarButton>();
+            mainMenuButtons = new List<Button>();
         }
 
 
@@ -52,6 +58,43 @@ namespace Game1.UI
                 button.panel.IsDisplayed = false;
             }
         }
+
+
+        public void BuildMainMenuButton(GraphicsDeviceManager graphicsManager, Texture2D exitButtonTexture, Texture2D resumeGameTexture, Texture2D newGameTexture)
+        {
+
+            float screenWidth = graphicsManager.GraphicsDevice.Viewport.Width;
+            float screenHeight= graphicsManager.GraphicsDevice.Viewport.Height;
+
+            
+
+            
+            if (SQLiteDBHandler.DBExists())
+            {
+                //mainMenuButtons.Add(new ResumeGameButton(null, new Vector2(screenWidth / 2 - resumeGameTexture.Width / 2, 2 * screenHeight / 3), resumeGameTexture));
+                mainMenuButtons.Add(new ResumeGameButton(null, new Vector2(screenWidth / 4 , screenHeight / 4), resumeGameTexture));
+            }
+
+            mainMenuButtons.Add(new NewGameButton(null, new Vector2(screenWidth / 80, ( screenHeight / 1.8f) ), newGameTexture));
+
+
+
+            mainMenuButtons.Add(new ExitButton(null, new Vector2((screenWidth / 2), (screenHeight / 1.8f)), exitButtonTexture));
+
+
+
+
+
+        }
+       
+
+
+
+        public void BuildExitButton(GraphicsDeviceManager graphicsManager)
+        {
+            exitButton = new ExitButton(null, new Vector2(graphicsManager.GraphicsDevice.Viewport.Width - ExitButton.defaultTexture.Width, 0));
+        }
+
 
         public void BuildToolbarButtons(GraphicsDeviceManager graphicsManager, Player player)
         {
@@ -102,6 +145,62 @@ namespace Game1.UI
 
 
 
+        public void HandleCharacterSelection()
+        {
+            throw new NotImplementedException();
+        }
+
+
+        public bool HandleMainMenuInput()
+        {
+            
+
+            if (!MouseInput.WasLeftClicked())
+            {
+                return false;
+            }
+            
+            Button buttonPressed = MouseInput.GetButtonPressed(mainMenuButtons);
+
+            if( buttonPressed == null)
+            {
+                return false;
+            }
+            else if (buttonPressed.GetType() == typeof(ExitButton))
+            {
+                ExitButton.Exit();
+            }
+            else  if (buttonPressed.GetType() == typeof(NewGameButton))
+            {
+                NewGameButton.CreateNewGame();
+            }
+
+            return true;
+
+
+
+
+
+
+        }
+
+
+        
+
+
+
+        public void DrawMainMenuButtons(SpriteBatch spriteBatch)
+        {
+            foreach (Button mainMenuButton in mainMenuButtons)
+            {
+
+                spriteBatch.Draw(mainMenuButton.buttonTexture, mainMenuButton.position);
+
+            }
+        }
+
+
+
         public void Draw(SpriteBatch spriteBatch, SpriteFont spriteFont)
         {
 
@@ -129,6 +228,8 @@ namespace Game1.UI
 
 
             }
+
+            spriteBatch.Draw(exitButton.buttonTexture, exitButton.position);
 
             if (displayTextbox)
             {

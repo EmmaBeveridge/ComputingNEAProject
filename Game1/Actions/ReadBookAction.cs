@@ -26,7 +26,7 @@ namespace Game1.Actions
 
         public override GOAPAction DefineGOAPAction()
         {
-            GOAPAction = new GOAPAction(this);
+            GOAPAction = new GOAPActionWithItem(this);
             GOAPAction.SetPrecondition(GOAPPerson.LowFun, true);
 
             GOAPAction.SetPostcondition(GOAPPerson.LowFun, false);
@@ -34,7 +34,7 @@ namespace Game1.Actions
             return GOAPAction;
         }
 
-        public void ReadBook(GameTime timer, Dictionary<NeedNames, Need> needs)
+        public void ReadBook(GameTime timer, Dictionary<NeedNames, Need> needs, People person = null)
         {
 
             needs[NeedAffected].Update(rate: rateOfNeedIncrease, gameTime: timer);

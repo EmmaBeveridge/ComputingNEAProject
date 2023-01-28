@@ -56,6 +56,18 @@ namespace Game1.GOAP
             return WorldState.Create(this);
         }
 
+
+
+
+
+        public GOAPAction FindActionWithPerson(People interactionPerson)
+        {
+            return actions.Find(a => a.interactionPerson == interactionPerson);
+        }
+
+
+
+
         public void AddRangeAction(List<GOAPAction> goapActions)
         {
             foreach (GOAPAction action in goapActions)
@@ -93,11 +105,10 @@ namespace Game1.GOAP
         {
             this.viableActions.Clear();
 
-            GOAPAction validAction = new GOAPAction();
-
+           
             foreach (GOAPAction action in this.actions)
             {
-                if (action.Validate())
+                if (action.Validate(person))
                 {
                     action.UpdateCost(person, person.Needs);
                     this.viableActions.Add(action);

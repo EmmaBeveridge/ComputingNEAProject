@@ -51,7 +51,9 @@ namespace Game1.UI
         public NeedsPanel(List<NeedBar> _bars)
         {
             needsBars = _bars;
-
+            panelPosition.Y -= 100;
+            panelPosition.X -= 15;
+            panelScale.Y += 100;
         }
 
 
@@ -76,12 +78,12 @@ namespace Game1.UI
 
     public class RelationshipsPanel : ToolbarPanel
     {
-        Dictionary<People, int> relationships;
-        List<List<KeyValuePair<People, int>>> screens = new List<List<KeyValuePair<People, int>>>();
+        Dictionary<People, float> relationships;
+        List<List<KeyValuePair<People, float>>> screens = new List<List<KeyValuePair<People, float>>>();
         public int currentScreen = 0;
         
 
-        public RelationshipsPanel(Dictionary<People, int> argRelationships)
+        public RelationshipsPanel(Dictionary<People, float> argRelationships)
         {
             relationships = argRelationships;
             panelPosition.X = 450;
@@ -95,11 +97,11 @@ namespace Game1.UI
             {
                 for (int i = 0; i < screens[currentScreen].Count; i++)
                 {
-                    KeyValuePair<People, int> relationship = screens[currentScreen][i];
+                    KeyValuePair<People, float> relationship = screens[currentScreen][i];
 
                     float X = panelPosition.X + i * relationship.Key.icon.Width + (i + 1) * 20;
 
-                    spriteBatch.Draw(texture: relationship.Key.icon,  scale: new Vector2(1.2f, 1.5f), position: new Vector2(X, panelPosition.Y + 20));
+                    spriteBatch.Draw(texture: relationship.Key.icon,  scale: new Vector2(1f, 1f), position: new Vector2(X, panelPosition.Y + 20));
 
                     RelationshipBar.Draw(spriteBatch, new Vector2(X + relationship.Key.icon.Width / 2, panelPosition.Y + 25 + relationship.Key.icon.Height), relationship.Value);
                 }
@@ -119,7 +121,7 @@ namespace Game1.UI
 
             for (int i = 0; i < (relationships.Count / 3); i++)
             {
-                List<KeyValuePair<People, int>> screen = new List<KeyValuePair<People, int>>();
+                List<KeyValuePair<People, float>> screen = new List<KeyValuePair<People, float>>();
 
                 screen.Add(relationships.ElementAt(i));
                 screen.Add(relationships.ElementAt(i + 1));
@@ -128,7 +130,7 @@ namespace Game1.UI
             }
             if (relationships.Count % 3 != 0)
             {
-                List<KeyValuePair<People, int>> finalScreen = new List<KeyValuePair<People, int>>();
+                List<KeyValuePair<People, float>> finalScreen = new List<KeyValuePair<People, float>>();
                 finalScreen.Add(relationships.ElementAt(relationships.Count - 1));
 
                 if ((relationships.Count - 1) % 3 != 0)

@@ -25,7 +25,7 @@ namespace Game1.Actions
 
         public override GOAPAction DefineGOAPAction()
         {
-            GOAPAction = new GOAPAction(this);
+            GOAPAction = new GOAPActionWithItem(this);
             GOAPAction.SetPrecondition(GOAPPerson.LowToilet, true);
             
             GOAPAction.SetPostcondition(GOAPPerson.LowToilet, false);
@@ -33,7 +33,7 @@ namespace Game1.Actions
             return GOAPAction;
         }
 
-        public void Toilet(GameTime gameTime, Dictionary<NeedNames, Need> needs)
+        public void Toilet(GameTime gameTime, Dictionary<NeedNames, Need> needs, People person = null)
         {
 
             needs[NeedAffected].Update(rate: rateOfNeedIncrease, gameTime: gameTime);

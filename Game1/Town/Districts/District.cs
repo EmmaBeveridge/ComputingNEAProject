@@ -130,14 +130,18 @@ namespace Game1.Town.Districts
 
             parent = endStreet;
 
-            do
+            if (endStreet.parent != null)
             {
-                parent = parent.parent; //will add LCA to street points too
-                goalToLCA.Add(parent.End);
-                
-            } while (parent != LCA);
 
 
+                do
+                {
+                    parent = parent.parent; //will add LCA to street points too
+                    goalToLCA.Add(parent.End);
+
+                } while (parent != LCA);
+
+            }
             //goalToLCA.RemoveAt(0); //Dont want to go to end of last street so remove it
 
             goalToLCA.Reverse();

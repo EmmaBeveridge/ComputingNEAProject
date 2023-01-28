@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Game1.GOAP
 {
-    public class GOAPAction
+    public abstract class GOAPAction
     {
         /// <summary>
         /// optional name for the Action. Used for debugging purposes
@@ -20,7 +20,16 @@ namespace Game1.GOAP
         /// </summary>
         public float Cost; ///esitmate so high accuracy not necessary
 
-        public Item item;
+        public Item item = null; //may cause problems here
+        
+        /// <summary>
+        /// Person who owns TalkToPersonAction (TalkToPersonAction.PersonToInteractWith) 
+        /// </summary>
+        public People interactionPerson = null;
+        
+       
+        //public People PersonToInteractWith;
+
 
         public ActionAbstract Action;
 
@@ -48,25 +57,7 @@ namespace Game1.GOAP
         }
 
 
-        public void UpdateCost(People person, Dictionary<NeedNames, Need> needs)
-        {
-            Cost = (float) Math.Sqrt(Math.Pow(MathHelper.Distance(person.position.X, item.townLocation.X), 2) + Math.Pow(MathHelper.Distance(person.position.Z, item.townLocation.Z), 2));
-
-            var selectedNeed = from need in needs
-                               where need.Key == Action.NeedAffected
-                               select need.Value;
-
-            Cost += Action.Cost(selectedNeed.FirstOrDefault<Need>());
-
-           
-
-            if (doingAction.FirstOrDefault()!=person)
-            {
-                Cost += Action.EstTimeToFinish + Action.Duration*(doingAction.Count-1);
-            }
-
-            
-        }
+        public abstract void UpdateCost(People person, Dictionary<NeedNames, Need> needs);
 
 
         public GOAPAction(ActionAbstract _action, int cost) : this(_action)
@@ -91,7 +82,7 @@ namespace Game1.GOAP
         /// called before the Planner does its planning. Gives the Action an opportunity to set its score or to opt out if it isnt of use.
         /// eg if action is to get food from fridge but no food in fridge, action is not considered by ActionPlanner
         /// </summary>
-        public virtual bool Validate()
+        public virtual bool Validate(People person)
         {
 
             //check if item is available herre???
