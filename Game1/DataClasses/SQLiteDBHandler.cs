@@ -198,7 +198,7 @@ namespace Game1.DataClasses
 
 
 
-        public void AddPeople()
+        public void AddPeople(string playerModelName)
         {
             
             try
@@ -220,7 +220,7 @@ namespace Game1.DataClasses
                         insertCommand.Parameters.AddWithValue("@Name", "player");
                         insertCommand.Parameters.AddWithValue("@HouseNum", 1);
                         insertCommand.Parameters.AddWithValue("@Career", "");
-                        insertCommand.Parameters.AddWithValue("@ModelName", "WomanPurple"); //need to change for character customisation
+                        insertCommand.Parameters.AddWithValue("@ModelName", playerModelName); 
                         insertCommand.ExecuteNonQuery();
 
 

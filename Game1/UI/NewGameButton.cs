@@ -11,6 +11,7 @@ namespace Game1.UI
 {
     class NewGameButton:Button
     {
+        public static string selectedCharacterName;
 
 
         public NewGameButton(string argLabel, Vector2 argPosition, Texture2D argTexture) : base(argLabel, argPosition, argTexture)
@@ -20,13 +21,17 @@ namespace Game1.UI
         }
 
 
+
+
+
+
         public static void CreateNewGame()
         {
 
             SQLiteDBHandler handler = new SQLiteDBHandler();
 
             handler.CreateTables();
-            handler.AddPeople();
+            handler.AddPeople(selectedCharacterName);
 
 
 

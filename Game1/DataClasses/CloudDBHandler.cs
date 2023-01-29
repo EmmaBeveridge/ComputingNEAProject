@@ -11,6 +11,7 @@ using Game1.Items;
 using Game1.Town;
 using Game1.Town.Districts;
 using Game1.DataClasses;
+using Game1.Town.Buildings;
 
 namespace Game1
 {
@@ -34,7 +35,7 @@ namespace Game1
 
         public async Task CreateTownInDBAsync()
         {
-            string query = ReadInQuery("CypherCleaned.txt");
+            string query = ReadInQuery("BuildTown.txt");
 
             var session = driver.AsyncSession();
             try
@@ -133,6 +134,9 @@ namespace Game1
                     {
                         case "Residential":
                             districts.Add(JsonConvert.DeserializeObject<Residential>(districtTemp, new PointConverter()));
+                            break;
+                        case "Community":
+                            districts.Add(JsonConvert.DeserializeObject<Community>(districtTemp, new PointConverter()));
                             break;
                         default:
                             districts.Add(districtUncast);
@@ -379,7 +383,21 @@ namespace Game1
 
                     switch (buildingUncast.buildingClass)
                     {
-                        
+                        case "Store":
+                            building =JsonConvert.DeserializeObject<Store>(buildingTemp, new PointConverter());
+                            break;
+                        case "Office":
+                            building = JsonConvert.DeserializeObject<Office>(buildingTemp, new PointConverter());
+                            break;
+                        case "School":
+                            building = JsonConvert.DeserializeObject<School>(buildingTemp, new PointConverter());
+                            break;
+                        case "TownHall":
+                            building = JsonConvert.DeserializeObject<TownHall>(buildingTemp, new PointConverter());
+                            break;
+                        case "Hospital":
+                            building = JsonConvert.DeserializeObject<Hospital>(buildingTemp, new PointConverter());
+                            break;
                         default:
                             building = buildingUncast;
                             break;

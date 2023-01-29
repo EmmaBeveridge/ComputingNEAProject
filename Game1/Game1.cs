@@ -38,12 +38,15 @@ namespace Game1
 
         Texture2D mainMenuScreen;
 
+        Texture2D characterSelectionBackground;
 
 
 
         public Dictionary<string, Model> modelDictionary = new Dictionary<string, Model>();
         public Dictionary<string, Texture2D> iconDictionary = new Dictionary<string, Texture2D>();
-        
+        public Dictionary<Texture2D, string> characterNameDictionary = new Dictionary<Texture2D, string>();
+
+
 
 
         SpriteBatch spriteBatch;
@@ -129,18 +132,25 @@ namespace Game1
 
 
             mainMenuScreen = Content.Load<Texture2D>("MainMenu");
+            characterSelectionBackground = Content.Load<Texture2D>("SelectCharacterScreen");
 
             Texture2D exitMainTexture = Content.Load<Texture2D>("ExitMainButtonSized");
             Texture2D newGameTexture = Content.Load<Texture2D>("NewGameButtonSized");
             Texture2D resumeGameTexture = Content.Load<Texture2D>("ResumeGameButtonSized");
 
+            characterNameDictionary.Add(Content.Load<Texture2D>("WomanPurpleFullSized"), "WomanPurple");
+            characterNameDictionary.Add(Content.Load<Texture2D>("WomanYellowFullSized"), "WomanYellow");
+            characterNameDictionary.Add(Content.Load<Texture2D>("ManRedFullSized"), "ManRedFull");
+            characterNameDictionary.Add(Content.Load<Texture2D>("ManGreenFullSized"), "ManGreenFull");
+
+            
 
 
 
             ExitButton.Exit = Exit;
 
-            UIHandler.BuildMainMenuButton(graphicsManager, exitMainTexture, resumeGameTexture, newGameTexture);
-
+            UIHandler.BuildMainMenuButtons(graphicsManager, exitMainTexture, resumeGameTexture, newGameTexture);
+            UIHandler.BuildCharacterSelectionButtons(graphicsManager, characterNameDictionary.Keys.ToList());
 
 
             Button.defaultTexture = Content.Load<Texture2D>("BlueButton");
@@ -209,6 +219,17 @@ namespace Game1
                     {
                         street.houses = await cloudDBHandler.GetHousesOnStreet(street);
                         street.buildings = await cloudDBHandler.GetBuildingsOnStreet(street);
+
+                        foreach (Building building in street.buildings)
+                        {
+                            building.model = Content.Load<Model>(building.modelName);
+                            building.GenerateAvatar();
+                            avatars.Add(building.avatar);
+                            Building.buildings.Add(building);
+
+
+                        }
+
 
                         foreach (House house in street.houses)
                         {
@@ -347,7 +368,7 @@ namespace Game1
 
 
 
-            //NEED TO RENAME MODELS AND ICONS!!!!!!
+            
             modelDictionary.Add("WomanPurple", Content.Load<Model>("WomanPurpleModel")); 
             iconDictionary.Add("WomanPurple", Content.Load<Texture2D>("WomanPurpleIcon"));
             modelDictionary.Add("WomanYellow", Content.Load<Model>("WomanYellowModel"));
@@ -397,7 +418,6 @@ namespace Game1
 
 
             //avatars.Add(new Avatar(Content.Load<Model>("houseBake6"), new Vector3(0, 41, 0)));
-            
 
 
 
@@ -408,16 +428,17 @@ namespace Game1
 
 
 
-            
+
+            //avatars.Add(new Avatar(Content.Load<Model>("Store"), Vector3.Zero));
             avatars.Add(new Avatar(Content.Load<Model>("Grass"), new Vector3(0, -12, 0))); // was at y=-12
-            avatars.Add(new Avatar(Content.Load<Model>("HouseInteriorWalls"), new Vector3(0, -5, 0))); //was at y=-2
-            avatars.Add(new Avatar(Content.Load<Model>("HouseExteriorWalls"), new Vector3(0, -5, 0))); //was at y=-2
+            //avatars.Add(new Avatar(Content.Load<Model>("HouseInteriorWalls"), new Vector3(0, -5, 0))); //was at y=-2
+            //avatars.Add(new Avatar(Content.Load<Model>("HouseExteriorWalls"), new Vector3(0, -5, 0))); //was at y=-2
                 //avatars.Add(new Avatar(Content.Load<Model>("Countertop"), new Vector3(60, 0, 100)));
                 //avatars.Add(new Avatar(Content.Load<Model>("CountertopSink"), new Vector3(105, 0, 100)));
                 //avatars.Add(new Avatar(Content.Load<Model>("Shower"), new Vector3(330, 0, -105)));
                 //avatars.Add(new Avatar(Content.Load<Model>("Toilet"), new Vector3(285, 0, -55)));
                 //avatars.Add(new Avatar(Content.Load<Model>("Bookcase"), new Vector3(70, 0, 5)));
-                avatars.Add(new Avatar(Content.Load<Model>("Fridge"), new Vector3(155, 0, 100)));
+                //avatars.Add(new Avatar(Content.Load<Model>("Fridge"), new Vector3(155, 0, 100)));
                 //avatars.Add(new Avatar(Content.Load<Model>("Sink"), new Vector3(230, 0, -115)));
                 //avatars.Add(new Avatar(Content.Load<Model>("Dresser"), new Vector3(215, 0, 70)));
                 //avatars.Add(new Avatar(Content.Load<Model>("Chair"), new Vector3(45, 0, 55)));
@@ -489,9 +510,42 @@ namespace Game1
             if (gameState == GameStates.States.MainMenu)
             {
 
-                bool transitionToLoading = UIHandler.HandleMainMenuInput();
-                if (transitionToLoading) { gameState = GameStates.States.Loading; }
+                Button menuButtonPressed = UIHandler.HandleMainMenuInput();
 
+                if (menuButtonPressed == null)
+                {
+
+                }
+                
+                else if (menuButtonPressed.GetType() == typeof(ExitButton))
+                {
+                    ExitButton.Exit();
+                }
+                else if (menuButtonPressed.GetType() == typeof(NewGameButton))
+                {
+                    gameState = GameStates.States.CharacterSelection;
+                }
+                else if (menuButtonPressed.GetType() == typeof(ResumeGameButton))
+                {
+
+                    gameState = GameStates.States.Loading;
+                }
+
+
+            }
+
+
+            else if (gameState == GameStates.States.CharacterSelection)
+            {
+                Texture2D selectedCharacter = UIHandler.HandleCharacterSelection();
+
+                if (selectedCharacter != null)
+                {
+                    NewGameButton.selectedCharacterName = characterNameDictionary[selectedCharacter];
+                    NewGameButton.CreateNewGame();
+                    gameState = GameStates.States.Loading;
+                }
+                
 
             }
 
@@ -594,6 +648,18 @@ namespace Game1
                 spriteBatch.End();
             }
 
+            else if (gameState == GameStates.States.CharacterSelection)
+            {
+                spriteBatch.Begin();
+               
+                spriteBatch.Draw(characterSelectionBackground, position: new Vector2(0, -10), scale: new Vector2(0.7f, 0.8f));
+                //spriteBatch.DrawString(spriteFont: spriteFont, text:"select character", position: new Vector2(graphicsManager.GraphicsDevice.Viewport.Width / 7, 10), scale: new Vector2(3, 2), color: Color.Black, rotation: 0f, effects: SpriteEffects.None, layerDepth:1f, origin: Vector2.Zero);
+
+                UIHandler.DrawCharacterSelectionButtons(spriteBatch);
+                spriteBatch.End();
+
+
+            }
             
 
 

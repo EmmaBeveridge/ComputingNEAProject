@@ -120,6 +120,25 @@
 /processorParam:TextureFormat=Compressed
 /build:Chair.fbx
 
+#begin CommunityMap.fbx
+/importer:FbxImporter
+/processor:ModelProcessor
+/processorParam:ColorKeyColor=0,0,0,0
+/processorParam:ColorKeyEnabled=True
+/processorParam:DefaultEffect=BasicEffect
+/processorParam:GenerateMipmaps=True
+/processorParam:GenerateTangentFrames=False
+/processorParam:PremultiplyTextureAlpha=True
+/processorParam:PremultiplyVertexColors=True
+/processorParam:ResizeTexturesToPowerOfTwo=False
+/processorParam:RotationX=270
+/processorParam:RotationY=180
+/processorParam:RotationZ=90
+/processorParam:Scale=10
+/processorParam:SwapWindingOrder=False
+/processorParam:TextureFormat=Compressed
+/build:CommunityMap.fbx
+
 #begin Countertop.fbx
 /importer:FbxImporter
 /processor:ModelProcessor
@@ -300,6 +319,25 @@
 /processorParam:SwapWindingOrder=False
 /processorParam:TextureFormat=Compressed
 /build:Grass.fbx
+
+#begin Hospital.fbx
+/importer:FbxImporter
+/processor:ModelProcessor
+/processorParam:ColorKeyColor=0,0,0,0
+/processorParam:ColorKeyEnabled=True
+/processorParam:DefaultEffect=BasicEffect
+/processorParam:GenerateMipmaps=True
+/processorParam:GenerateTangentFrames=False
+/processorParam:PremultiplyTextureAlpha=True
+/processorParam:PremultiplyVertexColors=True
+/processorParam:ResizeTexturesToPowerOfTwo=False
+/processorParam:RotationX=0
+/processorParam:RotationY=90
+/processorParam:RotationZ=0
+/processorParam:Scale=2
+/processorParam:SwapWindingOrder=False
+/processorParam:TextureFormat=Compressed
+/build:Hospital.fbx
 
 #begin houseBake6.fbx
 /importer:FbxImporter
@@ -509,6 +547,54 @@
 /processorParam:TextureFormat=Compressed
 /build:man4.dae
 
+#begin ManGreenFull.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:ManGreenFull.png
+
+#begin ManGreenFullSized.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:ManGreenFullSized.png
+
+#begin ManRedFull.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:ManRedFull.png
+
+#begin ManRedFullSized.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:ManRedFullSized.png
+
 #begin NeedsButton.jpg
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -580,6 +666,25 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:NewGameButtonSized.png
+
+#begin Office.fbx
+/importer:FbxImporter
+/processor:ModelProcessor
+/processorParam:ColorKeyColor=0,0,0,0
+/processorParam:ColorKeyEnabled=True
+/processorParam:DefaultEffect=BasicEffect
+/processorParam:GenerateMipmaps=True
+/processorParam:GenerateTangentFrames=False
+/processorParam:PremultiplyTextureAlpha=True
+/processorParam:PremultiplyVertexColors=True
+/processorParam:ResizeTexturesToPowerOfTwo=False
+/processorParam:RotationX=0
+/processorParam:RotationY=270
+/processorParam:RotationZ=0
+/processorParam:Scale=100
+/processorParam:SwapWindingOrder=False
+/processorParam:TextureFormat=Compressed
+/build:Office.fbx
 
 #begin Oven.fbx
 /importer:FbxImporter
@@ -698,6 +803,37 @@
 /processorParam:TextureFormat=Compressed
 /build:Roof.fbx;RoofBrown.fbx
 
+#begin School.fbx
+/importer:FbxImporter
+/processor:ModelProcessor
+/processorParam:ColorKeyColor=0,0,0,0
+/processorParam:ColorKeyEnabled=True
+/processorParam:DefaultEffect=BasicEffect
+/processorParam:GenerateMipmaps=True
+/processorParam:GenerateTangentFrames=False
+/processorParam:PremultiplyTextureAlpha=True
+/processorParam:PremultiplyVertexColors=True
+/processorParam:ResizeTexturesToPowerOfTwo=False
+/processorParam:RotationX=0
+/processorParam:RotationY=270
+/processorParam:RotationZ=0
+/processorParam:Scale=0.06
+/processorParam:SwapWindingOrder=False
+/processorParam:TextureFormat=Compressed
+/build:School.fbx
+
+#begin SelectCharacterScreen.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:SelectCharacterScreen.png
+
 #begin Shower.fbx
 /importer:FbxImporter
 /processor:ModelProcessor
@@ -748,6 +884,18 @@
 /processorParam:TextureFormat=Color
 /build:SkillsButton2.jpg
 
+#begin SkyBackground.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:SkyBackground.png
+
 #begin Sofa.fbx
 /importer:FbxImporter
 /processor:ModelProcessor
@@ -766,6 +914,44 @@
 /processorParam:SwapWindingOrder=False
 /processorParam:TextureFormat=Compressed
 /build:Sofa.fbx
+
+#begin Station.fbx
+/importer:FbxImporter
+/processor:ModelProcessor
+/processorParam:ColorKeyColor=0,0,0,0
+/processorParam:ColorKeyEnabled=True
+/processorParam:DefaultEffect=BasicEffect
+/processorParam:GenerateMipmaps=True
+/processorParam:GenerateTangentFrames=False
+/processorParam:PremultiplyTextureAlpha=True
+/processorParam:PremultiplyVertexColors=True
+/processorParam:ResizeTexturesToPowerOfTwo=False
+/processorParam:RotationX=0
+/processorParam:RotationY=0
+/processorParam:RotationZ=0
+/processorParam:Scale=1
+/processorParam:SwapWindingOrder=False
+/processorParam:TextureFormat=Compressed
+/build:Station.fbx
+
+#begin Store.fbx
+/importer:FbxImporter
+/processor:ModelProcessor
+/processorParam:ColorKeyColor=0,0,0,0
+/processorParam:ColorKeyEnabled=True
+/processorParam:DefaultEffect=BasicEffect
+/processorParam:GenerateMipmaps=True
+/processorParam:GenerateTangentFrames=False
+/processorParam:PremultiplyTextureAlpha=True
+/processorParam:PremultiplyVertexColors=True
+/processorParam:ResizeTexturesToPowerOfTwo=False
+/processorParam:RotationX=0
+/processorParam:RotationY=270
+/processorParam:RotationZ=0
+/processorParam:Scale=50
+/processorParam:SwapWindingOrder=False
+/processorParam:TextureFormat=Compressed
+/build:Store.fbx
 
 #begin Table.fbx
 /importer:FbxImporter
@@ -816,6 +1002,25 @@
 /processorParam:SwapWindingOrder=False
 /processorParam:TextureFormat=Compressed
 /build:Toilet.fbx
+
+#begin TownHall.fbx
+/importer:FbxImporter
+/processor:ModelProcessor
+/processorParam:ColorKeyColor=0,0,0,0
+/processorParam:ColorKeyEnabled=True
+/processorParam:DefaultEffect=BasicEffect
+/processorParam:GenerateMipmaps=True
+/processorParam:GenerateTangentFrames=False
+/processorParam:PremultiplyTextureAlpha=True
+/processorParam:PremultiplyVertexColors=True
+/processorParam:ResizeTexturesToPowerOfTwo=False
+/processorParam:RotationX=0
+/processorParam:RotationY=270
+/processorParam:RotationZ=0
+/processorParam:Scale=0.08
+/processorParam:SwapWindingOrder=False
+/processorParam:TextureFormat=Compressed
+/build:TownHall.fbx
 
 #begin TV.fbx
 /importer:FbxImporter
@@ -898,6 +1103,18 @@
 /processorParam:TextureFormat=Color
 /build:WomanPurpleFull.png
 
+#begin WomanPurpleFullSized.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:WomanPurpleFullSized.png
+
 #begin WomanYellow.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -921,4 +1138,16 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:WomanYellowFull.png
+
+#begin WomanYellowFullSized.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:WomanYellowFullSized.png
 

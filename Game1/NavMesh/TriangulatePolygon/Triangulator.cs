@@ -83,7 +83,7 @@ namespace Game1.NavMesh.TriangulatePolygon
 
                 foreach (var hole in holeVertices)
                 {
-                    if (hole.Max( h => h.X) > maxX)
+                    if (hole.Max( h => h.X) >= maxX) //for some reason this line has broken since adding buildings - making >= seems to have fixed it??
                     {
                         nextHole = hole;
                         maxX = hole.Max(h => h.X);

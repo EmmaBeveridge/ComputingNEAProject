@@ -16,6 +16,7 @@ namespace Game1.UI
         public List<ToolbarButton> toolbarButtons;
 
         public List<Button> mainMenuButtons;
+        public List<Button> characterSelectionButtons;
 
         public ExitButton exitButton;
         public bool displayTextbox = false;
@@ -30,6 +31,7 @@ namespace Game1.UI
             buttons = new List<Button>();
             toolbarButtons = new List<ToolbarButton>();
             mainMenuButtons = new List<Button>();
+            characterSelectionButtons = new List<Button>();
         }
 
 
@@ -60,7 +62,37 @@ namespace Game1.UI
         }
 
 
-        public void BuildMainMenuButton(GraphicsDeviceManager graphicsManager, Texture2D exitButtonTexture, Texture2D resumeGameTexture, Texture2D newGameTexture)
+
+        public void BuildCharacterSelectionButtons(GraphicsDeviceManager graphicsManager, List<Texture2D> characterTextures)
+        {
+            
+            float yPosition = 80;
+            float screenWidth = graphicsManager.GraphicsDevice.Viewport.Width;
+
+            float xSpacing = (screenWidth - characterTextures[0].Width * characterTextures.Count) / (characterTextures.Count + 1);
+
+            Vector2 position = new Vector2(xSpacing, yPosition);
+
+            for (int i = 0; i < characterTextures.Count; i++)
+            {
+                CharacterSelectionButton button = new CharacterSelectionButton(null, position, characterTextures[i]);
+                characterSelectionButtons.Add(button);
+
+                position.X += characterTextures[i].Width + xSpacing;
+
+
+
+            }
+
+
+
+
+
+
+        }
+
+
+        public void BuildMainMenuButtons(GraphicsDeviceManager graphicsManager, Texture2D exitButtonTexture, Texture2D resumeGameTexture, Texture2D newGameTexture)
         {
 
             float screenWidth = graphicsManager.GraphicsDevice.Viewport.Width;
@@ -144,38 +176,54 @@ namespace Game1.UI
         }
 
 
-
-        public void HandleCharacterSelection()
+        /// <summary>
+        /// Returns texture of character selected, texture used in game.characterNameDictionary to convert to name to get icon/model, null if none selected
+        /// </summary>
+        /// <returns></returns>
+        public Texture2D HandleCharacterSelection()
         {
-            throw new NotImplementedException();
+            if (!MouseInput.WasLeftClicked())
+            {
+                return null;
+            }
+
+            Button buttonPressed = MouseInput.GetButtonPressed(characterSelectionButtons);
+
+            if (buttonPressed == null) { return null; }
+
+            else { return buttonPressed.buttonTexture; }
+            
         }
 
 
-        public bool HandleMainMenuInput()
+        public Button HandleMainMenuInput()
         {
             
 
             if (!MouseInput.WasLeftClicked())
             {
-                return false;
+                return null;
             }
             
             Button buttonPressed = MouseInput.GetButtonPressed(mainMenuButtons);
 
-            if( buttonPressed == null)
-            {
-                return false;
-            }
-            else if (buttonPressed.GetType() == typeof(ExitButton))
-            {
-                ExitButton.Exit();
-            }
-            else  if (buttonPressed.GetType() == typeof(NewGameButton))
-            {
-                NewGameButton.CreateNewGame();
-            }
+            return buttonPressed;
 
-            return true;
+
+            //if( buttonPressed == null)
+            //{
+            //    return;
+            //}
+            //else if (buttonPressed.GetType() == typeof(ExitButton))
+            //{
+            //    ExitButton.Exit();
+            //}
+            //else  if (buttonPressed.GetType() == typeof(NewGameButton))
+            //{
+            //    //NewGameButton.CreateNewGame();
+            //}
+
+            //return true;
 
 
 
@@ -195,6 +243,17 @@ namespace Game1.UI
             {
 
                 spriteBatch.Draw(mainMenuButton.buttonTexture, mainMenuButton.position);
+
+            }
+        }
+
+
+        public void DrawCharacterSelectionButtons(SpriteBatch spriteBatch)
+        {
+            foreach (Button characterButton in characterSelectionButtons)
+            {
+
+                spriteBatch.Draw(characterButton.buttonTexture, characterButton.position, scale: new Vector2(1f, 1f));
 
             }
         }
