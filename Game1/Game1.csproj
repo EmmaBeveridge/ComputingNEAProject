@@ -48,23 +48,28 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Actions\Action.cs" />
+    <Compile Include="Actions\BuyIngredientsAction.cs" />
     <Compile Include="Actions\EatFromFridgeAction.cs" />
+    <Compile Include="Actions\GetJobAtStoreAction.cs" />
     <Compile Include="Actions\NapAction.cs" />
+    <Compile Include="Actions\QuitJobAtStoreAction.cs" />
     <Compile Include="Actions\ReadBookAction.cs" />
     <Compile Include="Actions\SleepAction.cs" />
     <Compile Include="Actions\TakeShowerAction.cs" />
     <Compile Include="Actions\TalkToPersonAction.cs" />
     <Compile Include="Actions\ToiletAction.cs" />
+    <Compile Include="Actions\WorkAtStoreAction.cs" />
     <Compile Include="AStar\AStar.cs" />
     <Compile Include="AStar\NodeCollection.cs" />
     <Compile Include="AStar\NodeLinks.cs" />
     <Compile Include="AStar\Path.cs" />
     <Compile Include="AStar\PriorityQueue.cs" />
-    <Compile Include="Career\Career.cs" />
-    <Compile Include="Career\Thief.cs" />
+    <Compile Include="Careers\Career.cs" />
+    <Compile Include="Careers\StoreClerk.cs" />
     <Compile Include="DataClasses\PointConverter.cs" />
     <Compile Include="Characters\Need.cs" />
     <Compile Include="DataClasses\SQLiteDBHandler.cs" />
+    <Compile Include="GOAP\GOAPActionWithBuilding.cs" />
     <Compile Include="GOAP\GOAPActionWithItem.cs" />
     <Compile Include="GOAP\GOAPActionWithPerson.cs" />
     <Compile Include="ID3\Cut.cs" />
@@ -80,8 +85,12 @@
     <Compile Include="Town\Buildings\TownHall.cs" />
     <Compile Include="Town\Districts\Community.cs" />
     <Compile Include="Traits\Trait.cs" />
+    <Compile Include="Traits\TraitGourmand.cs" />
+    <Compile Include="Traits\TraitLazy.cs" />
     <Compile Include="UI\Button.cs" />
     <Compile Include="UI\CharacterSelectionButton.cs" />
+    <Compile Include="UI\EmotionButton.cs" />
+    <Compile Include="UI\EmotionPanel.cs" />
     <Compile Include="UI\ExitButton.cs" />
     <Compile Include="UI\NewGameButton.cs" />
     <Compile Include="UI\RelationshipBar.cs" />
@@ -151,6 +160,7 @@
     <Compile Include="Town\Town.cs" />
     <Compile Include="UI\NeedBar.cs" />
     <Compile Include="UI\ToolbarPanel.cs" />
+    <Compile Include="UI\TraitSelectionButton.cs" />
     <Compile Include="UI\UIHandler.cs" />
   </ItemGroup>
   <ItemGroup>

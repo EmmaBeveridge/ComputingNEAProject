@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.Xna.Framework.Graphics;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -6,14 +7,61 @@ using System.Threading.Tasks;
 
 namespace Game1.Traits
 {
-    public class Trait
+    public abstract class Trait
     {
+
+
+       public static string TraitString;
+
+        public static Dictionary<Texture2D, string> ButtonToString = new Dictionary<Texture2D, string>();
+        public static int maxTraits = 2;
+
+        public static int DBID;
+
+        public List<NeedNames> needsPrioritised = new List<NeedNames>();
+        public List<NeedNames> needsAcceleratedDepletion = new List<NeedNames>();
+
 
         public Trait()
         {
 
         }
 
+
+
+        public int GetID() { return DBID; }
+
+
+        public static void SetTraitID(string TraitString, int TraitID)
+        {
+            switch (TraitString)
+            {
+                case "Lazy":
+                    TraitLazy.DBID = TraitID;
+                    break;
+                case "Gourmand":
+                    TraitGourmand.DBID = TraitID;
+                    break;
+
+                default:
+                    break;
+            }
+
+        }
+
+        public static int GetTraitID(string TraitString)
+        {
+            switch (TraitString)
+            {
+                case "Lazy":
+                    return TraitLazy.DBID;
+                case "Gourmand":
+                    return TraitGourmand.DBID;
+                default:
+                    break;
+            }
+            return -1;
+        }
 
 
         /// <summary>
@@ -23,7 +71,39 @@ namespace Game1.Traits
         /// <returns></returns>
         public static List<NeedNames> GetNeedsPrioritised(List<Trait> traits)
         {
-            return new List<NeedNames>();
+            List<NeedNames> prioritised = new List<NeedNames>();
+
+            foreach (Trait trait in traits)
+            {
+                prioritised.AddRange(trait.needsPrioritised);
+            }
+
+            prioritised = prioritised.Distinct().ToList();
+
+            return prioritised;
+
+
+        }
+
+        /// <summary>
+        /// Returns list of all needs that have an accelerated depletion rate due to specified traits
+        /// </summary>
+        /// <param name="traits">List of person's traits</param>
+        /// <returns></returns>
+        public static List<NeedNames> GetNeedsAcceleratedDepletion(List<Trait> traits)
+        {
+            List<NeedNames> accelerated = new List<NeedNames>();
+
+            foreach (Trait trait in traits)
+            {
+                accelerated.AddRange(trait.needsAcceleratedDepletion);
+            }
+
+            accelerated = accelerated.Distinct().ToList();
+
+            return accelerated;
+
+
         }
 
 
@@ -35,7 +115,23 @@ namespace Game1.Traits
 
         public static Trait GetTraitFromString (string TraitString)
         {
-            return null;
+            switch (TraitString)
+            {
+                case "Lazy":
+                    return new TraitLazy();
+                    break;
+
+                case "Gourmand":
+                    return new TraitGourmand();
+                    break;
+
+                default:
+                    return null;
+                    break;
+            }
+
+
+
         }
 
 

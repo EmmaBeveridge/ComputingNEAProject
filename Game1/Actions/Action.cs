@@ -1,4 +1,5 @@
 ﻿using Game1.GOAP;
+using Game1.Town;
 using Microsoft.Xna.Framework;
 using System;
 using System.Collections.Generic;
@@ -14,6 +15,7 @@ namespace Game1
         public string Name;
         public Item Item = null;
         public People PersonToInteractWith = null;
+        public Building Building = null;
         public Action<GameTime, Dictionary<NeedNames, Need>, People> ActionMethod;
         protected float minActionTime;
         protected float rateOfNeedIncrease;

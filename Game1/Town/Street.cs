@@ -43,6 +43,20 @@ namespace Game1.Town
         public List<Building> buildings;
 
 
+        /// <summary>
+        /// Finds perpendicular vector clockwise(left) from street vector
+        /// </summary>
+        /// <returns>perpendicular clockwise/left  vector</returns>
+        public Vector3 FindPerpendicularVector()
+        {
+            //https://gamedev.stackexchange.com/questions/70075/how-can-i-find-the-perpendicular-to-a-2d-vector
+
+            Vector3 direction = End - Start;
+
+            Vector3 normal = new Vector3(direction.Z, 0, -direction.X);
+            normal.Normalize();
+            return normal ;
+        }
 
 
         public Vector3 FindClosestPointOnStreet(Vector3 point)

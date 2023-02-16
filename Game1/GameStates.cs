@@ -13,6 +13,7 @@ namespace Game1
 
             MainMenu,
             CharacterSelection,
+            TraitSelection,
             Loading,
             Playing,
             Paused

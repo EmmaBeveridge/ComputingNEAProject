@@ -17,9 +17,23 @@ using Game1.Traits;
 
 namespace Game1
 {
+    public enum PeopleSelectingState
+    {
+        none,
+        ItemAction,
+        BuildingAction
+        
+    }
+
+    
+
+
     public class Player : People
     {
 
+        PeopleSelectingState selectingState = PeopleSelectingState.none;
+
+        
         public Player(Model _model, Vector3 _position, Mesh argMesh, Town.Town argTown, Game1 argGame, Texture2D argIcon, int argDBID, string argName, House argHouse, Career argCareer, List<Trait> argTraits, Dictionary<NeedNames, Need> argNeeds ) : base(_model, _position, argMesh, argTown, argGame, argIcon, argDBID, argName, argHouse, argCareer, argTraits, argNeeds, true)
         {
 
@@ -28,25 +42,37 @@ namespace Game1
 
         public override void Update(GameTime gameTime, GraphicsDevice graphicsDevice, Matrix projection, Matrix view, Game1 game)
         {
-
+            
+            DepleteNeeds(gameTime);
+            emotionalState = GetEmotionalState();
 
             goapStateMachine.Tick(gameTime);
 
 
             MouseInput.GetState();
 
+            //problem is being set into moving state even when should be selecting item/building action -- need to fix that
+            //add a peopleselecting state (item, building, person) 
 
             if (MouseInput.WasLeftClicked() && game.IsActive)
             {
                 ToolbarButton selectedToolBarButton = MouseInput.GetToolbarButton(game.UIHandler.toolbarButtons);
 
                 if (MouseInput.IsExitButtonPressed(game.UIHandler.exitButton))
-                {
+                { 
                     // End game, save game state
+                    ExitButton.SaveAndExit(people, game);
+
+
+                   
                 }
 
+                else if (MouseInput.IsEmotionButtonPressed(game.UIHandler.emotionButton))
+                {
+                    DisplayEmotion(game.UIHandler.emotionButton);
+                }
 
-                else if (actionState == PeopleActionStates.selectingItemAction)
+                else if (selectingState == PeopleSelectingState.ItemAction)
                 {
                     Button selectedButton = MouseInput.GetButtonPressed(selectedItem.actionButtons);
                     if (selectedButton != null)
@@ -54,7 +80,7 @@ namespace Game1
                         Console.WriteLine("Selected action:" + selectedButton.buttonLabel);
                         game.UIHandler.ClearButtons();
                         goapPerson.PushNewAction(selectedButton.buttonAction);
-                        actionState = PeopleActionStates.moving;
+                        //actionState = PeopleActionStates.moving;
 
 
                     }
@@ -62,13 +88,37 @@ namespace Game1
                     {
                         game.UIHandler.ClearButtons();
                         actionState = PeopleActionStates.idle;
+                        selectingState = PeopleSelectingState.none;
                     }
 
                 }
-                
-                
 
-                else if(selectedToolBarButton != null)
+                else if (selectingState == PeopleSelectingState.BuildingAction)
+                {
+                    Button selectedButton = MouseInput.GetButtonPressed(selectedBuilding.actionButtons);
+                    if (selectedButton != null)
+                    {
+                        Console.WriteLine("Selected action:" + selectedButton.buttonLabel);
+                        game.UIHandler.ClearButtons();
+                        goapPerson.PushNewAction(selectedButton.buttonAction);
+                        //actionState = PeopleActionStates.moving;
+
+
+                    }
+                    else
+                    {
+                        game.UIHandler.ClearButtons();
+                        actionState = PeopleActionStates.idle;
+                        selectingState = PeopleSelectingState.none;
+                    }
+
+                }
+
+
+
+
+
+                else if (selectedToolBarButton != null)
                 {
                     DisplayToolBarPanel(selectedToolBarButton);
 
@@ -91,7 +141,7 @@ namespace Game1
                 else if (MouseInput.FindItemSelected(currentHouse, graphicsDevice, projection, view, ref selectedItem)) //is item selected
                 {
 
-                    actionState = PeopleActionStates.selectingItemAction;
+                    selectingState = PeopleSelectingState.ItemAction;
                     DisplayItemLabels(selectedItem);
                     Console.WriteLine("Selected:" + selectedItem.id);
                 }
@@ -106,6 +156,15 @@ namespace Game1
 
 
                 }
+
+                else if (MouseInput.FindBuildingSelected(town.buildings, graphicsDevice, projection, view, ref selectedBuilding))
+                {
+                    selectingState = PeopleSelectingState.BuildingAction;
+                    DisplayBuildingLabels(selectedBuilding);
+                    Console.WriteLine("Selected:" + selectedBuilding.id);
+
+                }
+
                 else
                 {
                     goal = MouseInput.MousePosToWorldCoordinates(graphicsDevice, projection, view); //finds the position user has clicked in the 3d world and sets this as the avatar's target position
@@ -159,6 +218,18 @@ namespace Game1
         public void DisplayItemLabels(Item selectedItem)
         {
             selectedItem.DisplayActions(game);
+        }
+
+        public void DisplayBuildingLabels(Building selectedBuilding)
+        {
+            selectedBuilding.DisplayActions(game, this);
+        }
+
+
+        public void DisplayEmotion(EmotionButton button)
+        {
+            button.panel.IsDisplayed = !button.panel.IsDisplayed;
+           
         }
 
 
@@ -229,6 +300,7 @@ namespace Game1
                 //currentHouse = House.getHouseContainingPoint(position);
                 reachedGoal = true;
                 currentHouse = goalHouse;
+                //currentBuilding = goalBuilding;
                 return;
             }
 
@@ -278,6 +350,7 @@ namespace Game1
                     //currentHouse = House.getHouseContainingPoint(position);
                     reachedGoal = true;
                     currentHouse = goalHouse;
+                    //currentBuilding = goalBuilding;
                     return;
                 }
 

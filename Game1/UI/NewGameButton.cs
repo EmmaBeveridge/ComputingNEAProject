@@ -13,6 +13,9 @@ namespace Game1.UI
     {
         public static string selectedCharacterName;
 
+        public static List<string> selectedTraitNames = new List<string>();
+
+
 
         public NewGameButton(string argLabel, Vector2 argPosition, Texture2D argTexture) : base(argLabel, argPosition, argTexture)
         {
@@ -31,7 +34,8 @@ namespace Game1.UI
             SQLiteDBHandler handler = new SQLiteDBHandler();
 
             handler.CreateTables();
-            handler.AddPeople(selectedCharacterName);
+            handler.CreateTraitLookupTable();
+            handler.AddPeople(selectedCharacterName, selectedTraitNames);
 
 
 

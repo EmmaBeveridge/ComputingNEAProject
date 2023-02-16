@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Game1
 {
-    public enum NeedLevel { High, Mid, Low}
+    public enum NeedLevel {def, High, Mid, Low}
     public enum NeedPriority { High, Mid, Low}
 
     public enum NeedNames
@@ -19,10 +19,19 @@ namespace Game1
 
     public class Need
     {
+        private static float DepletionRateHunger = 0.4f;
+        private static float DepletionRateToilet = 0.6f;
+        private static float DepletionRateSleep = 0.1f;
+        private static float DepletionRateHygiene = 0.2f;
+        private static float DepletionRateFun = 0.4f;
+        private static float DepletionRateSocial = 0.3f;
+
+
         public NeedNames Name;
         public float CurrentNeed;
         public int MaxNeed;
         public NeedLevel Level;
+        public float DepletionRate;
         
         public NeedBar NeedBar = null;
         public float Percent;
@@ -33,7 +42,7 @@ namespace Game1
         public Need(NeedNames _name, int _maxNeed = 100, float _currentNeed = 10, bool generateNeedBar = false, bool _prioritised = false)
         {
             Name = _name;
-            
+            SetDepletionRate(Name);
             MaxNeed = _maxNeed;
             CurrentNeed = _currentNeed;
             Prioritised = _prioritised;
@@ -41,6 +50,50 @@ namespace Game1
             Update();
 
         }
+
+
+        private void SetDepletionRate(NeedNames name)
+        {
+            switch (name)
+            {
+                case NeedNames.Null:
+                    break;
+                case NeedNames.Hunger:
+                    DepletionRate = DepletionRateHunger;
+                    break;
+                case NeedNames.Sleep:
+                    DepletionRate = DepletionRateSleep;
+                    break;
+                case NeedNames.Toilet:
+                    DepletionRate = DepletionRateToilet;
+                    break;
+                case NeedNames.Social:
+                    DepletionRate = DepletionRateSocial;
+                    break;
+                case NeedNames.Hygiene:
+                    DepletionRate = DepletionRateHygiene;
+                    break;
+                case NeedNames.Fun:
+                    DepletionRate = DepletionRateFun;
+                    break;
+                default:
+                    break;
+            }
+        }
+
+
+        public void DepleteNeed(GameTime gameTime)
+        {
+            float decrement = (float)gameTime.ElapsedGameTime.TotalSeconds * DepletionRate;
+
+            Update(-decrement);
+
+
+
+
+        }
+
+
 
         public void Update(float increment = 0)
         {

@@ -27,6 +27,7 @@ namespace Game1.Town
         static public Mesh navMesh;
         public List<District> districts = new List<District>();
         public List<House> houses = new List<House>();
+        public List<Building> buildings = new List<Building>();
 
 
         public List<GOAPAction> GOAPActions = new List<GOAPAction>();

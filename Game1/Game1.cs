@@ -16,6 +16,7 @@ using Game1.UI;
 using System.Data;
 using Game1.DataClasses;
 using Game1.ID3;
+using Game1.Traits;
 
 namespace Game1
 
@@ -40,13 +41,15 @@ namespace Game1
 
         Texture2D characterSelectionBackground;
 
+        Texture2D traitSelectionBackground;
+
 
 
         public Dictionary<string, Model> modelDictionary = new Dictionary<string, Model>();
         public Dictionary<string, Texture2D> iconDictionary = new Dictionary<string, Texture2D>();
         public Dictionary<Texture2D, string> characterNameDictionary = new Dictionary<Texture2D, string>();
 
-
+        private Texture2D selectedCharacterTexture = null;
 
 
         SpriteBatch spriteBatch;
@@ -133,6 +136,8 @@ namespace Game1
 
             mainMenuScreen = Content.Load<Texture2D>("MainMenu");
             characterSelectionBackground = Content.Load<Texture2D>("SelectCharacterScreen");
+            traitSelectionBackground = Content.Load<Texture2D>("SelectTraitsScreen");
+
 
             Texture2D exitMainTexture = Content.Load<Texture2D>("ExitMainButtonSized");
             Texture2D newGameTexture = Content.Load<Texture2D>("NewGameButtonSized");
@@ -143,15 +148,18 @@ namespace Game1
             characterNameDictionary.Add(Content.Load<Texture2D>("ManRedFullSized"), "ManRedFull");
             characterNameDictionary.Add(Content.Load<Texture2D>("ManGreenFullSized"), "ManGreenFull");
 
+
+            Trait.ButtonToString.Add(Content.Load<Texture2D>("Lazy"), TraitLazy.TraitString);
+            Trait.ButtonToString.Add(Content.Load<Texture2D>("Gourmand"), TraitGourmand.TraitString);
+
+            EmotionButton.NegativeEmotionTexture = Content.Load<Texture2D>("Frown");
+            EmotionButton.PositiveEmotionTexture = Content.Load<Texture2D>("Smile");
+
             
-
-
-
-            ExitButton.Exit = Exit;
 
             UIHandler.BuildMainMenuButtons(graphicsManager, exitMainTexture, resumeGameTexture, newGameTexture);
             UIHandler.BuildCharacterSelectionButtons(graphicsManager, characterNameDictionary.Keys.ToList());
-
+            
 
             Button.defaultTexture = Content.Load<Texture2D>("BlueButton");
             spriteFont = Content.Load<SpriteFont>("buttonFont");
@@ -225,9 +233,13 @@ namespace Game1
                             building.model = Content.Load<Model>(building.modelName);
                             building.GenerateAvatar();
                             avatars.Add(building.avatar);
+                            building.BuildButtons(graphicsManager);
+
                             Building.buildings.Add(building);
 
+                            town.buildings.Add(building);
 
+                            town.GOAPActions.AddRange(building.GOAPActions);
                         }
 
 
@@ -470,7 +482,7 @@ namespace Game1
 
             UIHandler.BuildToolbarButtons(graphicsManager, player);
             UIHandler.BuildExitButton(graphicsManager);
-
+            UIHandler.BuildEmotionButton(graphicsManager, player);
             
             
 
@@ -519,7 +531,7 @@ namespace Game1
                 
                 else if (menuButtonPressed.GetType() == typeof(ExitButton))
                 {
-                    ExitButton.Exit();
+                    ExitButton.Exit(this);
                 }
                 else if (menuButtonPressed.GetType() == typeof(NewGameButton))
                 {
@@ -542,10 +554,61 @@ namespace Game1
                 if (selectedCharacter != null)
                 {
                     NewGameButton.selectedCharacterName = characterNameDictionary[selectedCharacter];
-                    NewGameButton.CreateNewGame();
-                    gameState = GameStates.States.Loading;
+                    //NewGameButton.CreateNewGame();
+                    //gameState = GameStates.States.Loading;
+                    selectedCharacterTexture = selectedCharacter;
+
+                    UIHandler.BuildTraitSelectionButtons(graphicsManager, Trait.ButtonToString.Keys.ToList(), selectedCharacter);
+
+
+                    gameState = GameStates.States.TraitSelection;
+
                 }
                 
+
+            }
+
+            else if (gameState == GameStates.States.TraitSelection)
+            {
+                Texture2D selectedTrait = UIHandler.HandleTraitSelection();
+                
+                if (selectedTrait != null)
+                {
+                    string selectedTraitString = Trait.ButtonToString[selectedTrait];
+                    Button selectedButton = UIHandler.traitSelectionButtons.Find(b => b.buttonTexture == selectedTrait);
+
+
+
+                    if (NewGameButton.selectedTraitNames.Contains(selectedTraitString)) //user unselects button
+                    {
+
+                        selectedButton.isSelected = false;
+
+                        NewGameButton.selectedTraitNames.Remove(selectedTraitString);
+                       
+
+
+
+                    }
+                    else
+                    {
+                        NewGameButton.selectedTraitNames.Add(selectedTraitString);
+
+                        selectedButton.isSelected = true;
+
+                        if (NewGameButton.selectedTraitNames.Count == Trait.maxTraits)
+                        {
+                            NewGameButton.CreateNewGame();
+                            gameState = GameStates.States.Loading;
+                        }
+
+                    }
+
+
+
+
+                }
+
 
             }
 
@@ -660,7 +723,19 @@ namespace Game1
 
 
             }
-            
+            else if (gameState == GameStates.States.TraitSelection)
+            {
+                spriteBatch.Begin();
+                spriteBatch.Draw(traitSelectionBackground, position: new Vector2(0, -10), scale: new Vector2(0.7f, 0.8f));
+                spriteBatch.Draw(selectedCharacterTexture, position: new Vector2(20, 80));
+               
+
+                UIHandler.DrawTraitSelectionButtons(spriteBatch);
+                spriteBatch.End();
+
+            }
+
+
 
 
             base.Draw(gameTime);

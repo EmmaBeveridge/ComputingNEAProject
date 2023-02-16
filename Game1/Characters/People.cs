@@ -36,10 +36,15 @@ namespace Game1
         beginMoving,
         selectingItemAction,
         selectingHouseAction,
+        selectingBuildingAction,
         typingChat,
         finishedTypingChat
     }
 
+    public enum PeopleEmotionalState
+    {
+        Comfortable, Uncomfortable, Playful, Tense, Energised, Lonely
+    }
     public struct DBPerson //halfway person, stores data about person from SQLite DataBase
     {
         public int DBID;
@@ -88,7 +93,7 @@ namespace Game1
         protected Vector3 viewVector = Vector3.Forward;
         protected const float velocity = 100f;
         protected const float angularVelocity = 20f;
-        
+
         protected Matrix transformationMatrix;
         protected Matrix rotationMatrix;
         protected Matrix translationMatrix;
@@ -97,7 +102,7 @@ namespace Game1
         protected const float yValue = 0f;
 
 
-        
+
         public Avatar avatar;
         public Texture2D icon;
         public string modelName;
@@ -107,16 +112,22 @@ namespace Game1
         public PeopleMotionStates motionState;
         public PeopleActionStates actionState;
 
-        protected List<Vector3> pathPoints;
+        public List<Vector3> pathPoints;
         protected Mesh mesh;
         protected Path pathFinder;
         public Vector3 goal;
 
         public House currentHouse;
         protected House goalHouse;
+
+        public Building currentBuilding;
+        public Building goalBuilding;
+
+
         protected Item selectedItem;
         protected People selectedPerson;
-        
+        protected Building selectedBuilding;
+
         public Town.Town town;
         protected Game1 game;
 
@@ -135,8 +146,8 @@ namespace Game1
 
         public List<Trait> Traits = new List<Trait>();
 
-
-
+        public PeopleEmotionalState emotionalState;
+       
         public static Tree decisionTree;
         public static List<People> people = new List<People>();
 
@@ -149,13 +160,13 @@ namespace Game1
         public People(Model _model, Vector3 _position, Mesh argMesh, Town.Town argTown, Game1 argGame, Texture2D argIcon, int argDBID, string argName, House argHouse, Career argCareer, List<Trait> argTraits, Dictionary<NeedNames, Need> argNeeds, bool _isPlayer = false)
         {
             position = _position;
-            avatar = new Avatar (_model, _position);
+            avatar = new Avatar(_model, _position);
             motionState = PeopleMotionStates.idle;
             actionState = PeopleActionStates.idle;
             transformationMatrix = Matrix.Identity;
             translationMatrix = Matrix.CreateTranslation(_position);
             rotationMatrix = Matrix.Identity;
-            avatar.worldMatrix = Matrix.Identity; 
+            avatar.worldMatrix = Matrix.Identity;
             viewVector = avatar.worldMatrix.Forward; //direction vector avatar is looking in
             mesh = argMesh;
             currentHouse = null;
@@ -192,6 +203,63 @@ namespace Game1
         }
 
 
+        /// <summary>
+        /// Decrements person's need to cause depletion over time
+        /// </summary>
+        protected void DepleteNeeds(GameTime gameTime)
+        {
+            
+            foreach (Need need in Needs.Values)
+            {
+
+                need.DepleteNeed(gameTime);
+
+
+            }
+
+
+        }
+
+        protected PeopleEmotionalState GetEmotionalState()
+        {
+
+            var orderedNeedsAscending = Needs.OrderBy(kvp => kvp.Value.CurrentNeed);
+
+            KeyValuePair<NeedNames, Need> mostUnfulfilled = orderedNeedsAscending.FirstOrDefault(kvp => kvp.Value.Level == NeedLevel.Low);
+
+            if (mostUnfulfilled.Value == null)
+            {
+                var orderedNeedsDescending = Needs.OrderByDescending(kvp => kvp.Value.CurrentNeed);
+                KeyValuePair<NeedNames, Need> mostFulfilled = orderedNeedsDescending.FirstOrDefault(kvp => kvp.Value.Level == NeedLevel.High);
+                switch (mostFulfilled.Key)
+                {
+                   
+                    case NeedNames.Sleep:
+                        return PeopleEmotionalState.Energised;                 
+                    case NeedNames.Fun:
+                        return PeopleEmotionalState.Playful;
+                    default:
+                        return PeopleEmotionalState.Comfortable;
+                }
+            }
+            else
+            {
+                switch (mostUnfulfilled.Key)
+                {                                     
+                    case NeedNames.Social:
+                        return PeopleEmotionalState.Lonely;                 
+                    case NeedNames.Fun:
+                        return PeopleEmotionalState.Tense;
+                    default:
+                        return PeopleEmotionalState.Uncomfortable;
+                }
+
+            }
+
+        }
+
+
+
         public void BuildAI()
         {
             //needs to be called after all talk to person actions created and added to town goap actions list
@@ -209,7 +277,7 @@ namespace Game1
             recipientAction.Action.initiator = this;
 
 
-             
+
 
 
 
@@ -235,16 +303,16 @@ namespace Game1
 
         public GOAPAction DefineActions()
         {
-            TalkToPersonAction talk  = new TalkToPersonAction(this);
+            TalkToPersonAction talk = new TalkToPersonAction(this);
             GOAPAction talkGOAP = talk.DefineGOAPAction();
             return talkGOAP;
-            
+
         }
 
 
 
 
-        public void UpdateRelationsAutonomous(People personInteractingWith) 
+        public void UpdateRelationsAutonomous(People personInteractingWith)
         {
             const float relationshipAdjustment = 0.01f; //should be small as applied every update frame
 
@@ -275,7 +343,7 @@ namespace Game1
         }
 
 
-        
+
 
 
         public static void BuildDecisionTree()
@@ -289,7 +357,7 @@ namespace Game1
 
 
 
-            
+
         }
 
 
@@ -297,17 +365,17 @@ namespace Game1
         {
             Needs = new Dictionary<NeedNames, Need>();
             Needs.Add(NeedNames.Hunger, new Need(_name: NeedNames.Hunger, generateNeedBar: _generateNeedsBar));
-            Needs.Add(NeedNames.Sleep, new Need(_name: NeedNames.Sleep,  generateNeedBar: _generateNeedsBar));
-            Needs.Add(NeedNames.Toilet, new Need(_name: NeedNames.Toilet,  generateNeedBar: _generateNeedsBar));
+            Needs.Add(NeedNames.Sleep, new Need(_name: NeedNames.Sleep, generateNeedBar: _generateNeedsBar));
+            Needs.Add(NeedNames.Toilet, new Need(_name: NeedNames.Toilet, generateNeedBar: _generateNeedsBar));
             Needs.Add(NeedNames.Hygiene, new Need(_name: NeedNames.Hygiene, generateNeedBar: _generateNeedsBar));
-            Needs.Add(NeedNames.Social, new Need(_name: NeedNames.Social,  generateNeedBar: _generateNeedsBar));
+            Needs.Add(NeedNames.Social, new Need(_name: NeedNames.Social, generateNeedBar: _generateNeedsBar));
             Needs.Add(NeedNames.Fun, new Need(_name: NeedNames.Fun, generateNeedBar: _generateNeedsBar));
 
 
         }
 
 
-       
+
 
 
 
@@ -315,10 +383,13 @@ namespace Game1
         {
             //currentHouse = House.getHouseContainingPoint(position);
             
+            DepleteNeeds(gameTime);
             goapStateMachine.Tick(gameTime);
 
+            
 
-            if (actionState==PeopleActionStates.idle && game.IsActive) 
+
+            if (actionState == PeopleActionStates.idle && game.IsActive)
             {
                 //Random random = new Random();
                 //goal = new Vector3(random.Next(-1000, 1000), yValue, random.Next(-1000, 1000)); //temporary for npc
@@ -327,9 +398,9 @@ namespace Game1
                 //BuildPath();
                 //MovePerson(gameTime);
 
-                
 
- 
+
+
             }
 
 
@@ -367,165 +438,213 @@ namespace Game1
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
         public void BuildPath()
         {
-
             reachedGoal = false;
+            pathPoints.Clear();
 
             House goalHouse = House.getHouseContainingPoint(goal);
             House currentHouse = House.getHouseContainingPoint(position);
-            pathPoints.Clear();
+            bool currentlyInHouse = currentHouse == null ? false : true;
+            bool goalInHouse = goalHouse == null ? false : true;
 
+            bool currentlyInBuilding = currentBuilding == null ? false : true;
+            bool goalInBuilding = goalBuilding == null ? false : true;
 
-            bool currentlyOutside = currentHouse == null ? true : false;
-            bool goalOutside = goalHouse == null ? true : false;
+            bool currentlyOutside = !(currentlyInHouse ||  currentlyInBuilding);
+            bool goalOutside = !(goalInHouse || goalInBuilding);
 
-            if (currentlyOutside && goalOutside)
+                        
+
+            if (!currentlyOutside)
             {
-                mesh = Town.Town.navMesh;
-                pathFinder = new Path(mesh);
-                pathFinder.FindPath(position, goal, ref pathPoints);
-                
-
-            }
-
-            else if (currentlyOutside && !goalOutside)
-            {
-                List<Vector3> pathToHouse = new List<Vector3>();
-                
-                mesh = Town.Town.navMesh;
-                pathFinder = new Path(mesh);
-                pathFinder.FindPath(position, goalHouse.TownLocation, ref pathToHouse);
-                pathPoints.AddRange(pathToHouse);
-
-                List<Vector3> houseToGoal = new List<Vector3>();
-                mesh = House.navMesh;
-                pathFinder = new Path(mesh);
-                Vector3 localHouseGoal = (Matrix.CreateTranslation(goal) * Matrix.Invert(goalHouse.houseToTownTransformation)).Translation;
-
-                pathFinder.FindPath(Vector3.Zero, localHouseGoal, ref houseToGoal);
-
-                foreach (Vector3 point in houseToGoal)
+                if (currentlyInHouse)
                 {
-                    pathPoints.Add((Matrix.CreateTranslation(point) * goalHouse.houseToTownTransformation).Translation);
-
-                }
-
-
-                
-
-            }
-
-            else if (!currentlyOutside && goalOutside)
-            {
-                List<Vector3> pathToOutside = new List<Vector3>();
-                mesh = House.navMesh;
-                pathFinder = new Path(mesh);
-                Vector3 localHouseStart = (Matrix.CreateTranslation(position) * Matrix.Invert(currentHouse.houseToTownTransformation)).Translation;
-
-                pathFinder.FindPath(localHouseStart, Vector3.Zero, ref pathToOutside);
-
-                foreach (Vector3 point in pathToOutside)
-                {
-                    pathPoints.Add((Matrix.CreateTranslation(point) * currentHouse.houseToTownTransformation).Translation);
-                }
-
-                List<Vector3> outsideToGoal = new List<Vector3>();
-
-                mesh = Town.Town.navMesh;
-                pathFinder = new Path(mesh);
-                pathFinder.FindPath(currentHouse.TownLocation, goal, ref outsideToGoal);
-
-                pathPoints.AddRange(outsideToGoal);
-
-                 
-            }
-
-            else if (!currentlyOutside && !goalOutside)
-            {
-                if (currentHouse.id == goalHouse.id)
-                {
-                    Console.WriteLine((new System.Diagnostics.StackTrace()).GetFrame(1).GetMethod().ToString());
-
-                    mesh = House.navMesh;
-                    pathFinder = new Path(mesh);
-
-                    Vector3 localHouseStart = (Matrix.CreateTranslation(position) * Matrix.Invert(currentHouse.houseToTownTransformation)).Translation;
-                    Vector3 localHouseGoal = (Matrix.CreateTranslation(goal) * Matrix.Invert(currentHouse.houseToTownTransformation)).Translation;
-
-                    List<Vector3> localHousePoints = new List<Vector3>();
-
-                    pathFinder.FindPath(localHouseStart, localHouseGoal, ref localHousePoints);
-
-                    Console.WriteLine("localHousePoints;" + localHousePoints.Count);
-                    Console.WriteLine("pp:" + pathPoints.Count);
-                    foreach (Vector3 point in localHousePoints)
+                    if (goalInHouse && goalHouse.id == currentHouse.id)//same house, doesn't need to go to frint door
                     {
-                        pathPoints.Add((Matrix.CreateTranslation(point) * currentHouse.houseToTownTransformation).Translation);
-                        Console.WriteLine((Matrix.CreateTranslation(point) * currentHouse.houseToTownTransformation).Translation.ToString());
-                        Console.WriteLine("pp:" + pathPoints.Count);
+                        mesh = House.navMesh;
+                        pathFinder = new Path(mesh);
+
+                        Vector3 localHouseStart = (Matrix.CreateTranslation(position) * Matrix.Invert(currentHouse.houseToTownTransformation)).Translation;
+                        Vector3 localHouseGoal = (Matrix.CreateTranslation(goal) * Matrix.Invert(currentHouse.houseToTownTransformation)).Translation;
+
+                        List<Vector3> localHousePoints = new List<Vector3>();
+
+                        pathFinder.FindPath(localHouseStart, localHouseGoal, ref localHousePoints);
+
+
+                        foreach (Vector3 point in localHousePoints)
+                        {
+                            pathPoints.Add((Matrix.CreateTranslation(point) * currentHouse.houseToTownTransformation).Translation);
+
+                        }
+
                     }
 
-                    Console.WriteLine("Path length:" + pathPoints.Count);
-
-                }
-
-                else if (currentHouse.id != goalHouse.id)
-                {
-
-                    List<Vector3> pathToOutside = new List<Vector3>();
-                    mesh = House.navMesh;
-                    pathFinder = new Path(mesh);
-                    Vector3 localHouseStart = (Matrix.CreateTranslation(position) * Matrix.Invert(currentHouse.houseToTownTransformation)).Translation;
-
-                    pathFinder.FindPath(localHouseStart, Vector3.Zero, ref pathToOutside);
-
-                    foreach (Vector3 point in pathToOutside)
+                    else //need to find path to front door first
                     {
-                        pathPoints.Add((Matrix.CreateTranslation(point) * currentHouse.houseToTownTransformation).Translation);
+                        List<Vector3> pathToOutside = new List<Vector3>();
+                        mesh = House.navMesh;
+                        pathFinder = new Path(mesh);
+                        Vector3 localHouseStart = (Matrix.CreateTranslation(position) * Matrix.Invert(currentHouse.houseToTownTransformation)).Translation;
+
+                        pathFinder.FindPath(localHouseStart, Vector3.Zero, ref pathToOutside);
+
+                        foreach (Vector3 point in pathToOutside)
+                        {
+                            pathPoints.Add((Matrix.CreateTranslation(point) * currentHouse.houseToTownTransformation).Translation);
+                        }
+
+                        if (goalInHouse && goalHouse.id != currentHouse.id) //different house as goal
+                        {
+                            District startDistrict = town.districts.Find(x => x.streets.Contains(currentHouse.street));
+
+                            pathPoints.AddRange(startDistrict.FindStreetPathPoints(currentHouse, goalHouse)); //houses in same district
+
+                            List<Vector3> houseToGoal = new List<Vector3>();
+                            mesh = House.navMesh;
+                            pathFinder = new Path(mesh);
+                            Vector3 localHouseGoal = (Matrix.CreateTranslation(goal) * Matrix.Invert(goalHouse.houseToTownTransformation)).Translation;
+
+                            pathFinder.FindPath(Vector3.Zero, localHouseGoal, ref houseToGoal);
+
+                            foreach (Vector3 point in houseToGoal)
+                            {
+                                pathPoints.Add((Matrix.CreateTranslation(point) * goalHouse.houseToTownTransformation).Translation);
+
+                            }
+                        }
+
+                        else if (goalInBuilding)
+                        {
+
+                            District startDistrict = town.districts.Find(x => x.streets.Contains(currentHouse.street));
+                            pathPoints.AddRange(startDistrict.StreetPathToDistrictOrigin(currentHouse));
+
+                            District endDistrict = town.districts.Find(x => x.streets.Contains(goalBuilding.street));
+
+                            List<Vector3> goalToOrigin = endDistrict.StreetPathToDistrictOrigin(goalBuilding);
+
+                            goalToOrigin.Reverse();
+
+                            pathPoints.AddRange(goalToOrigin);
+
+                            //need to add something to get inside building , maybe use vector perpendicualr to street of building
+
+                            pathPoints.Add(pathPoints.Last() + (goalBuilding.side? 1 : -1)*Building.StreetOffset * goalBuilding.street.FindPerpendicularVector());
+
+
+                        }
+                        else //goal in open space
+                        {
+
+                            List<Vector3> outsideToGoal = new List<Vector3>();
+
+                            mesh = Town.Town.navMesh;
+                            pathFinder = new Path(mesh);
+                            pathFinder.FindPath(currentHouse.TownLocation, goal, ref outsideToGoal);
+
+                            pathPoints.AddRange(outsideToGoal);
+
+                        }
+
+
                     }
 
 
+                }
+
+
+                else if (currentlyInBuilding)
+                {
+                    pathPoints.Add(currentBuilding.TownLocation);
+
+                    if (goalOutside)
+                    {
+                        List<Vector3> outsideToGoal = new List<Vector3>();
+
+                        mesh = Town.Town.navMesh;
+                        pathFinder = new Path(mesh);
+                        pathFinder.FindPath(currentBuilding.TownLocation, goal, ref outsideToGoal);
+
+                        pathPoints.AddRange(outsideToGoal);
+                    }
+
+                    else if (goalInBuilding)
+                    {
+                        District startDistrict = town.districts.Find(x => x.streets.Contains(currentBuilding.street));
+
+                        pathPoints.AddRange(startDistrict.FindStreetPathPoints(currentBuilding, goalBuilding)); //buildings in same district
+
+                        //need to add something to get inside building , maybe use vector perpendicualr to street of building
+                        pathPoints.Add(pathPoints.Last() + (goalBuilding.side ? 1 : -1) * Building.StreetOffset * goalBuilding.street.FindPerpendicularVector());
 
 
 
 
-                    /* using roads here 
-                    List<Vector3> outsideToGoalHouse = new List<Vector3>();
+                    }
 
+                    else if (goalInHouse)
+                    {
+                        District startDistrict = town.districts.Find(x => x.streets.Contains(currentBuilding.street));
+                        pathPoints.AddRange(startDistrict.StreetPathToDistrictOrigin(currentBuilding));
+                        District endDistrict = town.districts.Find(x => x.streets.Contains(goalHouse.street));
+                        List<Vector3> goalToOrigin = endDistrict.StreetPathToDistrictOrigin(goalHouse);
+                        goalToOrigin.Reverse();
+                        pathPoints.AddRange(goalToOrigin);
+
+                        List<Vector3> houseToGoal = new List<Vector3>();
+                        mesh = House.navMesh;
+                        pathFinder = new Path(mesh);
+                        Vector3 localHouseGoal = (Matrix.CreateTranslation(goal) * Matrix.Invert(goalHouse.houseToTownTransformation)).Translation;
+
+                        pathFinder.FindPath(Vector3.Zero, localHouseGoal, ref houseToGoal);
+
+                        foreach (Vector3 point in houseToGoal)
+                        {
+                            pathPoints.Add((Matrix.CreateTranslation(point) * goalHouse.houseToTownTransformation).Translation);
+
+                        }
+
+
+
+                    }
+
+
+
+                }
+
+                
+
+            }
+            else //currently outside
+            {
+                if (goalOutside)
+                {
                     mesh = Town.Town.navMesh;
                     pathFinder = new Path(mesh);
-                    pathFinder.FindPath(currentHouse.TownLocation, goalHouse.TownLocation, ref outsideToGoalHouse);
+                    pathFinder.FindPath(position, goal, ref pathPoints);
+                }
+                else if (goalInBuilding)
+                {
+                    mesh = Town.Town.navMesh;
+                    pathFinder = new Path(mesh);
+                    pathFinder.FindPath(position, goalBuilding.TownLocation, ref pathPoints);
 
-                    pathPoints.AddRange(outsideToGoalHouse);
-                    */
-
-                    //for now, assumes both in residential district
-
-                    //NEED TO CHANGE WHEN IT DECIDES ITS INSIDE THE CURRENT HOUSE AS IF JUST GO TO FRONT DOOR, DOESN'T THINK ITS IN THE HOUSE SO IT WONT GO TO ANOTHER HOUSE VIA THE ROADS.
-
-                    District startDistrict = town.districts.Find(x => x.streets.Contains(currentHouse.street));
-
-                    pathPoints.AddRange(startDistrict.FindStreetPathPoints(currentHouse, goalHouse));
+                    //need to add something to get inside building , maybe use vector perpendicualr to street of building
+                    pathPoints.Add(pathPoints.Last() + (goalBuilding.side ? 1 : -1) * Building.StreetOffset * goalBuilding.street.FindPerpendicularVector());
 
 
 
-
-
-
-
+                }
+                else if (goalInHouse)
+                {
+                    List<Vector3> pathToHouse = new List<Vector3>();
+                
+                    mesh = Town.Town.navMesh;
+                    pathFinder = new Path(mesh);
+                    pathFinder.FindPath(position, goalHouse.TownLocation, ref pathToHouse);
+                    pathPoints.AddRange(pathToHouse);
 
                     List<Vector3> houseToGoal = new List<Vector3>();
                     mesh = House.navMesh;
@@ -540,23 +659,205 @@ namespace Game1
 
                     }
 
+                }
+            }
+
+
+            
+
+        }
+
+
+    
+
+
+
+
+
+
+
+
+
+
+
+        //public void BuildPath()
+        //{
+
+        //    reachedGoal = false;
+
+        //    House goalHouse = House.getHouseContainingPoint(goal);
+        //    House currentHouse = House.getHouseContainingPoint(position);
+        //    pathPoints.Clear();
+
+
+        //    bool currentlyOutside = currentHouse == null ? true : false;
+        //    bool goalOutside = goalHouse == null ? true : false;
+
+        //    if (currentlyOutside && goalOutside)
+        //    {
+        //        mesh = Town.Town.navMesh;
+        //        pathFinder = new Path(mesh);
+        //        pathFinder.FindPath(position, goal, ref pathPoints);
+                
+
+        //    }
+
+        //    else if (currentlyOutside && !goalOutside)
+        //    {
+        //        List<Vector3> pathToHouse = new List<Vector3>();
+                
+        //        mesh = Town.Town.navMesh;
+        //        pathFinder = new Path(mesh);
+        //        pathFinder.FindPath(position, goalHouse.TownLocation, ref pathToHouse);
+        //        pathPoints.AddRange(pathToHouse);
+
+        //        List<Vector3> houseToGoal = new List<Vector3>();
+        //        mesh = House.navMesh;
+        //        pathFinder = new Path(mesh);
+        //        Vector3 localHouseGoal = (Matrix.CreateTranslation(goal) * Matrix.Invert(goalHouse.houseToTownTransformation)).Translation;
+
+        //        pathFinder.FindPath(Vector3.Zero, localHouseGoal, ref houseToGoal);
+
+        //        foreach (Vector3 point in houseToGoal)
+        //        {
+        //            pathPoints.Add((Matrix.CreateTranslation(point) * goalHouse.houseToTownTransformation).Translation);
+
+        //        }
+
+
+                
+
+        //    }
+
+        //    else if (!currentlyOutside && goalOutside)
+        //    {
+        //        List<Vector3> pathToOutside = new List<Vector3>();
+        //        mesh = House.navMesh;
+        //        pathFinder = new Path(mesh);
+        //        Vector3 localHouseStart = (Matrix.CreateTranslation(position) * Matrix.Invert(currentHouse.houseToTownTransformation)).Translation;
+
+        //        pathFinder.FindPath(localHouseStart, Vector3.Zero, ref pathToOutside);
+
+        //        foreach (Vector3 point in pathToOutside)
+        //        {
+        //            pathPoints.Add((Matrix.CreateTranslation(point) * currentHouse.houseToTownTransformation).Translation);
+        //        }
+
+        //        List<Vector3> outsideToGoal = new List<Vector3>();
+
+        //        mesh = Town.Town.navMesh;
+        //        pathFinder = new Path(mesh);
+        //        pathFinder.FindPath(currentHouse.TownLocation, goal, ref outsideToGoal);
+
+        //        pathPoints.AddRange(outsideToGoal);
+
+                 
+        //    }
+
+        //    else if (!currentlyOutside && !goalOutside)
+        //    {
+        //        if (currentHouse.id == goalHouse.id)
+        //        {
+        //            Console.WriteLine((new System.Diagnostics.StackTrace()).GetFrame(1).GetMethod().ToString());
+
+        //            mesh = House.navMesh;
+        //            pathFinder = new Path(mesh);
+
+        //            Vector3 localHouseStart = (Matrix.CreateTranslation(position) * Matrix.Invert(currentHouse.houseToTownTransformation)).Translation;
+        //            Vector3 localHouseGoal = (Matrix.CreateTranslation(goal) * Matrix.Invert(currentHouse.houseToTownTransformation)).Translation;
+
+        //            List<Vector3> localHousePoints = new List<Vector3>();
+
+        //            pathFinder.FindPath(localHouseStart, localHouseGoal, ref localHousePoints);
+
+        //            Console.WriteLine("localHousePoints;" + localHousePoints.Count);
+        //            Console.WriteLine("pp:" + pathPoints.Count);
+        //            foreach (Vector3 point in localHousePoints)
+        //            {
+        //                pathPoints.Add((Matrix.CreateTranslation(point) * currentHouse.houseToTownTransformation).Translation);
+        //                Console.WriteLine((Matrix.CreateTranslation(point) * currentHouse.houseToTownTransformation).Translation.ToString());
+        //                Console.WriteLine("pp:" + pathPoints.Count);
+        //            }
+
+        //            Console.WriteLine("Path length:" + pathPoints.Count);
+
+        //        }
+
+        //        else if (currentHouse.id != goalHouse.id)
+        //        {
+
+        //            List<Vector3> pathToOutside = new List<Vector3>();
+        //            mesh = House.navMesh;
+        //            pathFinder = new Path(mesh);
+        //            Vector3 localHouseStart = (Matrix.CreateTranslation(position) * Matrix.Invert(currentHouse.houseToTownTransformation)).Translation;
+
+        //            pathFinder.FindPath(localHouseStart, Vector3.Zero, ref pathToOutside);
+
+        //            foreach (Vector3 point in pathToOutside)
+        //            {
+        //                pathPoints.Add((Matrix.CreateTranslation(point) * currentHouse.houseToTownTransformation).Translation);
+        //            }
+
+
+
+
+
+
+        //            /* using roads here 
+        //            List<Vector3> outsideToGoalHouse = new List<Vector3>();
+
+        //            mesh = Town.Town.navMesh;
+        //            pathFinder = new Path(mesh);
+        //            pathFinder.FindPath(currentHouse.TownLocation, goalHouse.TownLocation, ref outsideToGoalHouse);
+
+        //            pathPoints.AddRange(outsideToGoalHouse);
+        //            */
+
+        //            //for now, assumes both in residential district
+
+        //            //NEED TO CHANGE WHEN IT DECIDES ITS INSIDE THE CURRENT HOUSE AS IF JUST GO TO FRONT DOOR, DOESN'T THINK ITS IN THE HOUSE SO IT WONT GO TO ANOTHER HOUSE VIA THE ROADS.
+
+        //            District startDistrict = town.districts.Find(x => x.streets.Contains(currentHouse.street));
+
+        //            pathPoints.AddRange(startDistrict.FindStreetPathPoints(currentHouse, goalHouse));
+
+
+
+
+
+
+
+
+        //            List<Vector3> houseToGoal = new List<Vector3>();
+        //            mesh = House.navMesh;
+        //            pathFinder = new Path(mesh);
+        //            Vector3 localHouseGoal = (Matrix.CreateTranslation(goal) * Matrix.Invert(goalHouse.houseToTownTransformation)).Translation;
+
+        //            pathFinder.FindPath(Vector3.Zero, localHouseGoal, ref houseToGoal);
+
+        //            foreach (Vector3 point in houseToGoal)
+        //            {
+        //                pathPoints.Add((Matrix.CreateTranslation(point) * goalHouse.houseToTownTransformation).Translation);
+
+        //            }
+
                    
 
 
 
-                }
+        //        }
 
 
 
 
 
-            }
+        //    }
 
 
 
 
 
-        }
+        //}
 
 
 
@@ -571,6 +872,7 @@ namespace Game1
                 actionState = PeopleActionStates.idle;
                 //currentHouse = House.getHouseContainingPoint(position);
                 currentHouse = goalHouse;
+                currentBuilding = goalBuilding;
 
                 reachedGoal = true;
                 return;
@@ -611,6 +913,7 @@ namespace Game1
                     actionState = PeopleActionStates.idle;
                     //currentHouse = House.getHouseContainingPoint(position);
                     currentHouse = goalHouse;
+                    currentBuilding = goalBuilding;
                     reachedGoal = true;
                     return;
                 }

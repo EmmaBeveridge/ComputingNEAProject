@@ -85,7 +85,7 @@ namespace Game1
 
                 pickedPosition.Y = 0;
 
-                Console.WriteLine("Clicked"+pickedPosition);
+                Console.WriteLine("\t\t\tCLICKED"+pickedPosition);
 
                 return pickedPosition;
             }
@@ -243,11 +243,34 @@ namespace Game1
             return false;
         }
 
+
+
+        public static bool FindBuildingSelected(List<Building> buildings, GraphicsDevice graphicsDevice, Matrix projection, Matrix view, ref Building buildingSelected)
+        {
+            Ray ray = GetRay(graphicsDevice, projection, view);
+            foreach (Building building in buildings)
+            {
+                if (building.buildingBox.Intersects(ray) != null)
+                {
+                    buildingSelected = building;
+                    return true;
+
+                }
+            }
+
+            return false;
+        }
+
         public static bool IsExitButtonPressed(ExitButton exitButton)
         {
             return MouseOverButton(exitButton, currentMouseState);
 
         }
+
+
+
+
+        public static bool IsEmotionButtonPressed(EmotionButton emotionButton) { return MouseOverButton(emotionButton, currentMouseState); }
 
 
         public static Button GetButtonPressed(List<Button> buttonsToCheck)

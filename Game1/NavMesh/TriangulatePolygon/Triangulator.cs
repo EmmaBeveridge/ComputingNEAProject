@@ -35,7 +35,7 @@ namespace Game1.NavMesh.TriangulatePolygon
         
 
 
-        public  void BuildHouseTriangles()
+        public void BuildHouseTriangles()
         {
             GetVerticesFromFile(housePolygonVerticesFileName);
             
@@ -54,7 +54,7 @@ namespace Game1.NavMesh.TriangulatePolygon
             {
                 List<Vector2> houseVertices = new List<Vector2>();
                 holeCount++;
-                
+
                 foreach (Vector3 corner in house.groundCorners)
                 {
 
@@ -65,6 +65,45 @@ namespace Game1.NavMesh.TriangulatePolygon
                 holeVertices.Add(houseVertices);
 
             }
+
+
+
+            for (int i = 0; i < 1; i++)
+            {
+                Building building = Building.buildings[i];
+                List<Vector2> buildingVertices = new List<Vector2>();
+                holeCount++;
+                Console.WriteLine(building.id);
+
+                foreach (Vector3 corner in building.groundCorners)
+                {
+
+                    buildingVertices.Add(new Vector2(corner.X, corner.Z));
+
+                }
+
+                holeVertices.Add(buildingVertices);
+
+            }
+
+
+            //foreach (Building building in Building.buildings)
+            //{
+            //    List<Vector2> buildingVertices = new List<Vector2>();
+            //    holeCount++;
+
+            //    foreach (Vector3 corner in building.groundCorners)
+            //    {
+
+            //        buildingVertices.Add(new Vector2(corner.X, corner.Z));
+
+            //    }
+
+            //    holeVertices.Add(buildingVertices);
+
+
+            //}
+
 
 
             foreach (Vector3 corner in Town.Town.corners)
@@ -79,22 +118,24 @@ namespace Game1.NavMesh.TriangulatePolygon
 
                 List<Vector2> nextHole = new List<Vector2>();
 
-                float maxX = holeVertices[0][0].X;
+                nextHole = holeVertices.OrderByDescending(h => h.Max(v => v.X)).First();
 
-                foreach (var hole in holeVertices)
-                {
-                    if (hole.Max( h => h.X) >= maxX) //for some reason this line has broken since adding buildings - making >= seems to have fixed it??
-                    {
-                        nextHole = hole;
-                        maxX = hole.Max(h => h.X);
-                    }
-                }
+                //float maxX = holeVertices[0][0].X;
+
+                //foreach (var hole in holeVertices)
+                //{
+                //    if (hole.Max( h => h.X) >= maxX) //for some reason this line has broken since adding buildings - making >= seems to have fixed it??
+                //    {
+                //        nextHole = hole;
+                //        maxX = hole.Max(h => h.X);
+                //    }
+                //}
 
                 holeVertices.Remove(nextHole);
                 
                 shapeVertices = CutHoleInShape(shapeVertices.ToArray(), nextHole.ToArray()).ToList<Vector2>();
 
-                Console.WriteLine("\n\n\nHOLE COUNT" + holeCount);
+                Console.WriteLine("\n\n\nHOLE:" + i);
                 foreach( var vertex in shapeVertices)
                 {
                     Console.WriteLine("v : "+vertex.ToString());
@@ -547,14 +588,14 @@ namespace Game1.NavMesh.TriangulatePolygon
                 if (IsConvex(vertex))
                 {
                     convexVertices.Add(vertex);
-                   Console.WriteLine($"{vertex.position.ToString()}: convex");
+                   //Console.WriteLine($"{vertex.position.ToString()}: convex");
                     
 
                 }
                 else
                 {
                     reflexVertices.Add(vertex);
-                    Console.WriteLine($"{vertex.position.ToString()}: reflex");
+                    //Console.WriteLine($"{vertex.position.ToString()}: reflex");
 
                 }
             }

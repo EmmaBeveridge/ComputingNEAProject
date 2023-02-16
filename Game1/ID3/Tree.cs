@@ -116,7 +116,7 @@ namespace Game1.ID3
 
                 string entry = QueryDict[root.Name];
 
-                Console.WriteLine("\n\n\nEntry"+entry);
+                ///Console.WriteLine("\n\n\nEntry"+entry);
 
 
                 //since don't have every possible combination of discrete categories in dataset, especially as data set gets large and discrete->continuous, must find a way to get closest edge from a given node
@@ -133,7 +133,7 @@ namespace Game1.ID3
 
                 foreach (TreeNode childNode in root.Children)
                 {
-                    Console.WriteLine("Edge: "+childNode.Edge);
+                    ///Console.WriteLine("Edge: "+childNode.Edge);
 
                     
                     if (childNode.Edge.ToUpper().Equals(entry.ToUpper()))
@@ -260,7 +260,7 @@ namespace Game1.ID3
         {
             TreeNode root = GetRootNode(data, edgeName);
 
-            Console.WriteLine(root.Name);
+            ///Console.WriteLine(root.Name);
 
 
             foreach (var edge in root.Attribute.AttributeNames)
@@ -487,7 +487,7 @@ namespace Game1.ID3
            Cut bestCut = FindBestCut(partition);
             DataTable mergedTable = new DataTable();
 
-            Console.WriteLine("Cut count:"+cutCount);
+            //Console.WriteLine("Cut count:"+cutCount);
 
             if (bestCut!= null && ShouldCut(bestCut))
             {
@@ -593,7 +593,7 @@ namespace Game1.ID3
             Cut bestCut = null;
 
             
-                Console.WriteLine("Finding Best Cut for"+partition.TableName);
+                //Console.WriteLine("Finding Best Cut for"+partition.TableName);
 
 
 
@@ -603,7 +603,7 @@ namespace Game1.ID3
 
                 int splitValue = 0;
 
-                Console.WriteLine("Started"+index);
+                //Console.WriteLine("Started"+index);
                 DataTable binaryPartition = MakeBinaryTable(partition.Copy(), index, ref splitValue);
                 //Console.WriteLine("Done:" + index);
                 Cut cut = CalculateInformationGain(binaryPartition, "DISCRETISED");
@@ -621,7 +621,7 @@ namespace Game1.ID3
             if(bestCut == null)
             {
                 
-                Console.WriteLine();
+                //Console.WriteLine();
             }
 
             return bestCut;

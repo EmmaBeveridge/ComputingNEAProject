@@ -1,4 +1,5 @@
-﻿using Microsoft.Xna.Framework;
+﻿using Game1.DataClasses;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
@@ -13,10 +14,8 @@ namespace Game1.UI
 
         public static Texture2D defaultTexture;
 
-        public static Action Exit;
-
-
-        //NEED TO DO SOMETHING ABOUT SAVING GAME HERE??
+        
+        
         public ExitButton(string argLabel, Vector2 argPosition):base(argLabel, argPosition, defaultTexture)
         {
 
@@ -29,7 +28,26 @@ namespace Game1.UI
 
         }
 
+        /// <summary>
+        /// Handles saving and exiting of game using SQLiteDBHandler.SaveGame
+        /// </summary>
+        /// <param name="people">List of people to save state for</param>
+        public static void SaveAndExit(List<People> people, Game1 game)
+        {
+            SQLiteDBHandler handler = new SQLiteDBHandler();
 
+            handler.SaveGame(people);
+            Exit(game);
+            
+
+
+        }
+
+
+        public static void Exit(Game1 game)
+        {
+            game.Exit();
+        }
 
 
     }

@@ -11,7 +11,8 @@ namespace Game1.DataClasses
 {
     class ExcelFileManager
     {
-        static string houseRectanglesFileName = Directory.GetParent(Directory.GetCurrentDirectory()).Parent.Parent.Parent.Parent.FullName + "/Data/HouseRectangles.xlsx";
+        //static string houseRectanglesFileName = Directory.GetParent(Directory.GetCurrentDirectory()).Parent.Parent.Parent.Parent.FullName + "/Data/HouseRectangles.xlsx";
+        static string houseRectanglesFileName = Directory.GetParent(Directory.GetCurrentDirectory()).Parent.Parent.Parent.Parent.FullName + "/Data/TownRectangles.xlsx";
         static string itemCoordinatesFileName = Directory.GetParent(Directory.GetCurrentDirectory()).Parent.Parent.Parent.Parent.FullName + "/Data/ItemCoordinates.xlsx";
 
 
@@ -26,10 +27,10 @@ namespace Game1.DataClasses
         }
 
 
-        public static DataTable ReadCoordinates(string sheetName, bool house = false, bool item = false )
+        public static DataTable ReadCoordinates(string sheetName, bool town = false, bool item = false )
         {
             string fileName = null;
-            if (house)
+            if (town)
             {
                 fileName = houseRectanglesFileName;
             }

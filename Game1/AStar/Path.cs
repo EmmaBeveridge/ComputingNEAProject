@@ -261,16 +261,16 @@ namespace Game1.AStar
                 return;
             }
 
-            Console.WriteLine("SearchResult" + searchResult.Count);
+            //Console.WriteLine("SearchResult" + searchResult.Count);
 
             foreach (Vertex vertex in searchResult)
             {
                 result.Add(vertex.position);
                 Triangle tri = mesh.GetTriangleAt(vertex.position);
-                Console.WriteLine(tri.ToString());
+                //Console.WriteLine(tri.ToString());
             }
 
-            Console.WriteLine("Result length" + result.Count);
+            //Console.WriteLine("Result length" + result.Count);
 
         }
 

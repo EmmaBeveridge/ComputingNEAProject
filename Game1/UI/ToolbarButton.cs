@@ -1,4 +1,5 @@
 ﻿
+using Game1.Careers;
 using Game1.GOAP;
 using Game1.UI;
 using Microsoft.Xna.Framework;
@@ -70,9 +71,9 @@ namespace Game1.UI
 
         public static Texture2D defaultTexture;
 
-        public CareerButton(string argLabel, Vector2 argPosition) : base(argLabel, argPosition, defaultTexture)
+        public CareerButton(string argLabel, Vector2 argPosition, Player argPlayer) : base(argLabel, argPosition, defaultTexture)
         {
-            panel = new CareerPanel();
+            panel = new CareerPanel(argPlayer);
         }
 
     }

@@ -282,6 +282,18 @@
 /processorParam:TextureFormat=Compressed
 /build:Fridge.fbx
 
+#begin Frown.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Frown.png
+
 #begin FurnishedHouse1.fbx
 /importer:FbxImporter
 /processor:ModelProcessor
@@ -300,6 +312,18 @@
 /processorParam:SwapWindingOrder=False
 /processorParam:TextureFormat=Compressed
 /build:FurnishedHouse1.fbx
+
+#begin Gourmand.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Gourmand.png
 
 #begin Grass.fbx
 /importer:FbxImporter
@@ -395,6 +419,18 @@
 /processorParam:SwapWindingOrder=False
 /processorParam:TextureFormat=Compressed
 /build:HouseInteriorWalls.fbx;HouseInteriorWallsBrown.fbx
+
+#begin Lazy.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Lazy.png
 
 #begin LoadingScreen0.png
 /importer:TextureImporter
@@ -834,6 +870,18 @@
 /processorParam:TextureFormat=Color
 /build:SelectCharacterScreen.png
 
+#begin SelectTraitsScreen.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:SelectTraitsScreen.png
+
 #begin Shower.fbx
 /importer:FbxImporter
 /processor:ModelProcessor
@@ -895,6 +943,18 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:SkyBackground.png
+
+#begin Smile.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Smile.png
 
 #begin Sofa.fbx
 /importer:FbxImporter

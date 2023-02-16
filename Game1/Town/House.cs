@@ -148,7 +148,7 @@ namespace Game1.Town
             //Regex regex = new Regex(@"T\d+\.R\.S\d\.(\d\.)*H\d+");
             Regex regex = new Regex(@"H\d+$");
             var match = regex.Match(id);
-            DataTable coordTable = ExcelFileManager.ReadCoordinates(match.Value, house: true);
+            DataTable coordTable = ExcelFileManager.ReadCoordinates(match.Value, town: true);
 
             foreach (DataRow row in coordTable.Rows)
             {

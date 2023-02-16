@@ -35,6 +35,8 @@ namespace Game1.Town.Districts
 
         public Avatar avatar;
 
+        public Vector3 origin;
+
 
         public void GenerateAvatar()
         {
@@ -61,9 +63,12 @@ namespace Game1.Town.Districts
         {
 
             StreetTree = new BinaryTree<Street>(streets.Count);
-            StreetTree.root = new TreeNode<Street>(streets.Find(x => x.parent == null));
-            AddChildrenToTree(StreetTree.root);
 
+            Street startStreet = streets.Find(x => x.parent == null);
+            origin = startStreet.Start;
+            StreetTree.root = new TreeNode<Street>(startStreet);
+
+            AddChildrenToTree(StreetTree.root);
             StreetTree.PrepareTree();
 
 
@@ -95,12 +100,70 @@ namespace Game1.Town.Districts
         }
 
 
+        protected List<Vector3> FindStreetSequence(Building start, Building end)
+        {
+            Street startStreet = start.street;
+            Street endStreet = end.street;
+            return FindStreetSequence(startStreet, endStreet);
+
+        }
+
 
         protected List<Vector3> FindStreetSequence(House start, House end)
         {
             Street startStreet = start.street;
             Street endStreet = end.street;
+            return FindStreetSequence(startStreet, endStreet);
+        }
+            
 
+        public List<Vector3> StreetPathToDistrictOrigin(Street startStreet)
+        {
+            List<Vector3> streetPoints = new List<Vector3>();
+            Street parent = startStreet;
+
+            while (parent != null)
+            {
+                streetPoints.Add(parent.Start);
+                parent = parent.parent;
+            }
+
+
+            streetPoints.Add(origin);
+            return streetPoints;
+
+
+        }
+
+
+        public List<Vector3> StreetPathToDistrictOrigin(House startHouse)
+        {
+            List<Vector3> path = new List<Vector3>();
+
+            path.Add(startHouse.TownLocation);
+
+            path.Add(startHouse.street.FindClosestPointOnStreet(startHouse.TownLocation));
+
+            path.AddRange(StreetPathToDistrictOrigin(startHouse.street));
+            return path;
+        }
+
+        public List<Vector3> StreetPathToDistrictOrigin(Building startBuilding)
+        {
+            List<Vector3> path = new List<Vector3>();
+
+            path.Add(startBuilding.TownLocation);
+
+            path.Add(startBuilding.street.FindClosestPointOnStreet(startBuilding.TownLocation));
+
+            path.AddRange(StreetPathToDistrictOrigin(startBuilding.street));
+            return path;
+        }
+
+
+        protected List<Vector3> FindStreetSequence(Street startStreet, Street endStreet)
+        {
+            
             List<Vector3> streetPoints = new List<Vector3>();
             
             
@@ -170,6 +233,25 @@ namespace Game1.Town.Districts
 
 
         }
+
+
+
+        public List<Vector3> FindStreetPathPoints(Building start, Building end)
+        {
+            List<Vector3> pathPoints = new List<Vector3>();
+            pathPoints.Add(start.street.FindClosestPointOnStreet(start.TownLocation));
+            pathPoints.AddRange(FindStreetSequence(start, end));
+            pathPoints.Add(end.street.FindClosestPointOnStreet(end.TownLocation));
+
+            return pathPoints;
+
+
+        }
+
+
+
+
+
 
 
 

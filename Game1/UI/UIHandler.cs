@@ -17,8 +17,10 @@ namespace Game1.UI
 
         public List<Button> mainMenuButtons;
         public List<Button> characterSelectionButtons;
+        public List<Button> traitSelectionButtons;
 
         public ExitButton exitButton;
+        public EmotionButton emotionButton;
         public bool displayTextbox = false;
         Textbox currentTextbox;
 
@@ -32,6 +34,7 @@ namespace Game1.UI
             toolbarButtons = new List<ToolbarButton>();
             mainMenuButtons = new List<Button>();
             characterSelectionButtons = new List<Button>();
+            traitSelectionButtons = new List<Button>();
         }
 
 
@@ -60,6 +63,49 @@ namespace Game1.UI
                 button.panel.IsDisplayed = false;
             }
         }
+
+
+
+        public void BuildTraitSelectionButtons(GraphicsDeviceManager graphicsManager, List<Texture2D> traitButtonsTextures, Texture2D selectedCharacter)
+        {
+
+            float yPosition = 80;
+            int buttonsPerRow = 2;
+            float screenWidth = graphicsManager.GraphicsDevice.Viewport.Width - selectedCharacter.Width;
+
+            float xSpacing = (screenWidth - traitButtonsTextures[0].Width * buttonsPerRow) / (buttonsPerRow + 1);
+            float ySpacing = traitButtonsTextures.Max(t => t.Height);
+
+            float initialX =  0.5f*xSpacing + selectedCharacter.Width;
+
+            Vector2 position = new Vector2( initialX, yPosition);
+
+            for (int i = 0; i < traitButtonsTextures.Count; i++)
+            {
+                TraitSelectionButton button = new TraitSelectionButton(null, position, traitButtonsTextures[i]);
+                traitSelectionButtons.Add(button);
+
+
+                if ((i+1) % buttonsPerRow == 0)
+                {
+                    position = new Vector2(initialX, position.Y + ySpacing);
+                }
+                else
+                {
+                    position.X += traitButtonsTextures[i].Width + xSpacing;
+                  
+
+                }
+               
+            }
+
+
+
+
+
+
+        }
+
 
 
 
@@ -128,6 +174,18 @@ namespace Game1.UI
         }
 
 
+        public void BuildEmotionButton(GraphicsDeviceManager graphicsManager, Player player) 
+        {
+            emotionButton = new EmotionButton(null, new Vector2(10, graphicsManager.GraphicsDevice.Viewport.Height-EmotionButton.PositiveEmotionTexture.Height), EmotionButton.PositiveEmotionTexture, player);
+            emotionButton.SetTexture();
+        
+        }
+
+
+
+
+
+
         public void BuildToolbarButtons(GraphicsDeviceManager graphicsManager, Player player)
         {
 
@@ -145,7 +203,7 @@ namespace Game1.UI
 
             AddToolbarButton(new RelationshipsButton(null, new Vector2((graphicsManager.GraphicsDevice.Viewport.Width - 3 * ToolbarButton.toolbarButtonTextureDim.X), (graphicsManager.GraphicsDevice.Viewport.Height - ToolbarButton.toolbarButtonTextureDim.Y)), player.Relationships));
             AddToolbarButton(new SkillsButton(null, new Vector2((graphicsManager.GraphicsDevice.Viewport.Width - 2 * ToolbarButton.toolbarButtonTextureDim.X), (graphicsManager.GraphicsDevice.Viewport.Height - ToolbarButton.toolbarButtonTextureDim.Y))));
-            AddToolbarButton(new CareerButton(null, new Vector2((graphicsManager.GraphicsDevice.Viewport.Width - ToolbarButton.toolbarButtonTextureDim.X), (graphicsManager.GraphicsDevice.Viewport.Height - ToolbarButton.toolbarButtonTextureDim.Y))));
+            AddToolbarButton(new CareerButton(null, new Vector2((graphicsManager.GraphicsDevice.Viewport.Width - ToolbarButton.toolbarButtonTextureDim.X), (graphicsManager.GraphicsDevice.Viewport.Height - ToolbarButton.toolbarButtonTextureDim.Y)), player));
         }
 
 
@@ -194,6 +252,29 @@ namespace Game1.UI
             else { return buttonPressed.buttonTexture; }
             
         }
+
+
+        public Texture2D HandleTraitSelection()
+        {
+            if (!MouseInput.WasLeftClicked())
+            {
+                return null;
+            }
+
+            Button buttonPressed = MouseInput.GetButtonPressed(traitSelectionButtons);
+
+            if (buttonPressed == null) { return null; }
+
+            else { return buttonPressed.buttonTexture; }
+
+
+        }
+
+
+
+
+
+
 
 
         public Button HandleMainMenuInput()
@@ -260,6 +341,29 @@ namespace Game1.UI
 
 
 
+        public void DrawTraitSelectionButtons(SpriteBatch spriteBatch)
+        {
+            foreach (Button traitButton in traitSelectionButtons)
+            {
+               
+
+                if (traitButton.isSelected)
+                {
+                    spriteBatch.Draw(traitButton.buttonTexture, traitButton.position, color: Color.Gray);
+
+                }
+                else
+                {
+                    spriteBatch.Draw(traitButton.buttonTexture, traitButton.position);
+
+                }
+
+
+            }
+        }
+
+
+
         public void Draw(SpriteBatch spriteBatch, SpriteFont spriteFont)
         {
 
@@ -289,6 +393,11 @@ namespace Game1.UI
             }
 
             spriteBatch.Draw(exitButton.buttonTexture, exitButton.position);
+            
+            emotionButton.SetTexture();
+            spriteBatch.Draw(emotionButton.buttonTexture, emotionButton.position);
+
+            if (emotionButton.panel.IsDisplayed) { emotionButton.panel.Draw(spriteBatch, spriteFont); }
 
             if (displayTextbox)
             {

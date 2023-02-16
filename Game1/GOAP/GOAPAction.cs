@@ -1,4 +1,5 @@
-﻿using Microsoft.Xna.Framework;
+﻿using Game1.Town;
+using Microsoft.Xna.Framework;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -26,8 +27,8 @@ namespace Game1.GOAP
         /// Person who owns TalkToPersonAction (TalkToPersonAction.PersonToInteractWith) 
         /// </summary>
         public People interactionPerson = null;
-        
-       
+
+        public Building building = null;
         //public People PersonToInteractWith;
 
 
@@ -43,6 +44,22 @@ namespace Game1.GOAP
         public Queue<People> doingAction = new Queue<People>();
         public GOAPAction()
         { }
+
+
+
+        public bool GetStateOfPrecondition(string PreconditionName)
+        {
+            foreach (Tuple<string, bool> precondtion in PreConditions)
+            {
+                if (precondtion.Item1 == PreconditionName)
+                {
+                    return precondtion.Item2;
+                }
+
+            }
+
+            return false; //assumes false if no precondtition found
+        }
 
 
         public GOAPAction(ActionAbstract _action)

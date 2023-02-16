@@ -29,6 +29,8 @@ namespace Game1.DataClasses
 
 
 
+
+
         public void CloseConnection()
         {
             
@@ -38,10 +40,133 @@ namespace Game1.DataClasses
 
 
 
+
         public static bool DBExists()
         {
             return File.Exists(DBName);
         }
+
+
+
+        public void SaveGame(List<People> people)
+        {
+            using (SQLiteConnection connection = new SQLiteConnection(connectionString))
+            {
+                connection.Open();
+
+                using (SQLiteCommand command = connection.CreateCommand())
+                {
+                    foreach (People person in people) //save needs, relationships, career
+                    {
+                        command.CommandText = "UPDATE People SET Career = @Career WHERE PersonID = @PersonID";
+                        command.Parameters.AddWithValue("@Career", person.Career==null?"":person.Career.ToString());
+                        command.Parameters.AddWithValue("@PersonID", person.DBID);
+
+                        command.ExecuteNonQuery();
+
+
+
+                        foreach (Trait trait in person.Traits)
+                        {
+                            command.CommandText = "INSERT OR IGNORE INTO Trait(TraitHolderID, TraitID) VALUES (@TraitHolderID, @TraitID)";
+                            command.Parameters.AddWithValue("@TraitHolderID", person.DBID);
+                            command.Parameters.AddWithValue("@TraitID", trait.GetID());
+
+
+
+
+                        }
+
+
+
+
+                        foreach (KeyValuePair<People, float> relationship in person.Relationships)
+                        {
+                            //adds relationship if doesn't already exist
+                            command.CommandText = "INSERT OR IGNORE INTO Relationship(Person1ID, Person2ID, Score) VALUES (@Person1ID, @Person2ID, @Score)";
+                            command.Parameters.AddWithValue("@Person1ID", person.DBID);
+                            command.Parameters.AddWithValue("@Person2ID", relationship.Key.DBID);
+                            command.Parameters.AddWithValue("@Score", relationship.Value);
+
+                            command.ExecuteNonQuery();
+
+
+                            //updates existing relationship which now must exist in table
+                            command.CommandText="UPDATE Relationship SET Score = @Score WHERE Person1ID = @Person1ID AND Person2ID = @Person2ID";
+
+                            command.Parameters.AddWithValue("@Person1ID", person.DBID);
+                            command.Parameters.AddWithValue("@Person2ID", relationship.Key.DBID);
+                            command.Parameters.AddWithValue("@Score", relationship.Value);
+
+                            command.ExecuteNonQuery();
+
+                        }
+
+                        foreach (KeyValuePair<NeedNames, Need> need in person.Needs)
+                        {
+                            command.CommandText = "UPDATE Need SET Score = @Score WHERE PersonID = @PersonID AND NeedName = @NeedName";
+                            command.Parameters.AddWithValue("@Score", need.Value.CurrentNeed);
+                            command.Parameters.AddWithValue("@PersonID", person.DBID);
+                            command.Parameters.AddWithValue("@NeedName", need.Key.ToString());
+
+                            command.ExecuteNonQuery();
+
+                        }
+
+
+
+
+
+                    }
+
+
+                }
+
+                
+            }
+
+            
+            //save item inventory
+
+
+        }
+
+
+
+
+        public void SetTraitIDs()
+        {
+            using (SQLiteConnection connection = new SQLiteConnection(connectionString))
+            {
+                connection.Open();
+
+                using (SQLiteCommand command = connection.CreateCommand())
+                {
+                    SQLiteDataReader dataReader;
+                    command.CommandText = "SELECT * FROM TraitLookup";
+                    dataReader = command.ExecuteReader();
+
+
+
+                    while (dataReader.Read())
+                    {
+                        int TraitID = dataReader.GetInt32(dataReader.GetOrdinal("TraitNumber"));
+                        string TraitName = dataReader.GetString(dataReader.GetOrdinal("TraitName"));
+
+
+                        Trait.SetTraitID(TraitName, TraitID);
+
+                    }
+
+
+
+                }
+
+            }
+        }
+
+
+
 
 
         public Dictionary<People, float> GetRelationships(People person1, List<People> people2)
@@ -62,11 +187,12 @@ namespace Game1.DataClasses
                     while (dataReader.Read())
                     {
                         People person2 = people2.Find(p => p.DBID == dataReader.GetInt32(dataReader.GetOrdinal("Person2ID")));
-                        float score = dataReader.GetInt32(dataReader.GetOrdinal("Score"));
+                        float score = dataReader.GetFloat(dataReader.GetOrdinal("Score"));
 
 
-                        relationships.Add(person2, score);
+                        relationships[person2] = score;
 
+                        
 
 
                     }
@@ -90,18 +216,20 @@ namespace Game1.DataClasses
                 connection.Open();
                 using (SQLiteCommand command = connection.CreateCommand())
                 {
-                    SQLiteDataReader dataReader;
-
-                    command.CommandText = "SELECT TraitName FROM People INNER JOIN Trait ON TraitHolderID = PersonID WHERE PersonId = @PersonID ";
+                    command.CommandText = "SELECT TraitName FROM People INNER JOIN Trait ON PersonID = Trait.TraitHolderID JOIN TraitLookup ON TraitLookup.TraitNumber = Trait.TraitNumber WHERE PersonID = @PersonID";
                     command.Parameters.AddWithValue("@PersonID", person.DBID);
-                    dataReader = command.ExecuteReader();
 
-                    while (dataReader.Read())
+                    using (SQLiteDataReader dataReader = command.ExecuteReader())
                     {
-                        Trait trait = Trait.GetTraitFromString(dataReader.GetString(dataReader.GetOrdinal("TraitName")));
-                        traits.Add(trait);
 
 
+                        while (dataReader.Read())
+                        {
+                            Trait trait = Trait.GetTraitFromString(dataReader.GetString(dataReader.GetOrdinal("TraitName")));
+                            traits.Add(trait);
+
+
+                        }
                     }
                 }
             }
@@ -137,7 +265,7 @@ namespace Game1.DataClasses
                     {
 
                         NeedNames Name = Need.GetNeedNamefromString(dataReader.GetString(dataReader.GetOrdinal("NeedName")));
-                        float Score = dataReader.GetInt32(dataReader.GetOrdinal("Score"));
+                        float Score = dataReader.GetFloat(dataReader.GetOrdinal("Score"));
 
                         Need need = new Need(_name: Name, _currentNeed: Score, generateNeedBar: person.IsPlayer, _prioritised: prioritisedNeeds.Contains(Name));
 
@@ -179,7 +307,7 @@ namespace Game1.DataClasses
 
                         string modelName = dataReader.GetString(dataReader.GetOrdinal("ModelName"));
 
-                        bool isPlayer = name.ToLower() == "player" ? true : false;
+                        bool isPlayer = dataReader.GetInt16(dataReader.GetOrdinal("IsPlayer")) == 1 ? true : false;
 
 
                         DBPeople.Add(new DBPerson(dbid, name, isPlayer, career, house, modelName));
@@ -198,8 +326,12 @@ namespace Game1.DataClasses
 
 
 
-        public void AddPeople(string playerModelName)
+        public void AddPeople(string playerModelName, List<string> playerTraits)
         {
+
+            Dictionary<int, string[]> PeopleTraits = new Dictionary<int, string[]> { { 1, new string[] { "Lazy", "Gourmand" } } };
+
+
             
             try
             {
@@ -208,53 +340,71 @@ namespace Game1.DataClasses
                     connection.Open();
                     using (SQLiteCommand insertCommand = connection.CreateCommand())
                     {
-                        
-                        insertCommand.CommandText = "INSERT OR IGNORE INTO People (Name, HouseNum, Career, ModelName) VALUES (@Name, @HouseNum, @Career, @ModelName)";
 
-                        insertCommand.Parameters.AddWithValue("@Name", "Robin Steele");
+                        insertCommand.CommandText = "INSERT OR IGNORE INTO People (Name, HouseNum, Career, ModelName, IsPlayer) VALUES (@Name, @HouseNum, @Career, @ModelName, @IsPlayer)";
+
+                        insertCommand.Parameters.AddWithValue("@Name", "Jane Doe");
                         insertCommand.Parameters.AddWithValue("@HouseNum", 2);
-                        insertCommand.Parameters.AddWithValue("@Career", "theif");
+                        insertCommand.Parameters.AddWithValue("@Career", "store clerk");
                         insertCommand.Parameters.AddWithValue("@ModelName", "WomanYellow");
+                        insertCommand.Parameters.AddWithValue("@IsPlayer", 0);
+
                         insertCommand.ExecuteNonQuery();
 
                         insertCommand.Parameters.AddWithValue("@Name", "player");
                         insertCommand.Parameters.AddWithValue("@HouseNum", 1);
                         insertCommand.Parameters.AddWithValue("@Career", "");
-                        insertCommand.Parameters.AddWithValue("@ModelName", playerModelName); 
+                        insertCommand.Parameters.AddWithValue("@ModelName", playerModelName);
+                        insertCommand.Parameters.AddWithValue("@IsPlayer", 1);
+
                         insertCommand.ExecuteNonQuery();
 
+                    }
 
-
-                        using (SQLiteCommand readCommand = connection.CreateCommand())
+                    using (SQLiteCommand readCommand = connection.CreateCommand())
+                    {
+                        readCommand.CommandText = "SELECT PersonID, IsPlayer FROM People";
+                        using (SQLiteDataReader dataReader = readCommand.ExecuteReader())
                         {
-                            SQLiteDataReader dataReader;
 
-                            readCommand.CommandText = "SELECT PersonID FROM People";
 
-                            dataReader = readCommand.ExecuteReader();
+                            
                             while (dataReader.Read())
                             {
                                 int dbid = dataReader.GetInt32(dataReader.GetOrdinal("PersonID"));
+                                bool isPlayer = dataReader.GetInt16(dataReader.GetOrdinal("IsPlayer")) == 1 ? true : false;
+
+
 
 
 
                                 AddNeeds(dbid, connection);
 
 
+                                if (isPlayer)
+                                {
+                                    AddTraits(dbid, playerTraits.ToArray(), connection);
+                                }
+                                else
+                                {
+                                    AddTraits(dbid, PeopleTraits[dbid], connection);
+                                }
 
 
 
 
                             }
+
                         }
-
-
-
-
-
-
-
                     }
+
+
+
+
+
+
+
+                    
 
 
 
@@ -275,6 +425,61 @@ namespace Game1.DataClasses
 
             }
 
+        }
+
+
+
+        public void CreateTraitLookupTable()
+        {
+
+            using (SQLiteConnection connection = new SQLiteConnection(connectionString))
+            {
+                connection.Open();
+
+                using (SQLiteCommand insertCommand = connection.CreateCommand())
+                {
+                    insertCommand.CommandText = "INSERT OR IGNORE INTO TraitLookup (TraitName) VALUES (@TraitName)";
+
+                    insertCommand.Parameters.AddWithValue("@TraitName", TraitLazy.TraitString);
+                    insertCommand.ExecuteNonQuery();
+
+                    insertCommand.Parameters.AddWithValue("@TraitName", TraitGourmand.TraitString);
+                    insertCommand.ExecuteNonQuery();
+
+                }
+            }
+
+            SetTraitIDs();
+
+
+
+        }
+
+
+        /// <summary>
+        /// Adds persons traits to Trait table in db
+        /// </summary>
+        /// <param name="PersonID">Id of trait holder</param>
+        /// <param name="TraitNames">Array of string names of traits of person</param>
+        /// <param name="connection">Db connection</param>
+        public void AddTraits(int PersonID, string[] TraitNames, SQLiteConnection connection)
+        {
+            
+                using (SQLiteCommand command = connection.CreateCommand())
+                {
+                    command.CommandText = "INSERT OR IGNORE INTO Trait (TraitHolderID, TraitNumber) VALUES (@TraitHolderID, @TraitNumber)";
+
+                    foreach (string TraitName in TraitNames)
+                    {
+                        command.Parameters.AddWithValue("@TraitHolderID", PersonID);
+                        command.Parameters.AddWithValue("@TraitNumber", Trait.GetTraitID(TraitName));
+                        command.ExecuteNonQuery();
+
+                    }
+                    
+                }
+
+            
         }
 
 
@@ -338,6 +543,10 @@ namespace Game1.DataClasses
                         command.CommandText = "DROP TABLE IF EXISTS Trait";
                         command.ExecuteNonQuery();
 
+                        command.CommandText = "DROP TABLE IF EXISTS TraitLookup";
+                        command.ExecuteNonQuery();
+
+
                         command.CommandText = "DROP TABLE IF EXISTS InventoryIndex";
                         command.ExecuteNonQuery();
 
@@ -345,7 +554,7 @@ namespace Game1.DataClasses
                         command.ExecuteNonQuery();
 
 
-                        command.CommandText = "CREATE TABLE IF NOT EXISTS People(PersonID INTEGER NOT NULL UNIQUE, Name TEXT NOT NULL UNIQUE, HouseNum INTEGER, Career TEXT, ModelName TEXT NOT NULL, PRIMARY KEY(PersonID AUTOINCREMENT))";
+                        command.CommandText = "CREATE TABLE IF NOT EXISTS People(PersonID INTEGER NOT NULL UNIQUE, Name TEXT NOT NULL UNIQUE, HouseNum INTEGER, Career TEXT, ModelName TEXT NOT NULL, IsPlayer INT NOT NULL,  PRIMARY KEY(PersonID AUTOINCREMENT))";
                         command.ExecuteNonQuery();
 
 
@@ -358,10 +567,13 @@ namespace Game1.DataClasses
 
 
 
-                        command.CommandText = "CREATE TABLE IF NOT EXISTS Trait(TraitID INTEGER NOT NULL UNIQUE, TraitHolderID INTEGER NOT NULL, TraitName TEXT NOT NULL, PRIMARY KEY(TraitID AUTOINCREMENT), FOREIGN KEY(TraitHolderID) REFERENCES People(PersonID))";
+                        command.CommandText = "CREATE TABLE IF NOT EXISTS Trait(TraitID INTEGER NOT NULL UNIQUE, TraitHolderID INTEGER NOT NULL, TraitNumber INTEGER NOT NULL, PRIMARY KEY(TraitID AUTOINCREMENT), FOREIGN KEY(TraitHolderID) REFERENCES People(PersonID), FOREIGN KEY(TraitNumber) REFERENCES TraitLookup(TraitNumber))";
 
                         command.ExecuteNonQuery();
 
+
+                        command.CommandText = "CREATE TABLE IF NOT EXISTS TraitLookup(TraitNumber INTEGER NOT NULL UNIQUE, TraitName TEXT NOT NULL, PRIMARY KEY(TraitNumber AUTOINCREMENT))";
+                        command.ExecuteNonQuery();
 
                         command.CommandText = "CREATE TABLE IF NOT EXISTS InventoryIndex(InventoryID INTEGER NOT NULL UNIQUE, Item TEXT NOT NULL, Room TEXT, House INTEGER, PRIMARY KEY(InventoryID AUTOINCREMENT))";
 

@@ -1,9 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using Game1.DataClasses;
+using Game1.GOAP;
 using Game1.Rooms;
+using Game1.UI;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Newtonsoft.Json;
@@ -22,6 +27,9 @@ namespace Game1.Town
         [JsonProperty("class")]
         public string buildingClass;
 
+        /// <summary>
+        /// true if on left side of street
+        /// </summary>
         [JsonProperty("leftSide")]
         public bool side;
 
@@ -43,11 +51,23 @@ namespace Game1.Town
         public static List<Building> buildings = new List<Building>();
 
         public BoundingBox buildingBox;
+        public List<Vector3> groundCorners = new List<Vector3>();
 
+
+        public Dictionary<string, GOAPAction> actionLabels = new Dictionary<string, GOAPAction>();
+        public List<Button> actionButtons = new List<Button>();
+        public List<GOAPAction> GOAPActions = new List<GOAPAction>();
+
+        public static float StreetOffset = 100;
+
+
+
+        public List<string> CareerNames = new List<string>();
+        public string EmployedAtConditionString = null; //string used when defining conditions for GOAP action to indicate employed at building
 
         public Building()
         {
-            modelName = "Station";
+            modelName = "Office";
         }
 
         public void GenerateAvatar()
@@ -71,9 +91,75 @@ namespace Game1.Town
 
             buildingBox = avatar.UpdateBoundingBox();
 
+            SetCorners();
 
 
         }
+
+        public void BuildButtons(GraphicsDeviceManager graphicsDeviceManager)
+        {
+            for (int i = 0; i < actionLabels.Count; i++)
+            {
+                float angle = (MathHelper.TwoPi / actionLabels.Count) * i;
+                float x = (float)Math.Cos(angle) * Button.circleRadius + graphicsDeviceManager.GraphicsDevice.Viewport.Width / 2 - Button.defaultTexture.Width / 2;
+                float y = (float)Math.Sin(angle) * Button.circleRadius + graphicsDeviceManager.GraphicsDevice.Viewport.Height / 2 - Button.defaultTexture.Height / 2;
+
+                if (angle < 0) { angle += MathHelper.TwoPi; }
+                if (angle >= MathHelper.TwoPi) { angle -= MathHelper.TwoPi; }
+
+
+                actionButtons.Add(new Button(actionLabels.Keys.ElementAt(i), actionLabels.Values.ElementAt(i), new Vector2(x, y)));
+
+
+
+
+            }
+        }
+
+
+
+
+
+        public void DisplayActions(Game1 game, Player player)
+        {
+            game.UIHandler.ClearButtons();
+            game.UIHandler.AddRangeButtons(GetValidButtons(player));
+        }
+
+
+
+        public List<Button> GetValidButtons(Player person)
+        {
+            List<Button> validButtons = new List<Button>();
+
+            if (person.Career != null && CareerNames.Contains(person.Career.CareerName)) //employed in career at building
+            {
+                validButtons.AddRange(actionButtons.FindAll(b => b.buttonAction.GetStateOfPrecondition(EmployedAtConditionString) == true));
+            } 
+            else { validButtons.AddRange(actionButtons.FindAll(b => b.buttonAction.GetStateOfPrecondition(EmployedAtConditionString) == false)); }
+            return validButtons;
+        }
+
+
+
+        public void SetCorners()
+        {
+            //Regex regex = new Regex(@"T\d+\.R\.S\d\.(\d\.)*H\d+");
+            Regex regex = new Regex(@"B\d+$");
+            var match = regex.Match(id);
+            DataTable coordTable = ExcelFileManager.ReadCoordinates(match.Value, town: true);
+
+            foreach (DataRow row in coordTable.Rows)
+            {
+                groundCorners.Add(new Vector3(int.Parse(row["X"].ToString()), 0, int.Parse(row["Z"].ToString())));
+            }
+
+            
+
+        }
+
+        public virtual void DefineActions() { }
+
 
 
 

@@ -11,6 +11,7 @@ namespace Game1.Town.Buildings
         public TownHall()
         {
             modelName = "TownHall";
+            
         }
     }
 }

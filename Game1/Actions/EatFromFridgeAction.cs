@@ -26,8 +26,11 @@ namespace Game1.Actions
         {
             GOAPAction = new GOAPActionWithItem(this);
             GOAPAction.SetPrecondition(GOAPPerson.LowHunger, true);
+            GOAPAction.SetPrecondition(BuyGroceriesAction.HasGroceriesConditionString, true);
 
             GOAPAction.SetPostcondition(GOAPPerson.LowHunger, false);
+            GOAPAction.SetPostcondition(BuyGroceriesAction.HasGroceriesConditionString, false);
+
             GOAPAction.item = this.Item;
             return GOAPAction;
         }

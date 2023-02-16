@@ -1,4 +1,5 @@
-﻿using Microsoft.Xna.Framework;
+﻿using Game1.Careers;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
@@ -156,12 +157,21 @@ namespace Game1.UI
 
     public class CareerPanel : ToolbarPanel
     {
-        public CareerPanel() { }
+        Player player;
+        public CareerPanel(Player argPlayer) { player = argPlayer; panelPosition.X = 450; }
 
         public override void Draw(SpriteBatch spriteBatch, SpriteFont spriteFont)
         {
-            throw new NotImplementedException();
+            spriteBatch.Draw(texture: whiteRectangle, position: panelPosition, scale: panelScale, layerDepth: 0.5f);
+
+
+            if (player.Career == null) { spriteBatch.DrawString(spriteFont, "You are unemployed", new Vector2(panelPosition.X + 15, panelPosition.Y + 85), Color.Black); }
+            else { spriteBatch.DrawString(spriteFont, player.Career.CareerName, new Vector2(panelPosition.X + 15, panelPosition.Y + 15), Color.Black); 
+                spriteBatch.DrawString(spriteFont, player.Career.CareerDescription, new Vector2(panelPosition.X + 15, panelPosition.Y + 85), Color.Black); }
         }
+
+
+
 
         public override void InitialisePanel()
         {

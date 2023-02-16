@@ -26,6 +26,8 @@ namespace Game1.UI
 
             SQLiteDBHandler handler = new SQLiteDBHandler();
 
+
+
             List<DBPerson> dbPeople = handler.GetPeople();
             List<People> people = new List<People>();
 

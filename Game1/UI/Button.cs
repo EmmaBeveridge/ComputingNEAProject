@@ -20,6 +20,9 @@ namespace Game1.UI
         public static readonly float circleRadius = 200f;
         public GOAPAction buttonAction;
 
+
+        public bool isSelected = false;
+
         public Button( string argLabel, Vector2 argPosition, Texture2D argTexture)
         {
             buttonLabel = argLabel;

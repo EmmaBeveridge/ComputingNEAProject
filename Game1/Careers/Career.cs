@@ -8,9 +8,15 @@ namespace Game1.Careers
 {
     public class Career
     {
-        string Name;
-
+        public static string Name;
+        public static string Description;
         public Career() { }
+
+
+
+        public virtual string CareerName { get { return Name; } }
+        public virtual string CareerDescription { get { return Description; } }
+
 
 
         public static Career GetCareerFromString (string careerString)
@@ -18,8 +24,8 @@ namespace Game1.Careers
 
             switch (careerString.ToLower())
             {
-                case "thief":
-                    return new Thief();
+                case "store clerk":
+                    return new StoreClerk();
                     break;
                 default:
                     return null;
