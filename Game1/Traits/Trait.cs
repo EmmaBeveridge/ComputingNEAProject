@@ -20,6 +20,7 @@ namespace Game1.Traits
 
         public List<NeedNames> needsPrioritised = new List<NeedNames>();
         public List<NeedNames> needsAcceleratedDepletion = new List<NeedNames>();
+        public List<NeedNames> needsDeceleratedDepletion = new List<NeedNames>();
 
 
         public Trait()
@@ -42,6 +43,19 @@ namespace Game1.Traits
                 case "Gourmand":
                     TraitGourmand.DBID = TraitID;
                     break;
+                case "Sociable":
+                    TraitSociable.DBID = TraitID;
+                    break;
+                case "Clean":
+                    TraitClean.DBID = TraitID;
+                    break;
+                case "FunLoving":
+                    TraitFunLoving.DBID = TraitID;
+                    break;
+                case "Loner":
+                    TraitLoner.DBID = TraitID;
+                    break;
+
 
                 default:
                     break;
@@ -57,6 +71,14 @@ namespace Game1.Traits
                     return TraitLazy.DBID;
                 case "Gourmand":
                     return TraitGourmand.DBID;
+                case "Sociable":
+                    return TraitSociable.DBID;
+                case "Clean":
+                    return TraitClean.DBID;
+                case "FunLoving":
+                    return TraitFunLoving.DBID;
+                case "Loner":
+                    return TraitLoner.DBID;
                 default:
                     break;
             }
@@ -106,6 +128,22 @@ namespace Game1.Traits
 
         }
 
+        public static List<NeedNames> GetNeedsDeceleratedDepletion(List<Trait> traits)
+        {
+            List<NeedNames> decelerated = new List<NeedNames>();
+
+            foreach (Trait trait in traits)
+            {
+                decelerated.AddRange(trait.needsDeceleratedDepletion);
+            }
+
+            decelerated = decelerated.Distinct().ToList();
+
+            return decelerated;
+
+
+        }
+
 
         /// <summary>
         /// Returns trait object given string name of trait
@@ -123,6 +161,18 @@ namespace Game1.Traits
 
                 case "Gourmand":
                     return new TraitGourmand();
+                    break;
+                case "Sociable":
+                    return new TraitSociable();
+                    break;
+                case "Clean":
+                    return new TraitClean();
+                    break;
+                case "FunLoving":
+                    return new TraitFunLoving();
+                    break;
+                case "Loner":
+                    return new TraitLoner();
                     break;
 
                 default:

@@ -87,8 +87,12 @@
     <Compile Include="Town\Buildings\TownHall.cs" />
     <Compile Include="Town\Districts\Community.cs" />
     <Compile Include="Traits\Trait.cs" />
+    <Compile Include="Traits\TraitClean.cs" />
+    <Compile Include="Traits\TraitFunLoving.cs" />
     <Compile Include="Traits\TraitGourmand.cs" />
     <Compile Include="Traits\TraitLazy.cs" />
+    <Compile Include="Traits\TraitLoner.cs" />
+    <Compile Include="Traits\TraitSociable.cs" />
     <Compile Include="UI\Button.cs" />
     <Compile Include="UI\CharacterSelectionButton.cs" />
     <Compile Include="UI\EmotionButton.cs" />

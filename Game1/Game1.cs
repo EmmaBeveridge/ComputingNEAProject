@@ -145,12 +145,16 @@ namespace Game1
 
             characterNameDictionary.Add(Content.Load<Texture2D>("WomanPurpleFullSized"), "WomanPurple");
             characterNameDictionary.Add(Content.Load<Texture2D>("WomanYellowFullSized"), "WomanYellow");
-            characterNameDictionary.Add(Content.Load<Texture2D>("ManRedFullSized"), "ManRedFull");
-            characterNameDictionary.Add(Content.Load<Texture2D>("ManGreenFullSized"), "ManGreenFull");
+            characterNameDictionary.Add(Content.Load<Texture2D>("ManRedFullSized"), "ManRed");
+            characterNameDictionary.Add(Content.Load<Texture2D>("ManGreenFullSized"), "ManGreen");
 
 
             Trait.ButtonToString.Add(Content.Load<Texture2D>("Lazy"), TraitLazy.TraitString);
             Trait.ButtonToString.Add(Content.Load<Texture2D>("Gourmand"), TraitGourmand.TraitString);
+            Trait.ButtonToString.Add(Content.Load<Texture2D>("Sociable"), TraitSociable.TraitString);
+            Trait.ButtonToString.Add(Content.Load<Texture2D>("Clean"), TraitClean.TraitString);
+            Trait.ButtonToString.Add(Content.Load<Texture2D>("FunLoving"), TraitFunLoving.TraitString);
+            Trait.ButtonToString.Add(Content.Load<Texture2D>("Loner"), TraitLoner.TraitString);
 
             EmotionButton.NegativeEmotionTexture = Content.Load<Texture2D>("Frown");
             EmotionButton.PositiveEmotionTexture = Content.Load<Texture2D>("Smile");
@@ -385,6 +389,10 @@ namespace Game1
             iconDictionary.Add("WomanPurple", Content.Load<Texture2D>("WomanPurpleIcon"));
             modelDictionary.Add("WomanYellow", Content.Load<Model>("WomanYellowModel"));
             iconDictionary.Add("WomanYellow", Content.Load<Texture2D>("WomanYellowIcon"));
+            modelDictionary.Add("ManGreen", Content.Load<Model>("ManGreenModel"));
+            iconDictionary.Add("ManGreen", Content.Load<Texture2D>("ManGreenIcon"));
+            modelDictionary.Add("ManRed", Content.Load<Model>("ManRedModel"));
+            iconDictionary.Add("ManRed", Content.Load<Texture2D>("ManRedIcon"));
 
             //Model man2 = Content.Load<Model>("man4");
             //Model woman5 = Content.Load<Model>("woman5");
@@ -590,7 +598,7 @@ namespace Game1
 
 
                     }
-                    else
+                    else //selects new button
                     {
                         NewGameButton.selectedTraitNames.Add(selectedTraitString);
 

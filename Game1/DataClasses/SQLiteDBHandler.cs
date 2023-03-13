@@ -328,6 +328,8 @@ namespace Game1.DataClasses
             Dictionary<NeedNames, Need> needs = new Dictionary<NeedNames, Need>();
 
             List<NeedNames> prioritisedNeeds = Trait.GetNeedsPrioritised(traits);
+            List<NeedNames> acceleratedDepletionNeeds = Trait.GetNeedsAcceleratedDepletion(traits);
+            List<NeedNames> deceleratedDepletionNeeds = Trait.GetNeedsDeceleratedDepletion(traits);
             using (SQLiteConnection connection = new SQLiteConnection(connectionString))
             {
                 connection.Open();
@@ -347,7 +349,7 @@ namespace Game1.DataClasses
                         NeedNames Name = Need.GetNeedNamefromString(dataReader.GetString(dataReader.GetOrdinal("NeedName")));
                         float Score = dataReader.GetFloat(dataReader.GetOrdinal("Score"));
 
-                        Need need = new Need(_name: Name, _currentNeed: Score, generateNeedBar: person.IsPlayer, _prioritised: prioritisedNeeds.Contains(Name));
+                        Need need = new Need(_name: Name, _currentNeed: Score, generateNeedBar: person.IsPlayer, _prioritised: prioritisedNeeds.Contains(Name), _accelerated: acceleratedDepletionNeeds.Contains(Name));
 
                         needs.Add(Name, need);
 
@@ -548,6 +550,18 @@ namespace Game1.DataClasses
                     insertCommand.ExecuteNonQuery();
 
                     insertCommand.Parameters.AddWithValue("@TraitName", TraitGourmand.TraitString);
+                    insertCommand.ExecuteNonQuery();
+
+                    insertCommand.Parameters.AddWithValue("@TraitName", TraitSociable.TraitString);
+                    insertCommand.ExecuteNonQuery();
+
+                    insertCommand.Parameters.AddWithValue("@TraitName", TraitClean.TraitString);
+                    insertCommand.ExecuteNonQuery();
+
+                    insertCommand.Parameters.AddWithValue("@TraitName", TraitFunLoving.TraitString);
+                    insertCommand.ExecuteNonQuery();
+
+                    insertCommand.Parameters.AddWithValue("@TraitName", TraitLoner.TraitString);
                     insertCommand.ExecuteNonQuery();
 
                 }

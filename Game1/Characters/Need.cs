@@ -39,10 +39,10 @@ namespace Game1
 
 
 
-        public Need(NeedNames _name, int _maxNeed = 100, float _currentNeed = 10, bool generateNeedBar = false, bool _prioritised = false)
+        public Need(NeedNames _name, int _maxNeed = 100, float _currentNeed = 10, bool generateNeedBar = false, bool _prioritised = false, bool _accelerated = false, bool _decelerated = false)
         {
             Name = _name;
-            SetDepletionRate(Name);
+            SetDepletionRate(Name, _accelerated, _decelerated);
             MaxNeed = _maxNeed;
             CurrentNeed = _currentNeed;
             Prioritised = _prioritised;
@@ -52,8 +52,11 @@ namespace Game1
         }
 
 
-        private void SetDepletionRate(NeedNames name)
+        private void SetDepletionRate(NeedNames name, bool accelerated, bool decelerated)
         {
+            float multiplier = accelerated ? 1.3f : (decelerated ? 0.7f : 1f);
+            
+
             switch (name)
             {
                 case NeedNames.Null:
@@ -79,6 +82,10 @@ namespace Game1
                 default:
                     break;
             }
+
+
+            DepletionRate *= multiplier;
+
         }
 
 

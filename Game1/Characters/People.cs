@@ -364,18 +364,18 @@ namespace Game1
         }
 
 
-        private void ConstructNeeds(bool _generateNeedsBar) //only generate needsbar display if player
-        {
-            Needs = new Dictionary<NeedNames, Need>();
-            Needs.Add(NeedNames.Hunger, new Need(_name: NeedNames.Hunger, generateNeedBar: _generateNeedsBar));
-            Needs.Add(NeedNames.Sleep, new Need(_name: NeedNames.Sleep, generateNeedBar: _generateNeedsBar));
-            Needs.Add(NeedNames.Toilet, new Need(_name: NeedNames.Toilet, generateNeedBar: _generateNeedsBar));
-            Needs.Add(NeedNames.Hygiene, new Need(_name: NeedNames.Hygiene, generateNeedBar: _generateNeedsBar));
-            Needs.Add(NeedNames.Social, new Need(_name: NeedNames.Social, generateNeedBar: _generateNeedsBar));
-            Needs.Add(NeedNames.Fun, new Need(_name: NeedNames.Fun, generateNeedBar: _generateNeedsBar));
+        //private void ConstructNeeds(bool _generateNeedsBar) //only generate needsbar display if player
+        //{
+        //    Needs = new Dictionary<NeedNames, Need>();
+        //    Needs.Add(NeedNames.Hunger, new Need(_name: NeedNames.Hunger, generateNeedBar: _generateNeedsBar));
+        //    Needs.Add(NeedNames.Sleep, new Need(_name: NeedNames.Sleep, generateNeedBar: _generateNeedsBar));
+        //    Needs.Add(NeedNames.Toilet, new Need(_name: NeedNames.Toilet, generateNeedBar: _generateNeedsBar));
+        //    Needs.Add(NeedNames.Hygiene, new Need(_name: NeedNames.Hygiene, generateNeedBar: _generateNeedsBar));
+        //    Needs.Add(NeedNames.Social, new Need(_name: NeedNames.Social, generateNeedBar: _generateNeedsBar));
+        //    Needs.Add(NeedNames.Fun, new Need(_name: NeedNames.Fun, generateNeedBar: _generateNeedsBar));
 
 
-        }
+        //}
 
 
 

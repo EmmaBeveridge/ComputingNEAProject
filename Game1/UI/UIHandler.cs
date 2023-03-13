@@ -70,7 +70,7 @@ namespace Game1.UI
         {
 
             float yPosition = 80;
-            int buttonsPerRow = 2;
+            int buttonsPerRow = 3;
             float screenWidth = graphicsManager.GraphicsDevice.Viewport.Width - selectedCharacter.Width;
 
             float xSpacing = (screenWidth - traitButtonsTextures[0].Width * buttonsPerRow) / (buttonsPerRow + 1);
