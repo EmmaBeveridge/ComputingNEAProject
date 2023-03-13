@@ -18,6 +18,7 @@ using Game1.DataClasses;
 using Game1.Actions;
 using Game1.Careers;
 using Game1.Traits;
+using Game1.Skills;
 
 namespace Game1
 {
@@ -145,6 +146,7 @@ namespace Game1
 
 
         public List<Trait> Traits = new List<Trait>();
+        public List<Skill> Skills = new List<Skill>();
 
         public PeopleEmotionalState emotionalState;
        
@@ -157,7 +159,7 @@ namespace Game1
 
 
 
-        public People(Model _model, Vector3 _position, Mesh argMesh, Town.Town argTown, Game1 argGame, Texture2D argIcon, int argDBID, string argName, House argHouse, Career argCareer, List<Trait> argTraits, Dictionary<NeedNames, Need> argNeeds, bool _isPlayer = false)
+        public People(Model _model, Vector3 _position, Mesh argMesh, Town.Town argTown, Game1 argGame, Texture2D argIcon, int argDBID, string argName, House argHouse, Career argCareer, List<Trait> argTraits, Dictionary<NeedNames, Need> argNeeds, List<Skill> argSkills, bool _isPlayer = false)
         {
             position = _position;
             avatar = new Avatar(_model, _position);
@@ -190,6 +192,7 @@ namespace Game1
 
             Traits = argTraits;
             Needs = argNeeds;
+            Skills = argSkills;
 
             //ConstructNeeds(_isPlayer); //need to move line somewhere else
 

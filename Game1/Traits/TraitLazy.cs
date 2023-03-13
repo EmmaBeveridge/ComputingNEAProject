@@ -18,6 +18,7 @@ namespace Game1.Traits
             needsAcceleratedDepletion.Add(NeedNames.Sleep);
         }
 
+        public override int GetID() { return DBID; }
 
 
     }

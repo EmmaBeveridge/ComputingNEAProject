@@ -14,6 +14,7 @@ using Game1.ML;
 using Game1.UI;
 using Game1.Careers;
 using Game1.Traits;
+using Game1.Skills;
 
 namespace Game1
 {
@@ -34,7 +35,7 @@ namespace Game1
         PeopleSelectingState selectingState = PeopleSelectingState.none;
 
         
-        public Player(Model _model, Vector3 _position, Mesh argMesh, Town.Town argTown, Game1 argGame, Texture2D argIcon, int argDBID, string argName, House argHouse, Career argCareer, List<Trait> argTraits, Dictionary<NeedNames, Need> argNeeds ) : base(_model, _position, argMesh, argTown, argGame, argIcon, argDBID, argName, argHouse, argCareer, argTraits, argNeeds, true)
+        public Player(Model _model, Vector3 _position, Mesh argMesh, Town.Town argTown, Game1 argGame, Texture2D argIcon, int argDBID, string argName, House argHouse, Career argCareer, List<Trait> argTraits, Dictionary<NeedNames, Need> argNeeds, List<Skill> argSkills ) : base(_model, _position, argMesh, argTown, argGame, argIcon, argDBID, argName, argHouse, argCareer, argTraits, argNeeds, argSkills, true)
         {
 
         }

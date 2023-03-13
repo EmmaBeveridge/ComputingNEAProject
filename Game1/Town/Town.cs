@@ -18,10 +18,10 @@ namespace Game1.Town
         [JsonProperty("id")]
         public string id;
 
-        static int maxX = 100000;
-        static int maxZ = 100000;
-        static int minX = -100000;
-        static int minZ = -100000;
+        static int maxX = 4000;
+        static int maxZ = 4000;
+        static int minX = -4000;
+        static int minZ = -4000;
 
         static public List<Vector3> corners = new List<Vector3> { new Vector3(maxX, 0, maxZ), new Vector3(maxX, 0, minZ), new Vector3(minX, 0, minZ), new Vector3(minX, 0, maxZ) };
         static public Mesh navMesh;

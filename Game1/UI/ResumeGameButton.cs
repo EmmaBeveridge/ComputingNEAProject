@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Game1.DataClasses;
+using Game1.Skills;
 using Game1.Traits;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -39,6 +40,7 @@ namespace Game1.UI
 
 
                 List<Trait> traits = handler.GetTraits(dbPerson);
+                List<Skill> skills = handler.GetSkills(dbPerson);
                 Dictionary<NeedNames, Need> needs = handler.GetNeeds(dbPerson, traits);
 
 
@@ -46,7 +48,7 @@ namespace Game1.UI
                 if (dbPerson.IsPlayer)
                 {
 
-                    Player player = new Player(model, position, Town.Town.navMesh, game.towns[0], game, icon, dbPerson.DBID, dbPerson.Name, dbPerson.House, dbPerson.Career, traits, needs);
+                    Player player = new Player(model, position, Town.Town.navMesh, game.towns[0], game, icon, dbPerson.DBID, dbPerson.Name, dbPerson.House, dbPerson.Career, traits, needs, skills);
                     game.player = player;
                     people.Add(player);
                     
@@ -54,7 +56,7 @@ namespace Game1.UI
 
                 else
                 {
-                    People person = new People(model, position, Town.Town.navMesh, game.towns[0], game, icon, dbPerson.DBID, dbPerson.Name, dbPerson.House, dbPerson.Career, traits, needs, false);
+                    People person = new People(model, position, Town.Town.navMesh, game.towns[0], game, icon, dbPerson.DBID, dbPerson.Name, dbPerson.House, dbPerson.Career, traits, needs, skills, false);
                     people.Add(person);
                 }
 

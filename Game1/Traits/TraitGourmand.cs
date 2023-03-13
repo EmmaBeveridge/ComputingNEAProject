@@ -18,7 +18,7 @@ namespace Game1.Traits
             needsAcceleratedDepletion.Add(NeedNames.Hunger);
         }
 
-
+        public override int GetID() { return DBID; }
 
     }
 }

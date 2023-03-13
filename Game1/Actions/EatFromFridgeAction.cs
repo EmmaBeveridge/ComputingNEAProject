@@ -18,6 +18,7 @@ namespace Game1.Actions
             rateOfNeedIncrease = 20f;
             ActionMethod = EatFromFridge;
             NeedAffected = NeedNames.Hunger;
+            SkillAffected = Skills.SkillTypes.Cooking;
 
 
         }
@@ -39,6 +40,7 @@ namespace Game1.Actions
         {
 
             needs[NeedAffected].Update(rate: rateOfNeedIncrease, gameTime: timer);
+            person.Skills.Find(s => s.SkillType == SkillAffected).UpdateSkill(timer);
             actionTimeElapsed += timer.ElapsedGameTime.TotalSeconds;
             EstTimeToFinish = Duration - (float)actionTimeElapsed;
 
@@ -48,6 +50,8 @@ namespace Game1.Actions
             {
                 CompleteAction();
             }
+
+
 
 
 

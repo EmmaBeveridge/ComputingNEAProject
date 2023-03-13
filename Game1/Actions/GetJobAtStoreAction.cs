@@ -36,7 +36,7 @@ namespace Game1.Actions
 
 
 
-        public override void BeginAction()
+        public override void BeginAction(People person)
         {
             ActionComplete = false;
             actionTimeElapsed = 0;

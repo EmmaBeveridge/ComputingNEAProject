@@ -76,6 +76,8 @@
     <Compile Include="ID3\NodeAttribute.cs" />
     <Compile Include="ID3\Tree.cs" />
     <Compile Include="ID3\TreeNode.cs" />
+    <Compile Include="Skills\Cooking.cs" />
+    <Compile Include="Skills\Skill.cs" />
     <Compile Include="StreetTraversal\BinaryTree.cs" />
     <Compile Include="StreetTraversal\TreeNode.cs" />
     <Compile Include="Town\Buildings\Hospital.cs" />

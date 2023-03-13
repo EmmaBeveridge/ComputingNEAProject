@@ -29,7 +29,7 @@ namespace Game1.Traits
 
 
 
-        public int GetID() { return DBID; }
+        public virtual int GetID() { return DBID; }
 
 
         public static void SetTraitID(string TraitString, int TraitID)

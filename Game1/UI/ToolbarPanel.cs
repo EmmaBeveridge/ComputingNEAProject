@@ -1,4 +1,5 @@
 ﻿using Game1.Careers;
+using Game1.Skills;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System;
@@ -180,11 +181,37 @@ namespace Game1.UI
     }
     public class SkillsPanel : ToolbarPanel
     {
-        public SkillsPanel() { }
+        Player player;
+        public SkillsPanel(Player argPlayer) { player = argPlayer; panelPosition.X = 450; }
 
         public override void Draw(SpriteBatch spriteBatch, SpriteFont spriteFont)
         {
-            throw new NotImplementedException();
+            spriteBatch.Draw(texture: whiteRectangle, position: panelPosition, scale: panelScale, layerDepth: 0.5f);
+
+            if (player.Skills.Count() == 0) {
+                spriteBatch.DrawString(spriteFont, "You have no skills", new Vector2(panelPosition.X + 15, panelPosition.Y + 15), Color.Black);
+
+            }
+            else
+            {
+                float yHeight = panelPosition.Y + 15;
+                foreach (Skill skill in player.Skills)
+                {
+                    spriteBatch.DrawString(spriteFont, skill.GetSkillString(), new Vector2(panelPosition.X + 15, yHeight), Color.Black);
+                    spriteBatch.DrawString(spriteFont, skill.Level.ToString(), new Vector2(panelPosition.X + 200, yHeight), Color.Black);
+
+
+                    
+
+                    yHeight += 30;
+
+                }
+
+            }
+
+            
+
+
         }
 
         public override void InitialisePanel()

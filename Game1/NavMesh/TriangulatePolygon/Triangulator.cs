@@ -8,6 +8,7 @@ using System.IO;
 using System.Data;
 using Game1.DataClasses;
 using Game1.Town;
+using Game1.Town.Buildings;
 
 namespace Game1.NavMesh.TriangulatePolygon
 {
@@ -68,23 +69,23 @@ namespace Game1.NavMesh.TriangulatePolygon
 
 
 
-            for (int i = 0; i < 1; i++)
-            {
-                Building building = Building.buildings[i];
-                List<Vector2> buildingVertices = new List<Vector2>();
-                holeCount++;
-                Console.WriteLine(building.id);
+            //for (int i = 0; i < 1; i++)
+            //{
+            //    Building building = Building.buildings.Find(b => b.GetType() == typeof(Office));
+            //    List<Vector2> buildingVertices = new List<Vector2>();
+            //    holeCount++;
+            //    Console.WriteLine(building.id);
 
-                foreach (Vector3 corner in building.groundCorners)
-                {
+            //    foreach (Vector3 corner in building.groundCorners)
+            //    {
 
-                    buildingVertices.Add(new Vector2(corner.X, corner.Z));
+            //        buildingVertices.Add(new Vector2(corner.X, corner.Z));
 
-                }
+            //    }
 
-                holeVertices.Add(buildingVertices);
+            //    holeVertices.Add(buildingVertices);
 
-            }
+            //}
 
 
             //foreach (Building building in Building.buildings)
@@ -142,10 +143,12 @@ namespace Game1.NavMesh.TriangulatePolygon
                 }
 
             }
-            
-            
+
+
 
             //FixVertices(ref shapeVertices);
+
+            
 
 
             Triangulate(shapeVertices.ToArray());
@@ -538,6 +541,12 @@ namespace Game1.NavMesh.TriangulatePolygon
 
             earVertices.RemoveAt(0);
             polygonVertices.RemoveAt(polygonVertices.IndexOf(ear));
+
+            if (earVertices.Count == 0)
+            {
+                Console.WriteLine();
+            }
+
 
             ValidateAdjacentVertex(previous);
             ValidateAdjacentVertex(next);

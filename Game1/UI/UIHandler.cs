@@ -202,7 +202,7 @@ namespace Game1.UI
             AddToolbarButton(new NeedsButton(null, new Vector2((graphicsManager.GraphicsDevice.Viewport.Width - 4 * ToolbarButton.toolbarButtonTextureDim.X), (graphicsManager.GraphicsDevice.Viewport.Height - ToolbarButton.toolbarButtonTextureDim.Y)), needBars));
 
             AddToolbarButton(new RelationshipsButton(null, new Vector2((graphicsManager.GraphicsDevice.Viewport.Width - 3 * ToolbarButton.toolbarButtonTextureDim.X), (graphicsManager.GraphicsDevice.Viewport.Height - ToolbarButton.toolbarButtonTextureDim.Y)), player.Relationships));
-            AddToolbarButton(new SkillsButton(null, new Vector2((graphicsManager.GraphicsDevice.Viewport.Width - 2 * ToolbarButton.toolbarButtonTextureDim.X), (graphicsManager.GraphicsDevice.Viewport.Height - ToolbarButton.toolbarButtonTextureDim.Y))));
+            AddToolbarButton(new SkillsButton(null, new Vector2((graphicsManager.GraphicsDevice.Viewport.Width - 2 * ToolbarButton.toolbarButtonTextureDim.X), (graphicsManager.GraphicsDevice.Viewport.Height - ToolbarButton.toolbarButtonTextureDim.Y)), player));
             AddToolbarButton(new CareerButton(null, new Vector2((graphicsManager.GraphicsDevice.Viewport.Width - ToolbarButton.toolbarButtonTextureDim.X), (graphicsManager.GraphicsDevice.Viewport.Height - ToolbarButton.toolbarButtonTextureDim.Y)), player));
         }
 

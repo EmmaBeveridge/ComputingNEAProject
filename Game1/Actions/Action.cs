@@ -1,4 +1,5 @@
 ﻿using Game1.GOAP;
+using Game1.Skills;
 using Game1.Town;
 using Microsoft.Xna.Framework;
 using System;
@@ -22,6 +23,7 @@ namespace Game1
         protected double actionTimeElapsed;
         public GOAPAction GOAPAction;
         public NeedNames NeedAffected;
+        public SkillTypes SkillAffected = SkillTypes.Null;
         public bool ActionComplete;
         public float EstTimeToFinish;
         public float Duration;
@@ -61,11 +63,23 @@ namespace Game1
         }
 
 
-        public virtual void BeginAction()
+        public virtual void BeginAction(People person)
         {
             ActionComplete = false;
             actionTimeElapsed = 0;
             Item.IsAvailable = false;
+
+            if (SkillAffected!= SkillTypes.Null)
+            {
+                if (!person.Skills.Any(s => s.SkillType == SkillAffected))
+                {
+                    person.Skills.Add(Skill.GetNewSkill(SkillAffected));
+                }
+
+
+            }
+
+
         }
 
 

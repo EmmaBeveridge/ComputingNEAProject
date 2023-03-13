@@ -35,6 +35,7 @@ namespace Game1.UI
 
             handler.CreateTables();
             handler.CreateTraitLookupTable();
+            handler.CreateSkillLookupTable();
             handler.AddPeople(selectedCharacterName, selectedTraitNames);
 
 

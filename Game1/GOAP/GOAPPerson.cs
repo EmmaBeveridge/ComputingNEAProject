@@ -707,7 +707,7 @@ namespace Game1.GOAP
                 person.IsAvailable = false;
 
                 currentActionMethod = action.Action.ActionMethod;
-                action.Action.BeginAction();
+                action.Action.BeginAction(person);
 
                 //currentAction = actionItem.BeginAction(action.Name, person);
 

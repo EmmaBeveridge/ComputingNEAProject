@@ -8,6 +8,7 @@ using System.IO;
 using Game1.Town;
 using Game1.Careers;
 using Game1.Traits;
+using Game1.Skills;
 
 namespace Game1.DataClasses
 {
@@ -68,11 +69,12 @@ namespace Game1.DataClasses
 
                         foreach (Trait trait in person.Traits)
                         {
-                            command.CommandText = "INSERT OR IGNORE INTO Trait(TraitHolderID, TraitID) VALUES (@TraitHolderID, @TraitID)";
+                            command.CommandText = "INSERT OR IGNORE INTO Trait(TraitHolderID, TraitNumber) VALUES (@TraitHolderID, @TraitNumber)";
                             command.Parameters.AddWithValue("@TraitHolderID", person.DBID);
-                            command.Parameters.AddWithValue("@TraitID", trait.GetID());
+                            command.Parameters.AddWithValue("@TraitNumber", trait.GetID());
 
 
+                            command.ExecuteNonQuery();
 
 
                         }
@@ -108,6 +110,19 @@ namespace Game1.DataClasses
                             command.Parameters.AddWithValue("@Score", need.Value.CurrentNeed);
                             command.Parameters.AddWithValue("@PersonID", person.DBID);
                             command.Parameters.AddWithValue("@NeedName", need.Key.ToString());
+
+                            command.ExecuteNonQuery();
+
+                        }
+
+                        foreach (Skill skill in person.Skills)
+                        {
+                            command.CommandText = "INSERT INTO Skill(SkillHolderID, SkillScore, SkillNumber) VALUES (@SkillHolderID, @SkillScore, @SkillNumber) ON CONFLICT (SkillHolderID, SkillNumber) DO UPDATE SET SkillScore = @SkillScore WHERE SkillHolderID = @SkillHolderID AND SkillNumber = @SkillNumber";
+
+                           
+                            command.Parameters.AddWithValue("@SkillScore", skill.Score);
+                            command.Parameters.AddWithValue("@SkillHolderID", person.DBID);
+                            command.Parameters.AddWithValue("@SkillNumber", skill.GetID());
 
                             command.ExecuteNonQuery();
 
@@ -155,6 +170,37 @@ namespace Game1.DataClasses
 
 
                         Trait.SetTraitID(TraitName, TraitID);
+
+                    }
+
+
+
+                }
+
+            }
+        }
+
+        public void SetSkillIDs()
+        {
+            using (SQLiteConnection connection = new SQLiteConnection(connectionString))
+            {
+                connection.Open();
+
+                using (SQLiteCommand command = connection.CreateCommand())
+                {
+                    SQLiteDataReader dataReader;
+                    command.CommandText = "SELECT * FROM SkillLookup";
+                    dataReader = command.ExecuteReader();
+
+
+
+                    while (dataReader.Read())
+                    {
+                        int SkillID = dataReader.GetInt32(dataReader.GetOrdinal("SkillNumber"));
+                        string SKillName = dataReader.GetString(dataReader.GetOrdinal("SkillName"));
+
+
+                        Skill.SetSkillID(SKillName, SkillID);
 
                     }
 
@@ -235,6 +281,40 @@ namespace Game1.DataClasses
             }
 
             return traits;
+
+
+
+        }
+
+
+        public List<Skill> GetSkills(DBPerson person)
+        {
+            List<Skill> skills = new List<Skill>();
+            using (SQLiteConnection connection = new SQLiteConnection(connectionString))
+            {
+                connection.Open();
+                using (SQLiteCommand command = connection.CreateCommand())
+                {
+                    command.CommandText = "SELECT SkillName, SkillScore FROM People INNER JOIN Skill ON PersonID = Skill.SkillHolderID JOIN SkillLookup ON SkillLookup.SkillNumber = Skill.SkillNumber WHERE PersonID = @PersonID";
+                    command.Parameters.AddWithValue("@PersonID", person.DBID);
+
+                    using (SQLiteDataReader dataReader = command.ExecuteReader())
+                    {
+
+
+                        while (dataReader.Read())
+                        {
+                            Skill skill = Skill.GetSkillFromString(dataReader.GetString(dataReader.GetOrdinal("SkillName")));
+                            skill.Score = dataReader.GetFloat(dataReader.GetOrdinal("SkillScore"));
+                            skills.Add(skill);
+
+
+                        }
+                    }
+                }
+            }
+
+            return skills;
 
 
 
@@ -427,6 +507,30 @@ namespace Game1.DataClasses
 
         }
 
+        public void CreateSkillLookupTable()
+        {
+            using (SQLiteConnection connection = new SQLiteConnection(connectionString))
+            {
+                connection.Open();
+
+                using (SQLiteCommand insertCommand = connection.CreateCommand())
+                {
+                    insertCommand.CommandText = "INSERT OR IGNORE INTO SkillLookup (SkillName) VALUES (@SkillName)";
+
+                    insertCommand.Parameters.AddWithValue("@SkillName", Skills.Cooking.SkillString);
+                    insertCommand.ExecuteNonQuery();
+
+                    
+
+                }
+            }
+
+            SetSkillIDs();
+
+
+        }
+
+
 
 
         public void CreateTraitLookupTable()
@@ -482,6 +586,26 @@ namespace Game1.DataClasses
             
         }
 
+
+        public void AddSkills(int PersonID, string[] SkillsNames, SQLiteConnection connection)
+        {
+
+            using (SQLiteCommand command = connection.CreateCommand())
+            {
+                command.CommandText = "INSERT OR IGNORE INTO Skill (SkillHolderID, SkillNumber, SkillScore) VALUES (@SkillHolderID, @SkillNumber, @SkillScore)";
+
+                foreach (string SkillName in SkillsNames)
+                {
+                    command.Parameters.AddWithValue("@SkillsHolderID", PersonID);
+                    command.Parameters.AddWithValue("@SkillNumber", Skill.GetSkillID(SkillName));
+                    command.ExecuteNonQuery();
+
+                }
+
+            }
+
+
+        }
 
 
         public void AddNeeds(int PersonID, SQLiteConnection connection)
@@ -546,6 +670,12 @@ namespace Game1.DataClasses
                         command.CommandText = "DROP TABLE IF EXISTS TraitLookup";
                         command.ExecuteNonQuery();
 
+                        command.CommandText = "DROP TABLE IF EXISTS SkillLookup";
+                        command.ExecuteNonQuery();
+
+                        command.CommandText = "DROP TABLE IF EXISTS Skill";
+                        command.ExecuteNonQuery();
+
 
                         command.CommandText = "DROP TABLE IF EXISTS InventoryIndex";
                         command.ExecuteNonQuery();
@@ -574,6 +704,16 @@ namespace Game1.DataClasses
 
                         command.CommandText = "CREATE TABLE IF NOT EXISTS TraitLookup(TraitNumber INTEGER NOT NULL UNIQUE, TraitName TEXT NOT NULL, PRIMARY KEY(TraitNumber AUTOINCREMENT))";
                         command.ExecuteNonQuery();
+
+
+                        command.CommandText = "CREATE TABLE IF NOT EXISTS Skill(SkillID INTEGER NOT NULL UNIQUE, SkillHolderID INTEGER NOT NULL, SkillNumber INTEGER NOT NULL, SkillScore INTEGER NOT NULL, PRIMARY KEY(SkillID AUTOINCREMENT), FOREIGN KEY(SkillHolderID) REFERENCES People(PersonID), FOREIGN KEY(SkillNumber) REFERENCES SkillLookup(SkillNumber)); CREATE UNIQUE INDEX idx ON Skill(SkillHolderID, SkillNumber);";
+
+                        command.ExecuteNonQuery();
+
+                        command.CommandText = "CREATE TABLE IF NOT EXISTS SkillLookup(SkillNumber INTEGER NOT NULL UNIQUE, SkillName TEXT NOT NULL, PRIMARY KEY(SkillNumber AUTOINCREMENT))";
+                        command.ExecuteNonQuery();
+
+
 
                         command.CommandText = "CREATE TABLE IF NOT EXISTS InventoryIndex(InventoryID INTEGER NOT NULL UNIQUE, Item TEXT NOT NULL, Room TEXT, House INTEGER, PRIMARY KEY(InventoryID AUTOINCREMENT))";
 

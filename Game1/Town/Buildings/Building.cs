@@ -91,7 +91,7 @@ namespace Game1.Town
 
             buildingBox = avatar.UpdateBoundingBox();
 
-            SetCorners();
+            //SetCorners();
 
 
         }

@@ -60,9 +60,9 @@ namespace Game1.UI
 
         public static Texture2D defaultTexture;
 
-        public SkillsButton(string argLabel, Vector2 argPosition) : base(argLabel, argPosition, defaultTexture)
+        public SkillsButton(string argLabel, Vector2 argPosition, Player argPlayer) : base(argLabel, argPosition, defaultTexture)
         {
-            panel = new SkillsPanel();
+            panel = new SkillsPanel(argPlayer);
         }
 
     }
