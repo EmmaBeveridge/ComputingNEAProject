@@ -159,7 +159,7 @@ namespace Game1.UI
     public class CareerPanel : ToolbarPanel
     {
         Player player;
-        public CareerPanel(Player argPlayer) { player = argPlayer; panelPosition.X = 450; }
+        public CareerPanel(Player argPlayer) { player = argPlayer; panelPosition.X = 400; }
 
         public override void Draw(SpriteBatch spriteBatch, SpriteFont spriteFont)
         {
@@ -189,7 +189,7 @@ namespace Game1.UI
             spriteBatch.Draw(texture: whiteRectangle, position: panelPosition, scale: panelScale, layerDepth: 0.5f);
 
             if (player.Skills.Count() == 0) {
-                spriteBatch.DrawString(spriteFont, "You have no skills", new Vector2(panelPosition.X + 15, panelPosition.Y + 15), Color.Black);
+                spriteBatch.DrawString(spriteFont, "You have no skills", new Vector2(panelPosition.X + 15, panelPosition.Y + 85), Color.Black);
 
             }
             else

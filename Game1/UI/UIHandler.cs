@@ -374,7 +374,7 @@ namespace Game1.UI
 
                 if (button.buttonLabel != null)
                 {
-                    spriteBatch.DrawString(spriteFont, button.buttonLabel, new Vector2(button.position.X + button.buttonTexture.Width / 4, button.position.Y + button.buttonTexture.Height / 20), Color.Black);
+                    spriteBatch.DrawString(spriteFont, button.buttonLabel, new Vector2(button.position.X + button.buttonTexture.Width / 20, button.position.Y + button.buttonTexture.Height / 20), Color.Black);
 
                 }
 

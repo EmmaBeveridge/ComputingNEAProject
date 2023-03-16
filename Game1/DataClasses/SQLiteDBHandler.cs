@@ -411,7 +411,12 @@ namespace Game1.DataClasses
         public void AddPeople(string playerModelName, List<string> playerTraits)
         {
 
-            Dictionary<int, string[]> PeopleTraits = new Dictionary<int, string[]> { { 1, new string[] { "Lazy", "Gourmand" } } };
+            Dictionary<int, string[]> PeopleTraits = new Dictionary<int, string[]>
+            {
+                { 2, new string[] { "Lazy", "Gourmand" } }, 
+                { 3, new string[] { "Loner", "FunLoving" } } 
+            
+            };
 
 
             
@@ -422,8 +427,16 @@ namespace Game1.DataClasses
                     connection.Open();
                     using (SQLiteCommand insertCommand = connection.CreateCommand())
                     {
-
+                        
                         insertCommand.CommandText = "INSERT OR IGNORE INTO People (Name, HouseNum, Career, ModelName, IsPlayer) VALUES (@Name, @HouseNum, @Career, @ModelName, @IsPlayer)";
+                        insertCommand.Parameters.AddWithValue("@Name", "player");
+                        insertCommand.Parameters.AddWithValue("@HouseNum", 1);
+                        insertCommand.Parameters.AddWithValue("@Career", "");
+                        insertCommand.Parameters.AddWithValue("@ModelName", playerModelName);
+                        insertCommand.Parameters.AddWithValue("@IsPlayer", 1);
+
+                        insertCommand.ExecuteNonQuery();
+                        
 
                         insertCommand.Parameters.AddWithValue("@Name", "Jane Doe");
                         insertCommand.Parameters.AddWithValue("@HouseNum", 2);
@@ -433,13 +446,7 @@ namespace Game1.DataClasses
 
                         insertCommand.ExecuteNonQuery();
 
-                        insertCommand.Parameters.AddWithValue("@Name", "player");
-                        insertCommand.Parameters.AddWithValue("@HouseNum", 1);
-                        insertCommand.Parameters.AddWithValue("@Career", "");
-                        insertCommand.Parameters.AddWithValue("@ModelName", playerModelName);
-                        insertCommand.Parameters.AddWithValue("@IsPlayer", 1);
-
-                        insertCommand.ExecuteNonQuery();
+                        
 
                     }
 

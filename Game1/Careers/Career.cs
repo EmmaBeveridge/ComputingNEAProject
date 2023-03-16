@@ -27,6 +27,15 @@ namespace Game1.Careers
                 case "store clerk":
                     return new StoreClerk();
                     break;
+                case "office worker":
+                    return new OfficeWorker();
+                    break;
+                case "doctor":
+                    return new Doctor();
+                    break;
+                case "teacher":
+                    return new Teacher();
+                    break;
                 default:
                     return null;
                     break;
