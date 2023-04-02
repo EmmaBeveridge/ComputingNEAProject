@@ -344,6 +344,16 @@ namespace Game1
         /// <returns></returns>
         public static bool IsEmotionButtonPressed(EmotionButton emotionButton) { return MouseOverButton(emotionButton, currentMouseState); }
 
+
+        /// <summary>
+        /// Returns if career feedback button has been pressed.
+        /// </summary>
+        /// <param name="careerFeedbackButton"></param>
+        /// <returns></returns>
+        public static bool IsCareerFeedbackButtonPressed(CareerFeedbackButton careerFeedbackButton) { if (careerFeedbackButton == null) { return false; } return MouseOverButton(careerFeedbackButton, currentMouseState); }
+
+
+
         /// <summary>
         /// Returns button user has pressed. 
         /// </summary>

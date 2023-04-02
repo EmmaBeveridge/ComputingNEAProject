@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Game1.UI;
 
 namespace Game1.Careers
 {
@@ -32,6 +33,16 @@ namespace Game1.Careers
         /// Get method for Description attribute.
         /// </summary>
         public virtual string CareerDescription { get { return Description; } }
+
+        /// <summary>
+        /// Emotional states leading to positive work scores
+        /// </summary>
+        public static List<PeopleEmotionalState> positiveWorkEmotions = new List<PeopleEmotionalState> { PeopleEmotionalState.Comfortable, PeopleEmotionalState.Playful, PeopleEmotionalState.Energised };
+
+        /// <summary>
+        /// Emotional states leading to negative work scores
+        /// </summary>
+        public static List<PeopleEmotionalState> negativeWorkEmotions = new List<PeopleEmotionalState> { PeopleEmotionalState.Uncomfortable, PeopleEmotionalState.Tense, PeopleEmotionalState.Lonely };
 
 
         /// <summary>
@@ -63,6 +74,25 @@ namespace Game1.Careers
 
 
         }
+
+
+
+        /// <summary>
+        /// Static method. Returns an increment value for work score using person's emotional state. If their emotional state is considered positive, returns 1. If negative, returns -1. If neutral, returns 0.
+        /// </summary>
+        /// <param name="person"></param>
+        /// <returns></returns>
+        public static int ReturnWorkScoreIncrement(People person)
+        {
+
+            if (positiveWorkEmotions.Contains(person.emotionalState)) { return 1; }
+            if (negativeWorkEmotions.Contains(person.emotionalState)) { return -1; }
+            return 0;
+
+        }
+
+
+
 
 
     }

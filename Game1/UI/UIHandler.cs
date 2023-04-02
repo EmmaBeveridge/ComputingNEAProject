@@ -21,6 +21,7 @@ namespace Game1.UI
 
         public ExitButton exitButton;
         public EmotionButton emotionButton;
+        public CareerFeedbackButton careerFeedbackButton;
         public bool displayTextbox = false;
         Textbox currentTextbox;
 
@@ -37,6 +38,15 @@ namespace Game1.UI
             mainMenuButtons = new List<Button>();
             characterSelectionButtons = new List<Button>();
             traitSelectionButtons = new List<Button>();
+        }
+
+        /// <summary>
+        /// Creates new career feedback button with feedback sentiment passed as parameter. Assigns to careerFeedbackButton field.
+        /// </summary>
+        /// <param name="feedback"></param>
+        public void CreateNewCareerFeedbackButton(FeedbackScore feedback)
+        {
+            careerFeedbackButton = new CareerFeedbackButton(feedback, new Vector2(20, 120));
         }
 
 
@@ -463,6 +473,13 @@ namespace Game1.UI
             spriteBatch.Draw(emotionButton.buttonTexture, emotionButton.position);
 
             if (emotionButton.panel.IsDisplayed) { emotionButton.panel.Draw(spriteBatch, spriteFont); }
+            if (careerFeedbackButton != null) 
+            {
+                careerFeedbackButton.Draw(spriteBatch, spriteFont);
+
+                
+            }
+
 
             if (displayTextbox)
             {

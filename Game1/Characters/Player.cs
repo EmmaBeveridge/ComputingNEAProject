@@ -29,7 +29,7 @@ namespace Game1
         
     }
 
-    
+
 
 
     public class Player : People
@@ -53,7 +53,7 @@ namespace Game1
         /// <param name="argTraits"></param>
         /// <param name="argNeeds"></param>
         /// <param name="argSkills"></param>
-        public Player(Model _model, Vector3 _position, Mesh argMesh, Town.Town argTown, Game1 argGame, Texture2D argIcon, int argDBID, string argName, House argHouse, Career argCareer, List<Trait> argTraits, Dictionary<NeedNames, Need> argNeeds, List<Skill> argSkills ) : base(_model, _position, argMesh, argTown, argGame, argIcon, argDBID, argName, argHouse, argCareer, argTraits, argNeeds, argSkills, true)
+        public Player(Model _model, Vector3 _position, Mesh argMesh, Town.Town argTown, Game1 argGame, Texture2D argIcon, int argDBID, string argName, House argHouse, Career argCareer, List<Trait> argTraits, Dictionary<NeedNames, Need> argNeeds, List<Skill> argSkills) : base(_model, _position, argMesh, argTown, argGame, argIcon, argDBID, argName, argHouse, argCareer, argTraits, argNeeds, argSkills, true)
         {
 
         }
@@ -68,7 +68,7 @@ namespace Game1
         /// <param name="game"></param>
         public override void Update(GameTime gameTime, GraphicsDevice graphicsDevice, Matrix projection, Matrix view, Game1 game)
         {
-            
+
             DepleteNeeds(gameTime);
             emotionalState = GetEmotionalState();
 
@@ -85,12 +85,14 @@ namespace Game1
                 ToolbarButton selectedToolBarButton = MouseInput.GetToolbarButton(game.UIHandler.toolbarButtons);
 
                 if (MouseInput.IsExitButtonPressed(game.UIHandler.exitButton))
-                { 
+                {
                     // End game, save game state
                     ExitButton.SaveAndExit(people, game);
 
-
-                   
+                }
+                else if (MouseInput.IsCareerFeedbackButtonPressed(game.UIHandler.careerFeedbackButton))
+                {
+                    CloseFeedback();
                 }
 
                 else if (MouseInput.IsEmotionButtonPressed(game.UIHandler.emotionButton))
@@ -149,7 +151,7 @@ namespace Game1
                     DisplayToolBarPanel(selectedToolBarButton);
 
                 }
-                
+
                 else if (actionState == PeopleActionStates.typingChat) { }
 
 
@@ -162,7 +164,7 @@ namespace Game1
                     DisplayTextbox(game);
 
                 }
-                
+
 
                 else if (MouseInput.FindItemSelected(currentHouse, graphicsDevice, projection, view, ref selectedItem)) //is item selected
                 {
@@ -209,8 +211,8 @@ namespace Game1
 
 
 
-            
-            
+
+
             else if (actionState == PeopleActionStates.beginMoving)
             {
                 actionState = PeopleActionStates.moving;
@@ -221,13 +223,13 @@ namespace Game1
 
             else if (actionState == PeopleActionStates.moving)
             {
-                
+
                 MovePerson(gameTime);
             }
 
-            
 
-           // prevMouseState = MouseInput.currentMouseState;
+
+            // prevMouseState = MouseInput.currentMouseState;
 
             updateTransformationMatrix(); //updates transformation matrix with transformations occured in current frame 
 
@@ -237,28 +239,66 @@ namespace Game1
 
         }
 
+
+        /// <summary>
+        /// Overriden method to display career feedback to player. Calls CreateNewCareerFeedbackButton in UI class to display feedback to user.
+        /// </summary>
+        public override void DisplayCareerFeedback(FeedbackScore feedback)
+        {
+            game.UIHandler.CreateNewCareerFeedbackButton(feedback);
+
+        }
+
+        /// <summary>
+        /// Sets UIHandler.careerFeedbackButton to null to close career feedback view.
+        /// </summary>
+        public void CloseFeedback()
+        {
+            this.game.UIHandler.careerFeedbackButton = null;
+        }
+
+        /// <summary>
+        /// Sets UIHandler.displayTextbox attribute to true to display textbox for user input.
+        /// </summary>
+        /// <param name="game"></param>
         public void DisplayTextbox(Game1 game)
         {
             game.UIHandler.displayTextbox = true;
         }
+
+        /// <summary>
+        /// Calls DisplayActions method on selected item in order to display action labels for user to select from.
+        /// </summary>
+        /// <param name="selectedItem"></param>
         public void DisplayItemLabels(Item selectedItem)
         {
             selectedItem.DisplayActions(game);
         }
 
+        /// <summary>
+        /// Calls DisplayActions method on selected building in order to display action labels for user to select from.
+        /// </summary>
+        /// <param name="selectedBuilding"></param>
         public void DisplayBuildingLabels(Building selectedBuilding)
         {
             selectedBuilding.DisplayActions(game, this);
         }
 
 
+        /// <summary>
+        /// Toggles emotion button panel display – showing/hiding emotional state from user.
+        /// </summary>
+        /// <param name="button"></param>
         public void DisplayEmotion(EmotionButton button)
         {
             button.panel.IsDisplayed = !button.panel.IsDisplayed;
            
         }
 
-
+        /// <summary>
+        /// Toggles toolbar button panel display. If a new panel is being opened, all panels closed first. If user has selected an already opened panel, the panel is closed.
+        /// </summary>
+        /// <param name="button"></param>
         public void DisplayToolBarPanel(ToolbarButton button)
         {
             if (!button.panel.IsDisplayed) //if opening a new panel, close open panel first
@@ -271,6 +311,10 @@ namespace Game1
         }
 
 
+        /// <summary>
+        /// Creates new SentimentData obect with user input conversation text. Uses MLMain.PredictWithSubject to determine if the user has input dialogue with a positive or negative sentiment towards the subject.
+        /// </summary>
+        /// <param name="text"></param>
         public void ReceiveConversationData(string text)
         {
 
@@ -294,7 +338,10 @@ namespace Game1
 
 
 
-
+        /// <summary>
+        /// Updates the player’s relationship with the person selected from interaction using sentiment prediction on the player’s input text. A relationship is created if it does not already exist. Relationship is incremented if the sentiment was deemed positive and decremented if deemed negative.
+        /// </summary>
+        /// <param name="prediction"></param>
         private void UpdateRelationship(bool prediction)
         {
             if (!Relationships.ContainsKey(selectedPerson))
@@ -313,7 +360,10 @@ namespace Game1
             selectedPerson = null;
         }
 
-
+        /// <summary>
+        /// Very similar to base method however has added functionality of removing and adding roofs to houses depending on if the player is currently inside the house to allow them to obtain a better view of the house interior.
+        /// </summary>
+        /// <param name="gameTime"></param>
         public override void MovePerson(GameTime gameTime)
         {
 

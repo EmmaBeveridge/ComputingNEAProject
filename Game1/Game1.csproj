@@ -110,6 +110,7 @@
     <Compile Include="Traits\TraitLoner.cs" />
     <Compile Include="Traits\TraitSociable.cs" />
     <Compile Include="UI\Button.cs" />
+    <Compile Include="UI\CareerFeedbackButton.cs" />
     <Compile Include="UI\CharacterSelectionButton.cs" />
     <Compile Include="UI\EmotionButton.cs" />
     <Compile Include="UI\EmotionPanel.cs" />

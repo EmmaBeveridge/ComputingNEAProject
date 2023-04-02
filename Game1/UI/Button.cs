@@ -50,6 +50,15 @@ namespace Game1.UI
         }
 
 
+        public Button(Vector2 argPosition)
+        {
+            position = argPosition;
+            buttonTexture = defaultTexture;
+            id = idCount;
+            idCount++;
+
+        }
+
 
     }
 }

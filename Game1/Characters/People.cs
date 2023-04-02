@@ -19,6 +19,7 @@ using Game1.Actions;
 using Game1.Careers;
 using Game1.Traits;
 using Game1.Skills;
+using Game1.UI;
 
 namespace Game1
 {
@@ -221,6 +222,16 @@ namespace Game1
 
 
         /// <summary>
+        /// Virtual method to display career feedback to player. Overriden in Player class.
+        /// </summary>
+        public virtual void DisplayCareerFeedback(FeedbackScore feedback)
+        {
+
+        }
+
+
+
+        /// <summary>
         /// Decrements person's need to cause depletion over time
         /// </summary>
         protected void DepleteNeeds(GameTime gameTime)
@@ -396,23 +407,6 @@ namespace Game1
 
 
         }
-
-
-        //private void ConstructNeeds(bool _generateNeedsBar) //only generate needsbar display if player
-        //{
-        //    Needs = new Dictionary<NeedNames, Need>();
-        //    Needs.Add(NeedNames.Hunger, new Need(_name: NeedNames.Hunger, generateNeedBar: _generateNeedsBar));
-        //    Needs.Add(NeedNames.Sleep, new Need(_name: NeedNames.Sleep, generateNeedBar: _generateNeedsBar));
-        //    Needs.Add(NeedNames.Toilet, new Need(_name: NeedNames.Toilet, generateNeedBar: _generateNeedsBar));
-        //    Needs.Add(NeedNames.Hygiene, new Need(_name: NeedNames.Hygiene, generateNeedBar: _generateNeedsBar));
-        //    Needs.Add(NeedNames.Social, new Need(_name: NeedNames.Social, generateNeedBar: _generateNeedsBar));
-        //    Needs.Add(NeedNames.Fun, new Need(_name: NeedNames.Fun, generateNeedBar: _generateNeedsBar));
-
-
-        //}
-
-
-
 
 
         /// <summary>

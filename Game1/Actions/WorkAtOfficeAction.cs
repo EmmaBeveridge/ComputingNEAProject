@@ -14,6 +14,7 @@ namespace Game1.Actions
     /// </summary>
     class WorkAtOfficeAction : ActionAbstract
     {
+        int WorkScore = 0;
 
         /// <summary>
         ///  Constructor to create a new WorkAtOfficeAction object. Sets action name, building, minActionTime, and ActionMethod (set to WorkAtOffice method) 
@@ -45,13 +46,14 @@ namespace Game1.Actions
 
 
         /// <summary>
-        /// Overrides virtual method in parent class. Resets actionComplete and actionTimeElapsed variables.
+        /// Overrides virtual method in parent class. Resets actionComplete and actionTimeElapsed variables. Resets WorkScore to 0
         /// </summary>
         /// <param name="person"></param>
         public override void BeginAction(People person)
         {
             ActionComplete = false;
             actionTimeElapsed = 0;
+            WorkScore = 0;
         }
 
         /// <summary>
@@ -64,7 +66,7 @@ namespace Game1.Actions
 
 
         /// <summary>
-        /// Called each update frame for which action is ongoing. Simulates working at office. Increments actionTimeElapsed and reduces EstTimeToFinish. If the elapsed action time is greater than the minimum action time and the affected need is fulfilled, CompleteAction method is called. 
+        /// Called each update frame for which action is ongoing. Simulates working at office. Increments actionTimeElapsed and reduces EstTimeToFinish. If the elapsed action time is greater than the minimum action time and the affected need is fulfilled, if the person is the player, then worker feedback is determined based on workScore and person.DisplayCareerFeedback method used to display feedback to user. CompleteAction method is then called. 
         /// </summary>
         /// <param name="gameTime"></param>
         /// <param name="needs"></param>
@@ -80,6 +82,14 @@ namespace Game1.Actions
 
             if (actionTimeElapsed > minActionTime)
             {
+                if (person.isPlayer) //displaying career feedback
+                {
+                    double averageScore = WorkScore / actionTimeElapsed;
+                    if (averageScore < 0) { person.DisplayCareerFeedback(UI.FeedbackScore.Bad); }
+                    else if (averageScore > 0.5) { person.DisplayCareerFeedback(UI.FeedbackScore.Good); }
+                    else { person.DisplayCareerFeedback(UI.FeedbackScore.Average); }
+
+                }
                 CompleteAction();
             }
 
