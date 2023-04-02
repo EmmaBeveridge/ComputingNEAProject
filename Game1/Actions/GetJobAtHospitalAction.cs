@@ -10,9 +10,16 @@ using System.Threading.Tasks;
 
 namespace Game1.Actions
 {
-
+    /// <summary>
+    /// Inherits from ActionAbstract to implement action to get a job at the hospital. 
+    /// </summary>
     class GetJobAtHospitalAction : ActionAbstract
     {
+
+        /// <summary>
+        /// Constructor to create a new GetJobAtHospitalAction object. Sets action name, building, minActionTime, and ActionMethod (set to GetJobAtHospital method) 
+        /// </summary>
+        /// <param name="_building"></param>
         public GetJobAtHospitalAction(Building _building)
         {
             Name = "get job at hospital";
@@ -24,6 +31,11 @@ namespace Game1.Actions
 
         }
 
+
+        /// <summary>
+        /// Overrides virtual method in parent class. Creates and returns new GOAPActionWithBuilding with instance as parameter. Sets preconditions of building’s EmployedAtConditionString as false and sets postconditions of building’s EmployedAtConditionString as true. Sets GOAPAction.building to instance’s building. 
+        /// </summary>
+        /// <returns></returns>
         public override GOAPAction DefineGOAPAction()
         {
             GOAPAction = new GOAPActionWithBuilding(this);
@@ -35,19 +47,31 @@ namespace Game1.Actions
         }
 
 
-
+        /// <summary>
+        /// Overrides virtual method in parent class. Resets actionComplete and actionTimeElapsed variables. 
+        /// </summary>
+        /// <param name="person"></param>
         public override void BeginAction(People person)
         {
             ActionComplete = false;
             actionTimeElapsed = 0;
         }
 
-
+        /// <summary>
+        /// Overrides virtual method in parent class. Sets ActionComplete to true.  
+        /// </summary>
         public override void CompleteAction()
         {
             ActionComplete = true;
         }
 
+
+        /// <summary>
+        /// Called each update frame for which action is ongoing. Simulates getting a job at hospital. Increments actionTimeElapsed and reduces EstTimeToFinish. If the elapsed action time is greater than the minimum action time and the affected need is fulfilled, Career attribute of person assigned to new instance of Doctor career and CompleteAction method is called. 
+        /// </summary>
+        /// <param name="gameTime"></param>
+        /// <param name="needs"></param>
+        /// <param name="person"></param>
         public void GetJobAtHospital(GameTime gameTime, Dictionary<NeedNames, Need> needs, People person = null)
         {
 

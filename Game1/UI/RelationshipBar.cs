@@ -13,7 +13,10 @@ namespace Game1.UI
         
         static int width = 25;
         static Texture2D whiteRectangle;
-
+        /// <summary>
+        /// Creates white rectangle to be scaled and coloured depending on relationship score. 
+        /// </summary>
+        /// <param name="graphicsDevice"></param>
         public static void GenerateTexture(GraphicsDevice graphicsDevice)
         {
             whiteRectangle = new Texture2D(graphicsDevice, 1, 1);
@@ -21,6 +24,12 @@ namespace Game1.UI
 
         }
 
+        /// <summary>
+        /// Draws relationship bar where length and colour of bar represents relationship score.
+        /// </summary>
+        /// <param name="spriteBatch"></param>
+        /// <param name="position"></param>
+        /// <param name="Score"></param>
         public static void Draw(SpriteBatch spriteBatch, Vector2 position, float Score )
         {
 

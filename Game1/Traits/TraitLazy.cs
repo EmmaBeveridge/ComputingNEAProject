@@ -11,13 +11,20 @@ namespace Game1.Traits
         public new static string TraitString = "Lazy"; 
         public new static int DBID;
 
-
+        /// <summary>
+        /// Constructor to create new lazy trait 
+        /// </summary>
         public TraitLazy()
         {
             needsPrioritised.Add(NeedNames.Sleep);
             needsAcceleratedDepletion.Add(NeedNames.Sleep);
         }
 
+
+        /// <summary>
+        /// Returns DBID for TraitLazy class 
+        /// </summary>
+        /// <returns></returns>
         public override int GetID() { return DBID; }
 
 

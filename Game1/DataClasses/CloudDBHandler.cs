@@ -15,6 +15,9 @@ using Game1.Town.Buildings;
 
 namespace Game1
 {
+    /// <summary>
+    /// Class to handle communicating with Neo4J database hosted on AuraDB server. 
+    /// </summary>
     public class CloudDBHandler : IDisposable
     {
         private bool _disposed = false;
@@ -33,6 +36,10 @@ namespace Game1
             //client = new GraphClient(uri);
         }
 
+        /// <summary>
+        /// Asynchronous method executing Cypher query to create town graph database or merge any changes with an existing town database. Cypher query read in from external text file. 
+        /// </summary>
+        /// <returns></returns>
         public async Task CreateTownInDBAsync()
         {
             string query = ReadInQuery("BuildTown.txt");
@@ -64,7 +71,10 @@ namespace Game1
         }
 
 
-
+        /// <summary>
+        /// Asynchronous method executing Cypher query to return all nodes of type Town from database. These nodes are returned in JSON format which is then deserialised into a C# Town object. 
+        /// </summary>
+        /// <returns></returns>
         public async Task<List<Town.Town>> GetTownsInDB()
         {
             var session = driver.AsyncSession();
@@ -109,7 +119,11 @@ namespace Game1
 
 
 
-
+        /// <summary>
+        ///  Asynchronous method executing Cypher query to return all nodes of type District within a particular town from database. These nodes are returned in JSON format which is then deserialised into a C# District object and further into a specific type of district e.g. Residential district. 
+        /// </summary>
+        /// <param name="town"></param>
+        /// <returns></returns>
         public async Task<List<District>> GetDistrictsInTown(Town.Town town)
         {
             var session = driver.AsyncSession();
@@ -167,7 +181,11 @@ namespace Game1
 
 
 
-
+        /// <summary>
+        /// Asynchronous method executing Cypher query to return all nodes of type Street within a particular district from database. These nodes are returned in JSON format which is then deserialised into a C# Street object. 
+        /// </summary>
+        /// <param name="district"></param>
+        /// <returns></returns>
         public async Task<List<Street>> GetStreetsInDistrict(District district)
         {
             var session = driver.AsyncSession();
@@ -209,6 +227,11 @@ namespace Game1
 
         }
 
+        /// <summary>
+        /// Asynchronous method executing Cypher query to return ids of parent and children streets for a particular street. (Road network laid out in a tree structure where each street can be thought of as a node with parent and child nodes being connecting streets.) These ids are stored in street object’s properties.  
+        /// </summary>
+        /// <param name="streets"></param>
+        /// <returns></returns>
         public async Task<List<Street>> SetStreetPointers(List<Street> streets)
         {
             
@@ -316,7 +339,11 @@ namespace Game1
 
         }
 
-
+        /// <summary>
+        /// Asynchronous method executing Cypher query to return all nodes of type House on a particular street from database. These nodes are returned in JSON format which is then deserialised into a C# House object. House rotation and street are set using street data. 
+        /// </summary>
+        /// <param name="street"></param>
+        /// <returns></returns>
         public async Task<List<House>> GetHousesOnStreet(Street street)
         {
             var session = driver.AsyncSession();
@@ -359,6 +386,13 @@ namespace Game1
 
         }
 
+
+
+        /// <summary>
+        /// Asynchronous method executing Cypher query to return all nodes of type Building on a particular street from database. These nodes are returned in JSON format which is then deserialised into a C# Building object and further into a specific type of building e.g. Grocery Store. Building rotation and street are set using street data. 
+        /// </summary>
+        /// <param name="street"></param>
+        /// <returns></returns>
         public async Task<List<Building>> GetBuildingsOnStreet(Street street)
         {
             var session = driver.AsyncSession();
@@ -426,6 +460,12 @@ namespace Game1
 
         }
 
+
+        /// <summary>
+        /// Asynchronous method executing Cypher query to return all nodes of type Room in a particular house from database. These nodes are returned in JSON format which is then deserialised into a C# Room object and further into a specific type of room e.g. Bedroom. 
+        /// </summary>
+        /// <param name="house"></param>
+        /// <returns></returns>
         public async Task<List<Room>> GetRoomsInHouse(House house)
         {
             var session = driver.AsyncSession();
@@ -486,7 +526,11 @@ namespace Game1
         }
 
 
-
+        /// <summary>
+        /// Asynchronous method executing Cypher query to return all nodes of type Item in a particular room from database. These nodes are returned in JSON format which is then deserialised into a C# Item object and further into a specific type of item e.g. Bed. 
+        /// </summary>
+        /// <param name="room"></param>
+        /// <returns></returns>
         public async Task<List<Item>> GetItemsInRoom(Room room)
         {
             var session = driver.AsyncSession();
@@ -588,14 +632,19 @@ namespace Game1
         }
 
 
-
-
+        /// <summary>
+        ///  Disposes of driver object
+        /// </summary>
         public void Dispose()
         {
             Dispose(true);
             GC.SuppressFinalize(this);
         }
 
+        /// <summary>
+        ///  Disposes of driver object
+        /// </summary>
+        /// <param name="disposing"></param>
         protected virtual void Dispose(bool disposing)
         {
             if (_disposed)
@@ -611,7 +660,11 @@ namespace Game1
 
 
 
-
+        /// <summary>
+        /// Reads in Cypher query to create town from a text file.  
+        /// </summary>
+        /// <param name="fileName"></param>
+        /// <returns></returns>
         private string ReadInQuery(string fileName)
         {
             string URI = Directory.GetParent(Directory.GetCurrentDirectory()).Parent.Parent.Parent.Parent.FullName;

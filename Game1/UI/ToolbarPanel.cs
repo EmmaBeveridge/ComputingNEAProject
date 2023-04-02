@@ -15,12 +15,21 @@ namespace Game1.UI
 
         private bool isDisplayed = false;
 
+        /// <summary>
+        /// Accessor for private isDisplayed attribute. Mutator for attribute calls InitialisePanel method first if setting isDisplayed to true, then modifies attribute. 
+        /// </summary>
         public bool IsDisplayed
         {
             get { return isDisplayed; }
             set { if (value == true) { InitialisePanel(); } isDisplayed = value; }
         }
 
+
+        /// <summary>
+        /// Abstract method to be implemented in child classes.
+        /// </summary>
+        /// <param name="spriteBatch"></param>
+        /// <param name="spriteFont"></param>
         public abstract void Draw(SpriteBatch spriteBatch, SpriteFont spriteFont);
 
         static protected Texture2D whiteRectangle;
@@ -28,6 +37,10 @@ namespace Game1.UI
         protected Vector2 panelPosition = new Vector2(545, 230);
         protected Vector2 panelScale = new Vector2(400, 200);
 
+        /// <summary>
+        ///  Creates white rectangle to be scaled as background for derived panel classes. 
+        /// </summary>
+        /// <param name="graphicsDevice"></param>
         public static void GenerateTexture(GraphicsDevice graphicsDevice)
         {
             whiteRectangle = new Texture2D(graphicsDevice, 1, 1);
@@ -35,6 +48,10 @@ namespace Game1.UI
 
         }
 
+
+        /// <summary>
+        ///  Abstract method to be implemented in child classes. 
+        /// </summary>
         public abstract void InitialisePanel();
     }
 
@@ -49,7 +66,10 @@ namespace Game1.UI
 
         List<NeedBar> needsBars;
 
-
+        /// <summary>
+        /// Constructor for new NeedsPanel object, supplied with list of needs bars as parameter, setting panel scales and positioning. 
+        /// </summary>
+        /// <param name="_bars"></param>
         public NeedsPanel(List<NeedBar> _bars)
         {
             needsBars = _bars;
@@ -59,7 +79,11 @@ namespace Game1.UI
         }
 
 
-
+        /// <summary>
+        ///  Draws panel background and calls draw method on each need bar. 
+        /// </summary>
+        /// <param name="spriteBatch"></param>
+        /// <param name="spriteFont"></param>
         public override void Draw(SpriteBatch spriteBatch, SpriteFont spriteFont)
         {
 
@@ -83,14 +107,22 @@ namespace Game1.UI
         Dictionary<People, float> relationships;
         List<List<KeyValuePair<People, float>>> screens = new List<List<KeyValuePair<People, float>>>();
         public int currentScreen = 0;
-        
 
+        /// <summary>
+        ///  Constructor for new RelationshipsPanel object, supplied with dictionary of relationships as parameter, setting panel scales and positioning. 
+        /// </summary>
+        /// <param name="argRelationships"></param>
         public RelationshipsPanel(Dictionary<People, float> argRelationships)
         {
             relationships = argRelationships;
             panelPosition.X = 450;
         }
 
+        /// <summary>
+        ///  Draws panel background and current screen of relationships. Relationships depicted by an icon of the person and a bar displaying degree of postive/negative relationship.
+        /// </summary>
+        /// <param name="spriteBatch"></param>
+        /// <param name="spriteFont"></param>
         public override void Draw(SpriteBatch spriteBatch, SpriteFont spriteFont)
         {
             spriteBatch.Draw(texture: whiteRectangle, position: panelPosition, scale: panelScale, layerDepth: 0.5f);
@@ -117,6 +149,10 @@ namespace Game1.UI
             
         }
 
+
+        /// <summary>
+        /// divides relationships into screens to display in panel. 
+        /// </summary>
         public void SplitIntoScreens()
         {
             screens.Clear();
@@ -159,8 +195,18 @@ namespace Game1.UI
     public class CareerPanel : ToolbarPanel
     {
         Player player;
+
+        /// <summary>
+        /// Constructor for new CareerPanel object.
+        /// </summary>
+        /// <param name="argPlayer"></param>
         public CareerPanel(Player argPlayer) { player = argPlayer; panelPosition.X = 400; }
 
+        /// <summary>
+        /// Draws panel background and career information 
+        /// </summary>
+        /// <param name="spriteBatch"></param>
+        /// <param name="spriteFont"></param>
         public override void Draw(SpriteBatch spriteBatch, SpriteFont spriteFont)
         {
             spriteBatch.Draw(texture: whiteRectangle, position: panelPosition, scale: panelScale, layerDepth: 0.5f);
@@ -182,8 +228,18 @@ namespace Game1.UI
     public class SkillsPanel : ToolbarPanel
     {
         Player player;
+
+        /// <summary>
+        ///  Constructor for new SkillsPanel object.
+        /// </summary>
+        /// <param name="argPlayer"></param>
         public SkillsPanel(Player argPlayer) { player = argPlayer; panelPosition.X = 450; }
 
+        /// <summary>
+        /// Draws panel background and each skill player has and level of skill.
+        /// </summary>
+        /// <param name="spriteBatch"></param>
+        /// <param name="spriteFont"></param>
         public override void Draw(SpriteBatch spriteBatch, SpriteFont spriteFont)
         {
             spriteBatch.Draw(texture: whiteRectangle, position: panelPosition, scale: panelScale, layerDepth: 0.5f);

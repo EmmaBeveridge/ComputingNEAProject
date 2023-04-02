@@ -332,12 +332,7 @@ namespace Game1
         }
 
 
-        public void BuildActions()
-        {
-
-        }
-
-
+        
 
 
         /// <summary>

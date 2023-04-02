@@ -18,6 +18,9 @@ using Game1.Skills;
 
 namespace Game1
 {
+    /// <summary>
+    /// Enumeration to store possible user selection states. 
+    /// </summary>
     public enum PeopleSelectingState
     {
         none,
@@ -34,13 +37,35 @@ namespace Game1
 
         PeopleSelectingState selectingState = PeopleSelectingState.none;
 
-        
+        /// <summary>
+        /// Constructor to make new Player object
+        /// </summary>
+        /// <param name="_model"></param>
+        /// <param name="_position"></param>
+        /// <param name="argMesh"></param>
+        /// <param name="argTown"></param>
+        /// <param name="argGame"></param>
+        /// <param name="argIcon"></param>
+        /// <param name="argDBID"></param>
+        /// <param name="argName"></param>
+        /// <param name="argHouse"></param>
+        /// <param name="argCareer"></param>
+        /// <param name="argTraits"></param>
+        /// <param name="argNeeds"></param>
+        /// <param name="argSkills"></param>
         public Player(Model _model, Vector3 _position, Mesh argMesh, Town.Town argTown, Game1 argGame, Texture2D argIcon, int argDBID, string argName, House argHouse, Career argCareer, List<Trait> argTraits, Dictionary<NeedNames, Need> argNeeds, List<Skill> argSkills ) : base(_model, _position, argMesh, argTown, argGame, argIcon, argDBID, argName, argHouse, argCareer, argTraits, argNeeds, argSkills, true)
         {
 
         }
 
-
+        /// <summary>
+        /// Overrides base class Update(). Calls DepleteNeeds method. Ticks GOAP state machine. Determines if user selection is taking place and, using MouseInput class methods, determines what the user is attempting to select e.g. NPC, item, house, button etc. If the user has selected an action by clicking on a button, this action is loaded into their action queue. Calls methods to handle People movement and update transformation matrix which is then applied to avatar’s world matrix to allow avatar to be rendered properly. Relevant UI changes made using UIHandler class. 
+        /// </summary>
+        /// <param name="gameTime"></param>
+        /// <param name="graphicsDevice"></param>
+        /// <param name="projection"></param>
+        /// <param name="view"></param>
+        /// <param name="game"></param>
         public override void Update(GameTime gameTime, GraphicsDevice graphicsDevice, Matrix projection, Matrix view, Game1 game)
         {
             

@@ -65,6 +65,11 @@ namespace Game1.UI
             Submitted = false;
         }
 
+
+        /// <summary>
+        ///  Constructor for new textbox object
+        /// </summary>
+        /// <param name="_position"></param>
         public Textbox(Vector2 _position)
         {
             texture = defaultTextboxTexture;
@@ -85,16 +90,24 @@ namespace Game1.UI
             Submitted = false;
         }
 
-
+        /// <summary>
+        /// Sets submitted attribute to true 
+        /// </summary>
         public void Submit() { Submitted = true; }
 
 
-
+        /// <summary>
+        /// Increments animation time. Called once per update cycle 
+        /// </summary>
         public void Update()
         {
             AnimationTime++;
         }
 
+        /// <summary>
+        /// Cursor flashes every half second. Method returns if cursor is currently visible. 
+        /// </summary>
+        /// <returns></returns>
         public bool IsFlashingCursorVisible()
         {
             int time = AnimationTime % 60;
@@ -105,7 +118,10 @@ namespace Game1.UI
             else { return false; }
         }
 
-
+        /// <summary>
+        /// Adds entered character to textbox. Character may encode a delete operation, in which case previous character deleted. Handles transitioning to new line or regressing to a previous one. 
+        /// </summary>
+        /// <param name="text"></param>
         public void AddText(char text)
         {
             Vector2 spacing = new Vector2();
@@ -163,7 +179,10 @@ namespace Game1.UI
 
         }
 
-        
+        /// <summary>
+        /// If the textbox is visible, the method draws a textbox background and any entered text. If the textbox is selected, a cursor will flash in the textbox.
+        /// </summary>
+        /// <param name="spriteBatch"></param>
         public void Draw(SpriteBatch spriteBatch)
         {
             if (Visible)

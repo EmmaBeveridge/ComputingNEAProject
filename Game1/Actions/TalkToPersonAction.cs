@@ -8,9 +8,12 @@ using System.Threading.Tasks;
 
 namespace Game1.Actions
 {
+    /// <summary>
+    /// Inherits from ActionAbstract to implement action to talk to another person. Each person gets their own talk to person (i.e talk to them) interaction. Each person assigns themself as PersonToInteractWith for their TalkToPersonAction- someone else can then pick the action which causes the someone else to start talking to the person. 
+    /// </summary>
     class TalkToPersonAction : ActionAbstract
     {
-        //each person gets their own talk to person (i.e talk to them) interaction i.e. each person assigns themself as PersonToInteractWith for their TalkToPersonAction- someone else can then pick the action which causes the someone else to start talking to the person
+        
         //but think should look from perspective of you are other person - need to push action where other person is PersonToInteractWith onto PersonToInteractWith action stack
 
 
@@ -32,7 +35,9 @@ namespace Game1.Actions
 
 
 
-
+        /// <summary>
+        ///  Overrides base class method. Sets initiatorReachedGoal attribute to true on non-initiator's ActionAbstract object to inform them that the initiator has reached them. 
+        /// </summary>
         public override void NotifyInitiatorReachedGoal()
         {
             ActionAbstract actionToUpdate = this.PersonToInteractWith.town.GOAPActions.Find(a => a.Action.PersonToInteractWith == this.initiator).Action;
@@ -43,14 +48,19 @@ namespace Game1.Actions
 
         }
 
-
+        /// <summary>
+        /// Overrides virtual method in parent class. Creates and returns new GOAPActionWithPerson with instance as parameter. Sets preconditions of lowSocial as true and sets postconditions of lowSocial as false. Sets GOAPAction.interactionPerson to instance’s PersonToInteractWith. 
+        /// </summary>
+        /// <returns></returns>
         public override GOAPAction DefineGOAPAction()
         {
             GOAPAction = new GOAPActionWithPerson(this);
             GOAPAction.SetPrecondition(GOAPPerson.LowSocial, true);
 
             GOAPAction.SetPostcondition(GOAPPerson.LowSocial, false);
-            GOAPAction.item = this.Item;
+            //GOAPAction.item = this.Item;
+            GOAPAction.interactionPerson = PersonToInteractWith;
+
             return GOAPAction;
         }
 
@@ -58,7 +68,7 @@ namespace Game1.Actions
 
 
         /// <summary>
-        /// Simulates autonomous interaction
+        /// Called each update frame for which action is ongoing. Simulates autonomous interaction between characters. Increments actionTimeElapsed and reduces EstTimeToFinish. Calls Update on affected need. Calls UpdateRelationsAutonomous method on person interacting with PersonToInteractWith, sending PersonToInteractWith as an argument. If the elapsed action time is greater than the minimum action time and the affected need is fulfilled, CompleteAction method is called. 
         /// </summary>
         /// <param name="timer"></param>
         /// <param name="needs">Needs of person interacting with PersonToInteractWith</param>
@@ -85,6 +95,11 @@ namespace Game1.Actions
 
         }
 
+
+        /// <summary>
+        /// Overrides virtual method in parent class. Resets ActionComplete and actionTimeElapsed variables. Sets PersonToInteractWith’s availability to false.
+        /// </summary>
+        /// <param name="person"></param>
         public override void BeginAction(People person)
         {
             ActionComplete = false;
@@ -96,7 +111,9 @@ namespace Game1.Actions
 
         }
 
-
+        /// <summary>
+        /// Overrides virtual method in parent class. Ends and resets action: sets ActionComplete to true, PersonToInteractWith as being available, sets initiatorReachedGoal to false, and initiator to null. 
+        /// </summary>
         public override void CompleteAction()
         {
             ActionComplete = true;

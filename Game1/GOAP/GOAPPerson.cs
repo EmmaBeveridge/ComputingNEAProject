@@ -42,7 +42,11 @@ namespace Game1.GOAP
             }
 
 
-
+            /// <summary>
+            /// Returns GOAP string condition name for fulfilment of need supplied as parameter. 
+            /// </summary>
+            /// <param name="needName">Low need to be fulfilled</param>
+            /// <returns></returns>
             public string GetConditionNameFromNeedName(NeedNames needName)
             {
                 switch (needName)
@@ -72,7 +76,11 @@ namespace Game1.GOAP
                 }
             }
 
-
+            /// <summary>
+            ///Overloaded method. If parameter supplied specifying need to fulfil, a world state in which that need is fulfilled is returned. WorldState object contains data regarding the GOAPPerson’s fulfilment of needs. 
+            /// </summary>
+            /// <param name="needToFulfill"></param>
+            /// <returns></returns>
             public WorldState GetWorldState(NeedNames needToFulfill)
             {
                 //doesnt deal with chance of needToFulfill being null
@@ -82,6 +90,11 @@ namespace Game1.GOAP
 
             }
 
+
+            /// <summary>
+            /// Overloaded method. If no parameter specified, a world state representing current character need state is returned. WorldState object contains data regarding the GOAPPerson’s fulfilment of needs. 
+            /// </summary>
+            /// <returns></returns>
             public override WorldState GetWorldState()
             {
                 var worldState = this.planner.CreateWorldState();
@@ -107,6 +120,10 @@ namespace Game1.GOAP
             }
 
 
+            /// <summary>
+            ///  Calls GetResult method on People.decisionTree with charcater’s needs dictionary as parameter to obtain need to fulfill. Returns a WorldState object where this need is set to be fulfilled. This goal state is what the GOAP will attempt to find a sequence of actions that will change the current world state into this goal state. 
+            /// </summary>
+            /// <returns></returns>
             public override WorldState GetGoalState()
             {
                 NeedNames tempRef = NeedNames.Null;
@@ -116,7 +133,11 @@ namespace Game1.GOAP
                 return GetGoalState(ref tempRef);
             }
 
-
+            /// <summary>
+            /// Returns a WorldState object where the desired need to fulfil supplied as parameter is set to fulfilled. This goal state is what the GOAP will attempt to find a sequence of actions that will change the current world state into this goal state.
+            /// </summary>
+            /// <param name="needToFulfill"></param>
+            /// <returns></returns>
             public WorldState GetGoalStateForNeed(NeedNames needToFulfill)
             {
                 var goalState = this.planner.CreateWorldState();
@@ -156,6 +177,11 @@ namespace Game1.GOAP
 
             }
 
+            /// <summary>
+            ///   Calls GetResult method on People.decisionTree with charcater’s needs dictionary as parameter to obtain need to fulfill. Returns a WorldState object where this need is set to be fulfilled. This goal state is what the GOAP will attempt to find a sequence of actions that will change the current world state into this goal state. 
+            /// </summary>
+            /// <param name="needToFulfill"></param>
+            /// <returns></returns>
             public override WorldState GetGoalState(ref NeedNames needToFulfill) 
             {
                 
@@ -204,6 +230,11 @@ namespace Game1.GOAP
 
         }
 
+
+        /// <summary>
+        /// Creates new GOAPPersonState object and ActionPlanner object. Adds all available actions in the town to the ActionPlanner object. Initialises new FSM adding Idle, GoTo, PerformAction, WaitForItem, WaitForPerson, LeaveBuilding states.
+        /// </summary>
+        /// <returns></returns>
         public StateMachine<GOAPPersonState> BuildAI()
         {
             goapPersonState = new GOAPPersonState(person.Needs);
@@ -221,7 +252,10 @@ namespace Game1.GOAP
 
         }
 
-
+        /// <summary>
+        /// Pushes new action onto the action stack. If an action is currently taking place, it is pushed to just underneath the current action. If action is with an item, GOAPWorld.ReserveItem used to reserve the item for character. 
+        /// </summary>
+        /// <param name="action"></param>
         public void PushNewAction(GOAPAction action)
         {
             if (goapPersonState.actionPlan==null||goapPersonState.actionPlan.Count == 0)
@@ -255,6 +289,10 @@ namespace Game1.GOAP
             {
                 
             }
+
+            /// <summary>
+            /// Uses GetGoalState method on GOAPPersonState object to find goal state. Calls Plan method on GOAPPersonState ActionPlanner attribute to obtain action plan stack to achieve goal state. If the action plan contains a GOAPActionWithPerson, then, if the person has been initialised, the SendRSVP method is used on the person to inform the NPC of the plan to interact.
+            /// </summary>
             public override void Begin()
             {
                 transitionOnNextTick = false;
@@ -303,6 +341,11 @@ namespace Game1.GOAP
                 }
             }
 
+
+            /// <summary>
+            /// As planning is all done in one tick of machine, machine is set to transition on its next tick and the GoTo state is set as the machine’s next state. 
+            /// </summary>
+            /// <param name="gameTime"></param>
             public override void Update(GameTime gameTime)
             {
                 if (this.Context.actionPlan != null && this.Context.actionPlan.Count > 0)
@@ -329,7 +372,9 @@ namespace Game1.GOAP
             }
 
 
-
+            /// <summary>
+            /// Determines location character should go to depending on the type of action to be carried out (action obtained by peeking action stack). If the character is to interact with an item and they are first in the queue to use the item, they should go to the location of the item, if they must wait for other characters to use the item first, they should go to the origin of the room the item is in and wait there until it is their turn to use the item. As multiple people can use a building at once, if the action is with a building the character should go straight into the building. If the action is with another person and this character was the initiator of the action, they should navigate to the other person by accessing the position of the interactionPerson for the action ; if however they were not the initiator of the action, they should remain where they are (if they are in a building they should exit it first). The person.actionState is then set to People.ActionStates.beginMoving.  
+            /// </summary>
             public override void Begin()
             {
                 transitionOnNextTick = false;
@@ -409,6 +454,11 @@ namespace Game1.GOAP
 
             }
 
+
+            /// <summary>
+            /// Called each update cycle as character moves to goal location and sets person into the appropriate next state when the goal is reached. (As the player character will also enter the GoTo state when navigating to a player picked spot without any action to undertake: if this is the case, the character is then set into the Idle state upon reaching the goal). If the person has reached goal and their next action is with an item: if they are the first in the queue to use the item, their next state is set as PerformAction, if they are not first in the queue, their next state is set as WaitForItem.  If the action is with a building, the person's state is set to PerformAction. If the action is with another person: if the character is not the initiator of the action, they must check if the initiator has reached the goal in which case they can transition to the PerformAction state, if not, they transition to the WaitForPersonState until the initiator has reached the goal. If the character is the initiator and they have reached the other person, the action’s AbstractAction field’s property of initiatorReachedGoal is set to true and the NotifyInitiatorReachedGoal() method is called. If the other person is available, the initiator is set to transition to the PerformAction state, otherwise their next state is set as WaitForPerson.
+            /// </summary>
+            /// <param name="gameTime"></param>
             public override void Update(GameTime gameTime)
             {
                 this.Context.currentLocation = person.position;
@@ -518,6 +568,10 @@ namespace Game1.GOAP
 
             }
 
+
+            /// <summary>
+            ///  Called just before transitioning out of GoTo state. Used to set currentBuilding, currentHouse attributes of person to the correct buildings/houses. 
+            /// </summary>
             public override void End()
             {
                 var action = this.Context.actionPlan.Peek();
@@ -555,6 +609,10 @@ namespace Game1.GOAP
             People person;
             public WaitForItem() { }
 
+
+            /// <summary>
+            /// Assigns people and action attributes. Determines action by peeking action stack.
+            /// </summary>
             public override void Begin()
             {
                 person = this.Context.planner.person;
@@ -562,6 +620,11 @@ namespace Game1.GOAP
                 action = this.Context.actionPlan.Peek();
             }
 
+
+            /// <summary>
+            /// Checks if person has reached front of queue for action, if they have: the machine transitions to go to state. 
+            /// </summary>
+            /// <param name="gameTime"></param>
             public override void Update(GameTime gameTime)
             {
                 
@@ -585,6 +648,8 @@ namespace Game1.GOAP
             
             public WaitForPerson() { }
 
+
+
             public override void Begin()
             {
                 person = this.Context.planner.person;
@@ -595,6 +660,10 @@ namespace Game1.GOAP
 
             }
 
+            /// <summary>
+            /// If the character is the initiator: checks if the other person is now available, if so, machine is set to PerformAction state. If the character is not the initiator: checks if the initiator has reached them, if so, machine is set to PerformAction state. 
+            /// </summary>
+            /// <param name="gameTime"></param>
             public override void Update(GameTime gameTime)
             {
                 if (action.Action.initiator != person) //not initiator so has to wait for initiator to reach goal
@@ -629,22 +698,32 @@ namespace Game1.GOAP
             People person;
             Vector3 location;
 
+
+            /// <summary>
+            /// Sets location variables to building’s origin town location. Sets people.actionState to beginMoving state. 
+            /// </summary>
             public override void Begin()
             {
                 transitionOnNextTick = false;
 
                 
                 person = this.Context.planner.person;
+                
+                location = person.currentBuilding.TownLocation;
 
                 this.Context.destinationLocation = location;
 
-                location = person.currentBuilding.TownLocation;
+                
 
                 person.actionState = PeopleActionStates.beginMoving;
                 person.goal = location;
 
             }
 
+            /// <summary>
+            /// Checks if person has reached the goal outside of building. If they have reached their goal and the action stack is empty, machine is set to Idle state. If they have reached their goal and the action stack is not empty, the machine is set to GoTo state. 
+            /// </summary>
+            /// <param name="gameTime"></param>
             public override void Update(GameTime gameTime)
             {
                 this.Context.currentLocation = person.position;
@@ -666,7 +745,9 @@ namespace Game1.GOAP
                 
             }
 
-
+            /// <summary>
+            /// Sets person’s currentBuilding attribute to null as no longer in building. 
+            /// </summary>
             public override void End()
             {
                 person.currentBuilding = null;
@@ -680,19 +761,30 @@ namespace Game1.GOAP
         {
 
             People person;
-            GameTime timer;
+
+            /// <summary>
+            /// Method to be called each update cycle to simulate action. 
+            /// </summary>
             Action<GameTime, Dictionary<NeedNames, Need>, People> currentActionMethod;
 
 
 
             GOAPAction action;
             //Item actionItem;
+            
+            /// <summary>
+            /// Constructor for new PerformAction state 
+            /// </summary>
             public PerformAction()
             {
                 
 
             }
 
+
+            /// <summary>
+            /// Peeks action stack to assign action and currentActionMethod attributes. Calls BeginAction method on ActionAbstract Action attribute on GOAPAction action variable. 
+            /// </summary>
             public override void Begin()
             {
                 transitionOnNextTick = false;
@@ -716,7 +808,10 @@ namespace Game1.GOAP
             }
 
 
-
+            /// <summary>
+            /// If the action is not complete, currentActionMethod is called to progress action. If the action is completed, action is removed from the action stack by popping the stack. If the next action in the stack is not an interaction with another person, the machine is set into the GoTo state. If the action stack is empty, if the character is finishing interacting with a building, they must then leave the building, so the FSM is set into a LeaveBuilding state, otherwise it is set into the Idle state. 
+            /// </summary>
+            /// <param name="gameTime"></param>
             public override void Update(GameTime gameTime)
             {
 
@@ -795,6 +890,10 @@ namespace Game1.GOAP
 
             }
 
+
+            /// <summary>
+            ///  Called before transitioning state. Person is dequeued from action’s doingAction queue. Person is set to be available. 
+            /// </summary>
             public override void End()
             {
 

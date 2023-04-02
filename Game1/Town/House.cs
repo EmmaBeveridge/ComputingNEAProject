@@ -70,13 +70,17 @@ namespace Game1.Town
         public Matrix houseToTownTransformation;
         public List<Plane> planes = new List<Plane>();
 
-        public List<GOAPAction> GOAPActions = new List<GOAPAction>(); 
+        public List<GOAPAction> GOAPActions = new List<GOAPAction>();
 
 
 
 
 
-
+        /// <summary>
+        /// Returns house object with house number supplied as parameter. 
+        /// </summary>
+        /// <param name="houseNumber"></param>
+        /// <returns></returns>
         public static House GetHouseFromNumber(int houseNumber)
         {
 
@@ -94,7 +98,9 @@ namespace Game1.Town
 
 
 
-
+        /// <summary>
+        /// Generates avatars for walls and roof. Calculates transformation matrix mapping local house coordinates to global town coordinates. 
+        /// </summary>
         public void GenerateAvatar()
         {
 
@@ -120,6 +126,10 @@ namespace Game1.Town
 
 
         }
+
+        /// <summary>
+        /// Creates planes from house cuboid corner coordinates. Planes used to determine mouse ray intersection when selecting a house
+        /// </summary>
         public void GeneratePlanes()
         {
             SetCorners();
@@ -142,7 +152,9 @@ namespace Game1.Town
 
         }
 
-
+        /// <summary>
+        /// Reads in correct house coordinates using ExcelFileManager class.
+        /// </summary>
         public void SetCorners()
         {
             //Regex regex = new Regex(@"T\d+\.R\.S\d\.(\d\.)*H\d+");
@@ -170,6 +182,11 @@ namespace Game1.Town
 
         }
 
+        /// <summary>
+        ///  Static method used to return the house containing a specified coordinate.
+        /// </summary>
+        /// <param name="position"></param>
+        /// <returns></returns>
         public static House getHouseContainingPoint(Vector3 position)
         {
             foreach (House house in houses)
@@ -184,7 +201,11 @@ namespace Game1.Town
             return null;
         }
 
-
+        /// <summary>
+        ///  Determines if point is within house rectangle. Does so by checking if a vector extending infinitely in the positive x direction from the point has an odd number of intersections with the edges of the house rectangle. If there are an odd number of intersections, then the point must be within rectangle/house. If there are an even or 0 intersections, then point cnnot be within rectangle/house. 
+        /// </summary>
+        /// <param name="position"></param>
+        /// <returns></returns>
         public bool inHouse(Vector3 position)
         {
 
@@ -222,7 +243,9 @@ namespace Game1.Town
         }
 
 
-
+        /// <summary>
+        /// Sets name of wall and roof models using the colour scheme of the house. 
+        /// </summary>
         public void setWallsFromColourScheme()
         {
             switch (colourScheme)

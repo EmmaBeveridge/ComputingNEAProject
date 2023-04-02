@@ -10,13 +10,21 @@ namespace Game1.AStar
 {
     public class Path
     {
+        /// <summary>
+        /// Stores the current navmesh through which a path is to be found. 
+        /// </summary>
         public Mesh mesh;
         public float maxScale, minScale;
 
+        /// <summary>
+        /// A node collection object that stores any triangle vertex that is not redundant (redundant if the number of triangles the node is a part of is equal to the number of edges the node is part of). This object can also be used to obtain the nodes that can be reached from a specified node without crossing any obstructing edge. 
+        /// </summary>
         NodeCollection nodes;
         AStar<Vertex> pathFinder;
-        
-        
+
+        /// <summary>
+        /// Stores collection of edges within the navmesh that are not shared by two or more triangles. That is, the edges that if crossed will result in leaving the navmesh. 
+        /// </summary>
         public List<LineSegment> obstructingEdges;
 
         AStar<Vertex> PathFinder
@@ -29,12 +37,23 @@ namespace Game1.AStar
 
         }
 
+        /// <summary>
+        /// Constructor for new Path object. Supplied with mesh as a parameter, calls Initialise method. 
+        /// </summary>
+        /// <param name="argMesh"></param>
         public Path(Mesh argMesh)
         {
             mesh = argMesh;
             Initialise();
         }
 
+
+        /// <summary>
+        /// returns whether the nodes are in each other's line of sight by first checking if the midpoint is within the navmesh and if not then checking if any of the obstructing edges intersect the line segment between the two nodes. If not then, then the line of sight check is passed.  
+        /// </summary>
+        /// <param name="a"></param>
+        /// <param name="b"></param>
+        /// <returns></returns>
         private bool LineOfSightCheck(Vector3 a, Vector3 b)
         {
             var centre = (a + b) / 2;
@@ -71,7 +90,12 @@ namespace Game1.AStar
 
         }
 
-
+        /// <summary>
+        ///  Method to check if two nodes are in each other’s line of sight by first calling LineOfSightCheck() but it then must be checked that the two nodes don’t lie on a line segment with a vertex of the navmesh but do not define the line segment, if so but the vertex does not pass the LineOfSightCheck() with each of the nodes then the nodes are not in each other’s line of sight.  
+        /// </summary>
+        /// <param name="a"></param>
+        /// <param name="b"></param>
+        /// <returns></returns>
         private bool InLineOfSight(Vector3 a, Vector3 b)
         {
             if (!LineOfSightCheck(a, b))
@@ -96,6 +120,9 @@ namespace Game1.AStar
 
         }
 
+        /// <summary>
+        /// Begins by constructing list of obstructing edges by filtering out any edges that are shared between two triangles. The method then produces a NodeCollection object containing all of the non-redundant nodes from the mesh. Finally, it calls the CalculateStaticLinks() method on this nodes object. 
+        /// </summary>
         protected void Initialise()
         {
             obstructingEdges = new List<LineSegment>();
@@ -154,6 +181,7 @@ namespace Game1.AStar
         }
 
 
+
         public bool LineObstructed(Vector3 from, Vector3 to, out Vector3 position)
         {
             position = Vector3.Zero;
@@ -204,6 +232,12 @@ namespace Game1.AStar
 
         }
 
+        /// <summary>
+        /// Determines the shortest path between two points through the navmesh. If the points are not within the navmesh, the closest points within the navmesh are used. As the start and goal points are unlikely to be vertices of the mesh itself, the method makes a call to CalculateDynamicLinks method on the nodes collection to allow for a path to be found between the start and end nodes.  As the A* algorithm is used to traverse the mesh, the method then uses the PathFinder object of AStar class to call the FindPath method, returning a search result that can then be returned at the path to be traversed. 
+        /// </summary>
+        /// <param name="from"></param>
+        /// <param name="to"></param>
+        /// <param name="result"></param>
         public void FindPath(Vector3 from, Vector3 to, ref List<Vector3> result)
         {
             result.Clear();
@@ -274,7 +308,11 @@ namespace Game1.AStar
 
         }
 
-
+        /// <summary>
+        /// Uses GetClosestTriangle method in mesh object to return the closest triangle to a specified point. 
+        /// </summary>
+        /// <param name="position"></param>
+        /// <returns></returns>
         public Triangle GetClosestTriangle (Vector3 position)
         {
             if (mesh == null)
@@ -285,6 +323,11 @@ namespace Game1.AStar
 
         }
 
+        /// <summary>
+        /// Uses GetClosestTriangle method in mesh object to find closest triangle to a specified point. Then uses GetClosestPoint on closest triangle to return closest point in mesh to specified point. 
+        /// </summary>
+        /// <param name="position"></param>
+        /// <returns></returns>
         public Vector3 GetClosestPoint(Vector3 position)
         {
             if (mesh == null)

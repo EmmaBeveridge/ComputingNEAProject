@@ -15,9 +15,12 @@ namespace Game1.NavMesh.TriangulatePolygon
     class Triangulator
     {
          string housePolygonVerticesFileName = "Polygon data.xlsx";
-         public List<Vector2> shapeVertices = new List<Vector2>();
-         public List<Vector2> holeVertices = new List<Vector2>();
+        /// <summary>
+        /// List of vertices for polygon to be triangulated, not including hole vertices. 
+        /// </summary>
+        public List<Vector2> shapeVertices = new List<Vector2>();
 
+        
          public List<Vertex> resultVertices;
          public int[] indices;
 
@@ -33,12 +36,17 @@ namespace Game1.NavMesh.TriangulatePolygon
 
 
 
-        
 
 
+        /// <summary>
+        /// Triangulates the house layout using house coordinates from file. Calls CutHoleInShape() method before triangulation to allow polygon to be triangulated properly. 
+        /// </summary>
         public void BuildHouseTriangles()
         {
-            GetVerticesFromFile(housePolygonVerticesFileName);
+            List<Vector2> holeVertices = new List<Vector2>();
+
+
+            GetVerticesFromFile(housePolygonVerticesFileName, ref holeVertices);
             
             Vector2[] newVertices = CutHoleInShape(shapeVertices.ToArray(), holeVertices.ToArray());
 
@@ -47,6 +55,9 @@ namespace Game1.NavMesh.TriangulatePolygon
            
         }
 
+        /// <summary>
+        /// Generates town polygon vertices and hole polygon vertices (e.g. a house is a hole in the navmesh). As the town polygon has multiple holes within it, each hole must be cut in the shape in term beginning with the hole with the largest X coordinate and then working towards the hole with the least X coordinate. Once all holes have been cut in the polygon, the polygon can be triangulated. 
+        /// </summary>
         public void BuildTownTriangles()
         {
             List<List<Vector2>> holeVertices = new List<List<Vector2>>();
@@ -213,8 +224,12 @@ namespace Game1.NavMesh.TriangulatePolygon
 
         }
 
-
-        private  void GetVerticesFromFile(string fileName)
+        /// <summary>
+        /// Uses ExcelFileManager class to read in polygon and hole vertices. If the vertex is marked as belonging to a hole they are added to the holeVertices list, otherwise they are added to the shapeVertices list. 
+        /// </summary>
+        /// <param name="fileName"></param>
+        /// <param name="holeVertices"></param>
+        private void GetVerticesFromFile(string fileName, ref List<Vector2> holeVertices)
         {
             DataTable sheet = ExcelFileManager.ReadExcelFile(fileName);
             foreach (DataRow row in sheet.Rows)
@@ -244,8 +259,11 @@ namespace Game1.NavMesh.TriangulatePolygon
             //}
         }
 
-
-        public  void Triangulate(Vector2[] inputVertices)//Vector2 used where Y = Z
+        /// <summary>
+        /// Begins by identifying all convex and reflex vertices and calculating the ear vertices of the polygon. Method then enters loop calling ClipNextEar method until there are no more ear vertices or there are fewer than 3 polygon vertices remaining. If there are exactly 3 polygon vertices remaining, a final triangle is added made from these three vertices. 
+        /// </summary>
+        /// <param name="inputVertices"></param>
+        public void Triangulate(Vector2[] inputVertices)//Vector2 used where Y = Z
         {
 
 
@@ -310,7 +328,7 @@ namespace Game1.NavMesh.TriangulatePolygon
         //    PolygonTree tree = polyTree;
         //    Queue<PolygonTree> treeQueue = new Queue<PolygonTree>();
         //    treeQueue.Enqueue(polyTree);
-            
+
         //    while(treeQueue.Count != 0)
         //    {
         //        PolygonTree outerNode = treeQueue.Dequeue();
@@ -333,7 +351,7 @@ namespace Game1.NavMesh.TriangulatePolygon
         //                    innerPolygons.Append(innerNode.polygon);
         //                    treeQueue.Prepend(innerNode.children[j]);
         //                }
-                        
+
 
 
         //            }
@@ -353,8 +371,13 @@ namespace Game1.NavMesh.TriangulatePolygon
 
 
 
-
-        public  Vector2[] CutHoleInShape(Vector2[] shapeVertices, Vector2[] holeVertices)
+        /// <summary>
+        /// In order to triangulate the polygon, we must cut open the polygon by introducing 2 new coincident edges between two mutually visible vertices, one vertex from shape vertices and one from hole vertices. Once the mutually visible vertices have been identified, the vertices of the hole are injected into the list of shape vertices in order to create a structure of vertices on which triangulation can occur.
+        /// </summary>
+        /// <param name="shapeVertices"></param>
+        /// <param name="holeVertices"></param>
+        /// <returns></returns>
+        public Vector2[] CutHoleInShape(Vector2[] shapeVertices, Vector2[] holeVertices)
         {
             //shape vertices wound counterclockwise, hole vertices wound clockwise
 
@@ -513,6 +536,13 @@ namespace Game1.NavMesh.TriangulatePolygon
 
         }
 
+
+        /// <summary>
+        /// In the case of polygons with multiple holes, some vertices may appear in the list of polygon vertices more than once. In order to correctly inject the hole vertices, if one of the vertices appearing more than once in the list of polygon vertices is chosen as the mutually visible vertex, the hole vertices must be injected after the last instance of this vertex in the list. The method returns the index of the last instance of the specified vertex in the list. 
+        /// </summary>
+        /// <param name="polyVertices"></param>
+        /// <param name="v"></param>
+        /// <returns></returns>
         private int FindLastIndex(List<Vertex> polyVertices, Vertex v)
         {
             int foundIndex = -1;
@@ -531,7 +561,12 @@ namespace Game1.NavMesh.TriangulatePolygon
 
         }
 
-        private  void ClipNextEar(ICollection<Triangle> triangles)
+
+        /// <summary>
+        /// Removes ear vertex from polygon vertices and adds ear triangle to the list of triangles. Proceeds to make a call to ValidateAdjacentVertex() for each of the adjacent vertices. This is because, after removing the ear vertex, a convex adjacent vertex may now also be an ear and a reflex vertex may now be convex and possibly an ear as well.  
+        /// </summary>
+        /// <param name="triangles"></param>
+        private void ClipNextEar(ICollection<Triangle> triangles)
         {
             Vertex ear = earVertices[0].Value;
             Vertex previous = polygonVertices[polygonVertices.IndexOf(ear) - 1].Value;
@@ -554,8 +589,11 @@ namespace Game1.NavMesh.TriangulatePolygon
 
         }
 
-
-        private  void ValidateAdjacentVertex(Vertex vertex)
+        /// <summary>
+        /// Called after an ear has been clipped for each adjacent vertex in order to update list of convex, reflex and ear vertices following removal of ear vertex. Any adjacent convex vertex must be tested as to whether it is now an ear, and any adjacent reflex vertex must be tested as to whether it is now convex and, if so, whether it is now also an ear. 
+        /// </summary>
+        /// <param name="vertex"></param>
+        private void ValidateAdjacentVertex(Vertex vertex)
         {
             if (reflexVertices.Contains(vertex))
             {
@@ -589,8 +627,10 @@ namespace Game1.NavMesh.TriangulatePolygon
 
 
 
-
-        public  void FindConvexAndReflexVertices()
+        /// <summary>
+        /// Iterates over each vertex in the list of polygonVertices using IsConvex() method to test if vertex is convex or reflex. 
+        /// </summary>
+        public void FindConvexAndReflexVertices()
         {
             foreach (Vertex vertex in polygonVertices)
             {
@@ -611,7 +651,12 @@ namespace Game1.NavMesh.TriangulatePolygon
         }
 
 
-        private  bool IsConvex(Vertex vertex)
+        /// <summary>
+        ///  Determines if a vertex is convex (less than 180 degrees) by first finding the vertex’s adjacent vertices and then calculating the direction vectors between these vertices and the vertex (one vector from the previous vertex to the tested vertex and one from the tested vertex to the next vertex). The vector from the test vertex to the next vertex is then rotated through 270 degrees and therefore the dot product between the vector from the previous vertex to the test vertex and the rotated vertex will be greater than zero if the angle at the test vertex is convex. 
+        /// </summary>
+        /// <param name="vertex"></param>
+        /// <returns></returns>
+        private bool IsConvex(Vertex vertex)
         {
             Vertex previous = polygonVertices[polygonVertices.IndexOf(vertex) - 1].Value;
             Vertex next = polygonVertices[polygonVertices.IndexOf(vertex) + 1].Value;
@@ -639,8 +684,10 @@ namespace Game1.NavMesh.TriangulatePolygon
             return !IsConvex(vertex);
         }
 
-
-        public  void FindEarVertices() 
+        /// <summary>
+        /// Iterates through each vertex calling IsEar() method to determine if the vertex is an ear vertex. If the vertex is an ear vertex, it is added to the list of earVertices.
+        /// </summary>
+        public void FindEarVertices() 
         {
             foreach (Vertex vertex in convexVertices)
             {
@@ -653,7 +700,13 @@ namespace Game1.NavMesh.TriangulatePolygon
         }
 
 
-        private  bool IsEar(Vertex vertex)
+
+        /// <summary>
+        /// Returns if the vertex is an ear vertex. An ear vertex forms part of the ear of the polygon. An ear of the polygon is a triangle formed by three consecutive vertices <P, V, N> where V is a convex vertex and the line segment from PN lies fully within the polygon (I.e. is a diagonal of the polygon). This method therefore identifies all of the ear vertices in the polygon by iterating over each convex vertex V and checking that for the triangle PVN the segment PN is contained within the polygon. We can determine if PN is within the polygon by checking if any of the polygon’s reflex vertices lies within PVN using the static Encloses() method of the Triangle class on PVN and the position of the reflex vertex. If any of the reflex vertices lie within PVN, then PVN is not an ear and therefore V is not an ear vertex. 
+        /// </summary>
+        /// <param name="vertex"></param>
+        /// <returns></returns>
+        private bool IsEar(Vertex vertex)
         {
             Vertex previous = polygonVertices[polygonVertices.IndexOf(vertex) - 1].Value;
             Vertex next = polygonVertices[polygonVertices.IndexOf(vertex) + 1].Value;

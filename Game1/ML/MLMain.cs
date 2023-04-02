@@ -17,11 +17,17 @@ namespace Game1.ML
 
     {
         static string _dataPath = Path.Combine(Environment.CurrentDirectory, "MLData", "yelp_labelled.txt");
+
+        /// <summary>
+        /// Object of MLContext class. Initialisation creates a new ML.NET environment and acts as a start point for ML.NET operations. 
+        /// </summary>
         static MLContext mlContext;
         static ITransformer model;
 
 
-
+        /// <summary>
+        /// Loads and splits data using LoadData method. Calls BuildAndTrainModel and Evaluate methods to prepare and evaluate model. 
+        /// </summary>
         public static void BuildML()
         {
             mlContext = new MLContext();
@@ -31,6 +37,11 @@ namespace Game1.ML
 
         }
 
+        /// <summary>
+        /// Loads dataset and splits into training and testing data. Returns the train and test datasets.
+        /// </summary>
+        /// <param name="mlContext"></param>
+        /// <returns></returns>
         static TrainTestData  LoadData(MLContext mlContext)
         {
             //loads data, splits dataset into train and test data and returns train and test datasets
@@ -41,6 +52,13 @@ namespace Game1.ML
 
         }
 
+
+        /// <summary>
+        /// Extracts and transforms the data by converting sentiment text data to numeric key type Features column. The SDCA logistic regression binary trainer is used as the classification training algorithm to categorise sentiment text data as either positive or negative. The model is then trained and returned.
+        /// </summary>
+        /// <param name="mlContext"></param>
+        /// <param name="splitTrainSet"></param>
+        /// <returns></returns>
         public static ITransformer BuildAndTrainModel (MLContext mlContext, IDataView splitTrainSet)
         {
             var estimator = mlContext.Transforms.Text.FeaturizeText(outputColumnName: "Features", inputColumnName: nameof(SentimentData.SentimentText)).Append(mlContext.BinaryClassification.Trainers.SdcaLogisticRegression(labelColumnName: "Label", featureColumnName: "Features"));
@@ -50,6 +68,13 @@ namespace Game1.ML
 
         }
 
+
+        /// <summary>
+        /// Quality check method. Uses the test dataset and a binary classification evaluator to evaluate the accuracy of the model’s predictions.
+        /// </summary>
+        /// <param name="mlContext"></param>
+        /// <param name="model"></param>
+        /// <param name="splitTestSet"></param>
         static void Evaluate(MLContext mlContext, ITransformer model, IDataView splitTestSet)
         {
             IDataView predictions = model.Transform(splitTestSet);
@@ -63,6 +88,11 @@ namespace Game1.ML
             Console.WriteLine("=============== End of model evaluation ===============");
         }
 
+        /// <summary>
+        /// Returns new SentimentPrediction object containing prediction for supplied sentiment data. Creates a new PredictionEngine (convenience API to perform prediction on single data instance) object to evaluate sentiment of supplied data.
+        /// </summary>
+        /// <param name="sentimentData"></param>
+        /// <returns></returns>
         public static SentimentPrediction Predict(SentimentData sentimentData)
         {
             PredictionEngine<SentimentData, SentimentPrediction> predictionFunc = mlContext.Model.CreatePredictionEngine<SentimentData, SentimentPrediction>(model);
@@ -73,7 +103,12 @@ namespace Game1.ML
 
 
         }
-        
+
+        /// <summary>
+        /// Imperfect data set means the model has a tendency to penalise negative opinions even if they are not directed towards the subject. This method contextualises the sentiment text by checking for the subject of the sentence. If the negative sentiment is directed towards the person, then the interaction sentiment is evaluated as negative.
+        /// </summary>
+        /// <param name="sentimentData"></param>
+        /// <returns></returns>
         public static SentimentPrediction PredictWithSubject(SentimentData sentimentData)
         {
             SentimentPrediction prediction = Predict(sentimentData);

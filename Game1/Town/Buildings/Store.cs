@@ -8,8 +8,14 @@ using System.Threading.Tasks;
 using Game1.Careers;
 namespace Game1.Town.Buildings
 {
-    class Store:Building
+    /// <summary>
+    /// Child Store class inherits from Building parent class; implements store in town. 
+    /// </summary>
+    class Store :Building
     {
+        /// <summary>
+        /// Constructor for new store object. Sets model name, names of careers available at store, EmployedAtConditionString, and calls DefineActions() method. 
+        /// </summary>
         public Store()
         {
             modelName = "Store";
@@ -20,6 +26,10 @@ namespace Game1.Town.Buildings
 
         }
 
+
+        /// <summary>
+        /// Defines GOAP actions for store building and adds action label to describe action in button display to actionLabels list. 
+        /// </summary>
         public override void DefineActions()
         {
 

@@ -14,8 +14,12 @@ namespace Game1.UI
 
         public static Texture2D defaultTexture;
 
-        
-        
+
+        /// <summary>
+        /// Constructor for new exit button 
+        /// </summary>
+        /// <param name="argLabel"></param>
+        /// <param name="argPosition"></param>
         public ExitButton(string argLabel, Vector2 argPosition):base(argLabel, argPosition, defaultTexture)
         {
 
@@ -44,6 +48,10 @@ namespace Game1.UI
         }
 
 
+        /// <summary>
+        ///  Exits game without saving.
+        /// </summary>
+        /// <param name="game"></param>
         public static void Exit(Game1 game)
         {
             game.Exit();

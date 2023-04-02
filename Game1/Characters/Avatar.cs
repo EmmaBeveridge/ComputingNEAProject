@@ -21,7 +21,11 @@ namespace Game1
 
 
 
-
+        /// <summary>
+        /// Constructor for Avatar object. Sets worldMatrix as matrix encoding translation to _position argument. Sets model and id, increments static idCount.
+        /// </summary>
+        /// <param name="_model"></param>
+        /// <param name="_position"></param>
         public Avatar (Model _model, Vector3 _position)
         {
             model = _model;
@@ -31,6 +35,10 @@ namespace Game1
         }
 
 
+        /// <summary>
+        /// Uses model’s meshes to determine a minimum and maximum vector to be used to build a BoundingBox object for the avatar. 
+        /// </summary>
+        /// <returns></returns>
         public BoundingBox UpdateBoundingBox()
         {
             Vector3 minVector = new Vector3(float.MaxValue);
@@ -68,9 +76,13 @@ namespace Game1
 
         }
 
-        
 
 
+        /// <summary>
+        /// Iterates over meshes in 3D model, applying view, world, projection matrices to each effect in the mesh’s effect. It then draws the model.  
+        /// </summary>
+        /// <param name="viewMatrix"></param>
+        /// <param name="projectionMatrix"></param>
         public void Draw(Matrix viewMatrix, Matrix projectionMatrix)
         {
 

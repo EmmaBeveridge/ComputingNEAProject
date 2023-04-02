@@ -24,20 +24,33 @@ namespace Game1.Town.Districts
 
         public string districtClass;
 
+        /// <summary>
+        /// String containing filename of model of district. 
+        /// </summary>
         public string mapName;
 
+        /// <summary>
+        /// List of street objects of streets within the district. 
+        /// </summary>
         public List<Street> streets;
 
+        /// <summary>
+        ///  Binary tree object representing streets in district. Used to preform range minimum queries for street navigation. 
+        /// </summary>
         public BinaryTree<Street> StreetTree;
 
-
+        /// <summary>
+        /// Model of district. Model consists of road network for street.
+        /// </summary>
         public Model mapModel;
 
         public Avatar avatar;
 
         public Vector3 origin;
 
-
+        /// <summary>
+        /// sets avatar using model and town location to allow model to be rendered.
+        /// </summary>
         public void GenerateAvatar()
         {
 
@@ -58,7 +71,9 @@ namespace Game1.Town.Districts
 
 
 
-
+        /// <summary>
+        /// Creates a new binary tree to represent the district’s street network. Determines and sets the origin of the district as the start of the street with no parent. Sets TreeNode object representing the start street as the origin of the tree. Calls AddChildrenToTree method and PrepareTree() method on binary street tree object. 
+        /// </summary>
         public void BuildStreets()
         {
 
@@ -76,7 +91,10 @@ namespace Game1.Town.Districts
         }
 
 
-
+        /// <summary>
+        /// Recursive subroutine to create and assign child nodes in binary street tree. Creates and adds left/right child nodes (if required) and then calls method using left /right child as parent node to populate tree.  
+        /// </summary>
+        /// <param name="parentNode">Parent node to add children to tree for</param>
         private void AddChildrenToTree(TreeNode<Street> parentNode)
         {
             parentNode.leftChild = parentNode.item.children.Count > 0 ? new TreeNode<Street>(parentNode.item.children[0]) : null;
@@ -100,6 +118,12 @@ namespace Game1.Town.Districts
         }
 
 
+        /// <summary>
+        /// Overloaded method, supplied with either start and end buildings. Method establishes start/end street and finds sequence of streets to be traversed in order to move from start to end. Method uses StreetTree.FindLowestCommonAncestor method to obtain lowest common ancestor (LCA) of streets in tree. List of points on street constructed by backtracking from start street through street parents until the LCA is reached, each time adding the start of the street to list of coordinates. We then backtrack from the end street through street parents up to and including LCA, adding end of street to list of coordinates each time – reversing this list when finished to go from LCA to goal. Combining these lists gives final output of street points character should follow to reach goal. 
+        /// </summary>
+        /// <param name="start"></param>
+        /// <param name="end"></param>
+        /// <returns></returns>
         protected List<Vector3> FindStreetSequence(Building start, Building end)
         {
             Street startStreet = start.street;
@@ -108,15 +132,25 @@ namespace Game1.Town.Districts
 
         }
 
-
+        /// <summary>
+        /// Overloaded method, supplied with either start and end houses. Method establishes start/end street and finds sequence of streets to be traversed in order to move from start to end. Method uses StreetTree.FindLowestCommonAncestor method to obtain lowest common ancestor (LCA) of streets in tree. List of points on street constructed by backtracking from start street through street parents until the LCA is reached, each time adding the start of the street to list of coordinates. We then backtrack from the end street through street parents up to and including LCA, adding end of street to list of coordinates each time – reversing this list when finished to go from LCA to goal. Combining these lists gives final output of street points character should follow to reach goal. 
+        /// </summary>
+        /// <param name="start"></param>
+        /// <param name="end"></param>
+        /// <returns></returns>
         protected List<Vector3> FindStreetSequence(House start, House end)
         {
             Street startStreet = start.street;
             Street endStreet = end.street;
             return FindStreetSequence(startStreet, endStreet);
         }
-            
 
+
+        /// <summary>
+        /// Returns list of coordinates navigating from current street to district origin (start of starting street in district). List obtained by backtracking from start street through street parents until parent is null, each time adding the start of the street to the list of coordinates.  
+        /// </summary>
+        /// <param name="startStreet"></param>
+        /// <returns></returns>
         public List<Vector3> StreetPathToDistrictOrigin(Street startStreet)
         {
             List<Vector3> streetPoints = new List<Vector3>();
@@ -136,6 +170,11 @@ namespace Game1.Town.Districts
         }
 
 
+        /// <summary>
+        /// Overloaded method, supplied with start house. Returns list of coordinates navigating from current street to district origin (start of main street in district). List obtained by backtracking from start street through street parents until parent is null, each time adding the start of the street to the list of coordinates.  
+        /// </summary>
+        /// <param name="startHouse"></param>
+        /// <returns></returns>
         public List<Vector3> StreetPathToDistrictOrigin(House startHouse)
         {
             List<Vector3> path = new List<Vector3>();
@@ -148,6 +187,12 @@ namespace Game1.Town.Districts
             return path;
         }
 
+
+        /// <summary>
+        /// Overloaded method, supplied with start building. Returns list of coordinates navigating from current street to district origin (start of main street in district). List obtained by backtracking from start street through street parents until parent is null, each time adding the start of the street to the list of coordinates.  
+        /// </summary>
+        /// <param name="startBuilding"></param>
+        /// <returns></returns>
         public List<Vector3> StreetPathToDistrictOrigin(Building startBuilding)
         {
             List<Vector3> path = new List<Vector3>();
@@ -160,7 +205,12 @@ namespace Game1.Town.Districts
             return path;
         }
 
-
+        /// <summary>
+        /// Overloaded method, supplied with either start and end streets. Method establishes start/end street and finds sequence of streets to be traversed in order to move from start to end. Method uses StreetTree.FindLowestCommonAncestor method to obtain lowest common ancestor (LCA) of streets in tree. List of points on street constructed by backtracking from start street through street parents until the LCA is reached, each time adding the start of the street to list of coordinates. We then backtrack from the end street through street parents up to and including LCA, adding end of street to list of coordinates each time – reversing this list when finished to go from LCA to goal. Combining these lists gives final output of street points character should follow to reach goal. 
+        /// </summary>
+        /// <param name="startStreet"></param>
+        /// <param name="endStreet"></param>
+        /// <returns></returns>
         protected List<Vector3> FindStreetSequence(Street startStreet, Street endStreet)
         {
             
@@ -216,6 +266,13 @@ namespace Game1.Town.Districts
         }
 
 
+
+        /// <summary>
+        /// Overloaded method, supplied start and end houses, to find path via streets. First adds closest point on start street to house/building origin using FindClosestPointOnStreet method on street object. Sequence of street points from start to end determined using FindStreetSequence method. Finally, closest point on end street added to list of path points which is then returned. 
+        /// </summary>
+        /// <param name="start"></param>
+        /// <param name="end"></param>
+        /// <returns></returns>
         public List<Vector3> FindStreetPathPoints(House start, House end)
         {
 
@@ -235,7 +292,12 @@ namespace Game1.Town.Districts
         }
 
 
-
+        /// <summary>
+        /// Overloaded method, supplied start and end buildings, to find path via streets. First adds closest point on start street to house/building origin using FindClosestPointOnStreet method on street object. Sequence of street points from start to end determined using FindStreetSequence method. Finally, closest point on end street added to list of path points which is then returned. 
+        /// </summary>
+        /// <param name="start"></param>
+        /// <param name="end"></param>
+        /// <returns></returns>
         public List<Vector3> FindStreetPathPoints(Building start, Building end)
         {
             List<Vector3> pathPoints = new List<Vector3>();

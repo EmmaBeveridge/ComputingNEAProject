@@ -37,17 +37,22 @@ namespace Game1
         /// stores if action initiator has reached persontointeractwith location so conversation can begin
         /// </summary>
         public bool initiatorReachedGoal = false;
-        
+
 
 
         /// <summary>
-        /// Updates variable for non-initiators action object so they know initiator has reached them
+        ///   Virtual method. Base method has no method body. Overridden in TalkToPersonAction class. 
         /// </summary>
         public virtual void NotifyInitiatorReachedGoal()
         {
 
         }
 
+        /// <summary>
+        /// Returns an estimated cost (time) for the action. First determines the estimated amount of time needed to fulfil the need by dividing the difference between the current need level and the maximum need level by the rate of need increase for that action. This is then compared to the minimum action time, the larger of these two values being assigned to Duration and EstTimeToFinish variables and returned.
+        /// </summary>
+        /// <param name="need"></param>
+        /// <returns></returns>
         public virtual float Cost(Need need)
         {
            
@@ -62,7 +67,10 @@ namespace Game1
 
         }
 
-
+        /// <summary>
+        /// Virtual method. Called once when person begins doing the action. Resets actionComplete and actionTimeElapsed variables and sets item availability to false. If the action affects a skill and the person does not currently possess this skill, a new Skill object of the affected type is added to person.Skills using Skill.GetNewSkill static method. 
+        /// </summary>
+        /// <param name="person"></param>
         public virtual void BeginAction(People person)
         {
             ActionComplete = false;
@@ -83,7 +91,9 @@ namespace Game1
         }
 
 
-
+        /// <summary>
+        /// Virtual method. Called once when action is finished. Sets ActionComplete and item availability to true. 
+        /// </summary>
         public virtual void CompleteAction()
         {
             ActionComplete = true;
@@ -91,6 +101,10 @@ namespace Game1
         }
 
 
+        /// <summary>
+        /// Abstract method implemented in child classes. Creates and returns a new GOAPAction with pre/post- conditions set and building/item/interactionPerson attributes assigned. 
+        /// </summary>
+        /// <returns>GOAPAction for action</returns>
         public abstract GOAPAction DefineGOAPAction();
 
 

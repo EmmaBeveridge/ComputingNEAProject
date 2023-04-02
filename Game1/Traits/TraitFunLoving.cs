@@ -11,13 +11,19 @@ namespace Game1.Traits
         public new static string TraitString = "FunLoving";
         public new static int DBID;
 
-
+        /// <summary>
+        /// Constructor to create new fun-loving trait 
+        /// </summary>
         public TraitFunLoving()
         {
             needsPrioritised.Add(NeedNames.Fun);
             needsAcceleratedDepletion.Add(NeedNames.Fun);
         }
 
+        /// <summary>
+        /// Returns DBID for TraitFunLoving class 
+        /// </summary>
+        /// <returns></returns>
         public override int GetID() { return DBID; }
 
 

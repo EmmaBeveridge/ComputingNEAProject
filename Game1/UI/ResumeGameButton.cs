@@ -21,7 +21,10 @@ namespace Game1.UI
 
 
 
-
+        /// <summary>
+        ///  Creates a new SQLiteDBHandler object and uses to load in game data from SQLite database. Receives list of DBPerson objects from SQliteDBHandler GetPeople method. By iterating over these DBPeople, uses handler to get traits, skills, and relationships from database to create People and player objects. 
+        /// </summary>
+        /// <param name="game"></param>
         public static void ResumeGame(Game1 game)
         {
 

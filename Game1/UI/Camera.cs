@@ -33,8 +33,20 @@ namespace Game1
         bool mouseLookOn = false;
 
         Vector3 up = Vector3.Up;
+
+        /// <summary>
+        ///  Matrix situating camera within the world space. 
+        /// </summary>
         Matrix cameraWorldMatrix = Matrix.Identity;
+
+        /// <summary>
+        /// Matrix to transform geometry from world space into view space.  
+        /// </summary>
         Matrix viewMatrix = Matrix.Identity;
+
+        /// <summary>
+        /// Matrix to transform scene from view space and project onto an imaginary screen in front of camera. This camera uses perspective projection wherein the area seen by the camera is modelled as a frustrum and must be remapped onto a screen.
+        /// </summary>
         Matrix projectionMatrix = Matrix.Identity;
 
         Vector3 TargetPositionToLookAt;
@@ -131,6 +143,9 @@ namespace Game1
            
         }
 
+        /// <summary>
+        /// Creates world and view matrices for camera given its current position and rotation. 
+        /// </summary>
         private void CreateWorldandViewMatrices()
         {
 
@@ -141,12 +156,23 @@ namespace Game1
 
         }
 
+        /// <summary>
+        /// Creates projection matrix using perspective projection. 
+        /// </summary>
+        /// <param name="graphicsDevice"></param>
+        /// <param name="fieldOfViewDeg"></param>
         public void CreatePerspectiveProjectionMatrix(GraphicsDevice graphicsDevice, float fieldOfViewDeg)
         {
             projectionMatrix = Matrix.CreatePerspectiveFieldOfView(MathHelper.ToRadians(fieldOfViewDeg), graphicsDevice.Viewport.AspectRatio, nearPlaneDistance, farPlaneDistance);
 
         }
 
+        /// <summary>
+        /// Creates projection matrix using perspective projection. 
+        /// </summary>
+        /// <param name="fieldOfViewInDegrees"></param>
+        /// <param name="nearPlane"></param>
+        /// <param name="farPlane"></param>
         public void CreatePerspectiveProjectionMatrix(float fieldOfViewInDegrees, float nearPlane, float farPlane)
         {
             // create the projection matrix.
@@ -158,7 +184,10 @@ namespace Game1
         }
 
 
-
+        /// <summary>
+        /// Registers user keyboard input and calls relevant methods in order to translate or rotate the camera. Calls methods to update world, view, and projection matrices. 
+        /// </summary>
+        /// <param name="gameTime"></param>
         public void Update (GameTime gameTime)
         {
             MouseState _mouseState = Mouse.GetState(gameWindow);

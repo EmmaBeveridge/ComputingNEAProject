@@ -36,6 +36,12 @@ namespace Game1.UI
 
         public static Texture2D defaultTexture;
 
+        /// <summary>
+        /// Constructor for new needs toolbar button 
+        /// </summary>
+        /// <param name="argLabel"></param>
+        /// <param name="argPosition"></param>
+        /// <param name="needBars"></param>
         public NeedsButton(string argLabel, Vector2 argPosition, List<NeedBar> needBars) : base(argLabel, argPosition, defaultTexture)
         {
             panel = new NeedsPanel(needBars);
@@ -48,6 +54,13 @@ namespace Game1.UI
 
         public static Texture2D defaultTexture;
 
+
+        /// <summary>
+        /// Constructor for new relationships toolbar button 
+        /// </summary>
+        /// <param name="argLabel"></param>
+        /// <param name="argPosition"></param>
+        /// <param name="argRelationships"></param>
         public RelationshipsButton(string argLabel, Vector2 argPosition, Dictionary<People, float> argRelationships) : base(argLabel, argPosition, defaultTexture)
         {
             panel = new RelationshipsPanel(argRelationships);
@@ -60,6 +73,12 @@ namespace Game1.UI
 
         public static Texture2D defaultTexture;
 
+        /// <summary>
+        /// Constructor for new skills toolbar button 
+        /// </summary>
+        /// <param name="argLabel"></param>
+        /// <param name="argPosition"></param>
+        /// <param name="argPlayer"></param>
         public SkillsButton(string argLabel, Vector2 argPosition, Player argPlayer) : base(argLabel, argPosition, defaultTexture)
         {
             panel = new SkillsPanel(argPlayer);
@@ -71,6 +90,12 @@ namespace Game1.UI
 
         public static Texture2D defaultTexture;
 
+        /// <summary>
+        /// Constructor for new career toolbar button 
+        /// </summary>
+        /// <param name="argLabel"></param>
+        /// <param name="argPosition"></param>
+        /// <param name="argPlayer"></param>
         public CareerButton(string argLabel, Vector2 argPosition, Player argPlayer) : base(argLabel, argPosition, defaultTexture)
         {
             panel = new CareerPanel(argPlayer);

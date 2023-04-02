@@ -8,6 +8,9 @@ using System.Threading.Tasks;
 
 namespace Game1.DataClasses
 {
+    /// <summary>
+    /// Inherits from JsonConverter class to deserialise JSON returned from graph database and convert to a Neo4j.Driver.Point object. 
+    /// </summary>
     class PointConverter : JsonConverter
     {
         public override bool CanConvert(Type objectType)

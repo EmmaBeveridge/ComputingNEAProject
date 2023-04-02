@@ -17,6 +17,14 @@ namespace Game1.AStar
         public IMapPosition position;
         public IMapPosition parentPosition;
 
+
+        /// <summary>
+        /// Constructor for new AStarNode. Initialises all attributes with totalEstimatedCost equal to the sum of costFromStart and heuristicToGoal.
+        /// </summary>
+        /// <param name="argCostFromStart"></param>
+        /// <param name="argHeuristicToGoal"></param>
+        /// <param name="argPosition"></param>
+        /// <param name="argParentPosition"></param>
         public AStarNode(float argCostFromStart, float argHeuristicToGoal, IMapPosition argPosition, IMapPosition argParentPosition)
         {
             costFromStart = argCostFromStart;

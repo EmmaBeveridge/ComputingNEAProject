@@ -41,7 +41,9 @@ namespace Game1
         [JsonProperty("inventory")]
         public List<string> inventory;
 
-
+        /// <summary>
+        /// List of plane objects forming cuboid around item. Used to detect intersection of mouse ray and item. 
+        /// </summary>
         public List<Plane> planes = new List<Plane>();
         public List<Vector3> corners = new List<Vector3>();
         //public Dictionary<string, float> keyCoordinates = new Dictionary<string, float>() 
@@ -57,9 +59,20 @@ namespace Game1
 
         public Room room;
 
+        /// <summary>
+        ///  List of text displayed on action selection buttons e.g. sleep 
+        /// </summary>
         public Dictionary<string, GOAPAction> actionLabels = new Dictionary<string, GOAPAction>();
+
+        /// <summary>
+        ///  List of action buttons displayed when user is selecting an action using that item.
+        /// </summary>
         public List<Button> actionButtons = new List<Button>();
-        public  List<GOAPAction> GOAPActions = new List<GOAPAction>();
+
+        /// <summary>
+        /// List of GOAP actions for this item. 
+        /// </summary>
+        public List<GOAPAction> GOAPActions = new List<GOAPAction>();
 
 
         public bool IsAvailable = true;
@@ -75,8 +88,11 @@ namespace Game1
         Matrix itemToTownTransformation;
 
 
-       public void GenerateAvatar()
-       {
+        /// <summary>
+        /// Calculates transformation matrices and creates avatar. 
+        /// </summary>
+        public void GenerateAvatar()
+        {
 
             //Matrix rotationMatrix = Matrix.CreateRotationY(MathHelper.ToRadians(rotation));
 
@@ -120,7 +136,9 @@ namespace Game1
 
         }
 
-        
+        /// <summary>
+        ///  Calls SetCorners method. Creates planes of cuboid encasing item using corners of item and adds to planes list. 
+        /// </summary>
         public void GeneratePlanes()
         {
             SetCorners();
@@ -143,6 +161,9 @@ namespace Game1
 
         }
 
+        /// <summary>
+        /// : Reads in local house coordinates for item. Applies houseToTownTransformation matrix to coordinate and obtains translation vector from this transformation and adds to corners list. 
+        /// </summary>
         public virtual void SetCorners()
         {
            
@@ -183,6 +204,11 @@ namespace Game1
 
         }
 
+        /// <summary>
+        /// Determines if item cuboid contains a specified coordinate. Does so by checking if a vector extending infinitely in the positive x direction from the point has an odd number of intersections with the edges of the item rectangle on ground plane. If there are an odd number of intersections, then the point must be within rectangle/item. If there are an even or 0 intersections, then point cannot be within rectangle/item. 
+        /// </summary>
+        /// <param name="position"></param>
+        /// <returns></returns>
         public bool ContainsPoint(Vector3 position)
         {
 
@@ -232,7 +258,10 @@ namespace Game1
         }
 
 
-
+        /// <summary>
+        /// Generates action selection buttons and sets position to allow buttons to be displayed in a circle around the screen. 
+        /// </summary>
+        /// <param name="graphicsDeviceManager"></param>
         public void BuildButtons(GraphicsDeviceManager graphicsDeviceManager)
         {
             for (int i = 0; i < actionLabels.Count; i++)
@@ -256,7 +285,10 @@ namespace Game1
 
 
 
-
+        /// <summary>
+        /// Uses UIHandler to clear the current buttons displayed and adds all buttons advertising valid actions for the user to display list in UIHandler. 
+        /// </summary>
+        /// <param name="game"></param>
         public void DisplayActions(Game1 game)
         {
             game.UIHandler.ClearButtons();
@@ -265,7 +297,9 @@ namespace Game1
 
 
 
-
+        /// <summary>
+        ///  Virtual method implemented in children classes. Method used to define the GOAP actions advertised by the item. 
+        /// </summary>
         public virtual void DefineActions() { }
 
         //public virtual Action<GameTime> BeginAction(string actionName, People person) { return null; }

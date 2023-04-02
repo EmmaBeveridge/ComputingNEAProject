@@ -20,6 +20,14 @@ namespace Game1.UI
 
 
         public Player Player;
+
+        /// <summary>
+        /// Constructor for new EmotionButton 
+        /// </summary>
+        /// <param name="argLabel"></param>
+        /// <param name="argPosition"></param>
+        /// <param name="argTexture"></param>
+        /// <param name="player"></param>
         public EmotionButton(string argLabel, Vector2 argPosition, Texture2D argTexture, Player player) : base(argLabel, argPosition, argTexture)
         {
             Player = player;
@@ -27,6 +35,10 @@ namespace Game1.UI
 
         }
 
+
+        /// <summary>
+        /// Establishes if player’s current emotion is positive or negative and assigns button texture accordingly 
+        /// </summary>
         public void SetTexture()
         {
             if (positiveEmotions.Contains(Player.emotionalState)) { this.buttonTexture = PositiveEmotionTexture; }

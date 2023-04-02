@@ -29,10 +29,17 @@ namespace Game1.Traits
         }
 
 
-
+        /// <summary>
+        /// Returns ID for skill type used in SQLite database Trait lookup system, where each trait type is assigned and identified by an integer value. 
+        /// </summary>
+        /// <returns></returns>
         public virtual int GetID() { return DBID; }
 
-
+        /// <summary>
+        /// Static method to assign database ID for each trait type to static DBID attribute of each derived Trait class. Appropriate trait class identified by string supplied as parameter. 
+        /// </summary>
+        /// <param name="TraitString"></param>
+        /// <param name="TraitID"></param>
         public static void SetTraitID(string TraitString, int TraitID)
         {
             switch (TraitString)
@@ -63,6 +70,11 @@ namespace Game1.Traits
 
         }
 
+        /// <summary>
+        /// Returns DBID attribute for trait class specified by string parameter. 
+        /// </summary>
+        /// <param name="TraitString"></param>
+        /// <returns></returns>
         public static int GetTraitID(string TraitString)
         {
             switch (TraitString)
@@ -128,6 +140,12 @@ namespace Game1.Traits
 
         }
 
+
+        /// <summary>
+        /// Returns list of all needs that have a decelerated depletion rate due to specified traits
+        /// </summary>
+        /// <param name="traits">List of person's traits</param>
+        /// <returns></returns>
         public static List<NeedNames> GetNeedsDeceleratedDepletion(List<Trait> traits)
         {
             List<NeedNames> decelerated = new List<NeedNames>();
@@ -146,7 +164,7 @@ namespace Game1.Traits
 
 
         /// <summary>
-        /// Returns trait object given string name of trait
+        /// Returns new child trait object of correct derived type given string name of trait 
         /// </summary>
         /// <param name="TraitString">string name of trait</param>
         /// <returns></returns>

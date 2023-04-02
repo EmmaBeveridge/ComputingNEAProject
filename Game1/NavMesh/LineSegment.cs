@@ -20,7 +20,11 @@ namespace Game1.NavMesh
 
         public LineSegment() { }
 
-
+        /// <summary>
+        /// Constructor to produce new line segment- sets defining vertices, calculates length and direction vector for line. 
+        /// </summary>
+        /// <param name="argV1"></param>
+        /// <param name="argV2"></param>
         public LineSegment(Vector3 argV1, Vector3 argV2)
         {
             v1 = new Vertex(argV1);
@@ -29,7 +33,11 @@ namespace Game1.NavMesh
             direction = v2.position - v1.position;
         }
 
-
+        /// <summary>
+        /// Constructor to produce new line segment- sets defining vertices, calculates length and direction vector for line. 
+        /// </summary>
+        /// <param name="argV1"></param>
+        /// <param name="argV2"></param>
         public LineSegment (Vertex argV1, Vertex argV2)
         {
             v1 = argV1;
@@ -40,7 +48,11 @@ namespace Game1.NavMesh
 
 
 
-
+        /// <summary>
+        /// Checks if specified vertex is one of the two vertices defining the line segment. 
+        /// </summary>
+        /// <param name="vertex"></param>
+        /// <returns></returns>
         public bool ContainsVertex(Vector3 vertex)
         {
 
@@ -48,7 +60,12 @@ namespace Game1.NavMesh
         }
 
 
-
+        /// <summary>
+        /// Returns if line intersects with the line segment using Crosses method to evaluate intersection 
+        /// </summary>
+        /// <param name="a"></param>
+        /// <param name="b"></param>
+        /// <returns></returns>
         public bool Intersects( Vector3 a, Vector3 b)
         {
             Vector3 intersection;
@@ -56,7 +73,15 @@ namespace Game1.NavMesh
         }
 
 
-
+        /// <summary>
+        /// Returns if line intersects with the line segment. Parameters for if the line is infinite or able to be extend in the negative direction.  
+        /// </summary>
+        /// <param name="a"></param>
+        /// <param name="b"></param>
+        /// <param name="intersection"></param>
+        /// <param name="vectorInfinite"></param>
+        /// <param name="vectorNonNegative"></param>
+        /// <returns></returns>
         public bool Intersects(Vector3 a, Vector3 b, out Vector3 intersection, bool vectorInfinite, bool vectorNonNegative = false)//vectorInfinite refers to ab not linesegment  
         {
             intersection = Vector3.Zero;
@@ -120,7 +145,13 @@ namespace Game1.NavMesh
         }
 
 
-
+        /// <summary>
+        /// Determines if lines intersect using crosses method to evaluate intersection
+        /// </summary>
+        /// <param name="a"></param>
+        /// <param name="b"></param>
+        /// <param name="intersection"></param>
+        /// <returns></returns>
         public bool Intersects (Vector3 a, Vector3 b, out Vector3 intersection)
         {
             return Crosses(new Vector2(a.X, a.Z), new Vector2(b.X, b.Z), out intersection);
@@ -132,7 +163,13 @@ namespace Game1.NavMesh
 
 
 
-
+        /// <summary>
+        /// Returns if two line and vector intersect using method to allow for rounding/truncation effects in C#. 
+        /// </summary>
+        /// <param name="a"></param>
+        /// <param name="b"></param>
+        /// <param name="intersection"></param>
+        /// <returns></returns>
         public bool Crosses(Vector2 a, Vector2 b, out Vector3 intersection)
         {
             //https://www.geeksforgeeks.org/check-if-two-given-line-segments-intersect/
@@ -168,6 +205,7 @@ namespace Game1.NavMesh
 
         const float EPSILON = 0.00001f;
 
+
         public static float EpsilonUnitInterval(float a)
         {
             if (NearlyEqual(a, 1f))
@@ -183,6 +221,12 @@ namespace Game1.NavMesh
             return a;
         }
 
+        /// <summary>
+        /// Returns if two floats are roughly equal by comparing their difference divided by their sum to EPSILON value (machine epsilon). 
+        /// </summary>
+        /// <param name="a"></param>
+        /// <param name="b"></param>
+        /// <returns></returns>
         public static bool NearlyEqual(float a, float b)
         {
             var Diff = Math.Abs(b - a);
@@ -201,7 +245,11 @@ namespace Game1.NavMesh
             }
         }
 
-
+        /// <summary>
+        /// Determines if the specified point lies on the line segment by checking if the sum of the length from the start vertex of the line to the point and the length from the end vertex of the line to the point is equal to the length of the line. 
+        /// </summary>
+        /// <param name="c"></param>
+        /// <returns></returns>
         public bool Contains(Vector3 c)
         {
             var partsLen = (v1 - c).Length() + (c - v2).Length();
@@ -217,6 +265,11 @@ namespace Game1.NavMesh
 
         }
 
+        /// <summary>
+        /// Returns the closest point on the line segment to a specified point. Determined by finding direction vector of line segment and rearranging the dot product between this direction vector and the vector from the specified point to an arbitrary point on the line set equal to zero, I.e. such that vectors are perpendicular and thus vector from point to line is shortest. Solving for the distance the arbitrary point is along the line and substituting back into vector equation of the line gives the closest point on the edge.
+        /// </summary>
+        /// <param name="p"></param>
+        /// <returns></returns>
         public Vector3 GetClosestPointOnEdge(Vector3 p)
         {
 
@@ -246,8 +299,13 @@ namespace Game1.NavMesh
 
 
         }
-        
 
+        /// <summary>
+        /// Returns if two floats are almost equal by calculating the percentage error and comparing that to the minimum allowable percentage error. 
+        /// </summary>
+        /// <param name="a"></param>
+        /// <param name="b"></param>
+        /// <returns></returns>
         public static bool AlmostEqual(float a, float b) //uses % diff to determine is nearly equal 
         {
             const float allowablePercentageDifference = 0.0001f;
@@ -271,12 +329,23 @@ namespace Game1.NavMesh
 
         }
 
+        /// <summary>
+        /// Returns if the line if defined by vertices with positions equal to the vectors supplied as parameters 
+        /// </summary>
+        /// <param name="a"></param>
+        /// <param name="b"></param>
+        /// <returns></returns>
         public bool Equals (Vector3 a, Vector3 b)
         {
             return ((a == v1.position && b == v2.position) || (a == v2.position && b == v1.position));
         }
 
-
+        /// <summary>
+        /// overrides standard == operator to compare if the two lines can be considered equal as the defining vertices of the lines are the same rather than object references. 
+        /// </summary>
+        /// <param name="t1"></param>
+        /// <param name="t2"></param>
+        /// <returns></returns>
         public static bool operator == (LineSegment t1, LineSegment t2)
         {
             if (object.ReferenceEquals(t1, null))

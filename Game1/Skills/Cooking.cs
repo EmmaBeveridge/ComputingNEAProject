@@ -11,6 +11,10 @@ namespace Game1.Skills
         public new static string SkillString = "Cooking";
         public new static int DBID;
 
+
+        /// <summary>
+        /// Constructor to create new cooking skill; setting SkillType and rate of skill gain for cooking skill 
+        /// </summary>
         public Cooking()
         {
             SkillType = SkillTypes.Cooking;
@@ -19,8 +23,16 @@ namespace Game1.Skills
 
         }
 
-
+        /// <summary>
+        ///  Returns DBID for Cooking skill class
+        /// </summary>
+        /// <returns></returns>
         public override int GetID() { return DBID; }
+
+        /// <summary>
+        /// Returns SkillString for Cooking skill class 
+        /// </summary>
+        /// <returns></returns>
         public override string GetSkillString() { return SkillString; }
 
 

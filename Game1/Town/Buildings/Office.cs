@@ -8,8 +8,14 @@ using System.Threading.Tasks;
 using Game1.Careers;
 namespace Game1.Town.Buildings
 {
-    class Office:Building
+    /// <summary>
+    /// Child Office class inherits from Building parent class; implements office in town.
+    /// </summary>
+    class Office :Building
     {
+        /// <summary>
+        /// Constructor for new office object. Sets model name, names of careers available at office, EmployedAtConditionString, and calls DefineActions() method. 
+        /// </summary>
         public Office()
         {
             modelName = "Office";
@@ -20,6 +26,10 @@ namespace Game1.Town.Buildings
 
         }
 
+
+        /// <summary>
+        ///  Defines GOAP actions for office building and adds action label to describe action in button display to actionLabels list. 
+        /// </summary>
         public override void DefineActions()
         {
 

@@ -8,6 +8,10 @@ namespace Game1
 {
     public class GameStates
     {
+
+        /// <summary>
+        /// Enumeration to store possible game states.
+        /// </summary>
         public enum States
         {
 

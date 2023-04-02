@@ -11,6 +11,13 @@ namespace Game1.UI
     public class EmotionPanel : ToolbarPanel
     {
         Player Player;
+
+
+        /// <summary>
+        /// Constructor for new EmotionPanel object, setting panel scales and positioning. 
+        /// </summary>
+        /// <param name="player"></param>
+        /// <param name="position"></param>
         public EmotionPanel(Player player, Vector2 position)
         {
             Player = player;
@@ -21,6 +28,11 @@ namespace Game1.UI
             
         }
 
+        /// <summary>
+        /// Draws string of player’s current emotion 
+        /// </summary>
+        /// <param name="spriteBatch"></param>
+        /// <param name="spriteFont"></param>
         public override void Draw(SpriteBatch spriteBatch, SpriteFont spriteFont)
         {
             //spriteBatch.Draw(texture: whiteRectangle, position: panelPosition, scale: panelScale, layerDepth: 0.5f);

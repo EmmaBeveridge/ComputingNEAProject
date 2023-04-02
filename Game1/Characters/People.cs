@@ -22,6 +22,9 @@ using Game1.Skills;
 
 namespace Game1
 {
+    /// <summary>
+    /// Enumeration to store different motion states for person 
+    /// </summary>
     public enum PeopleMotionStates
     {
         idle,
@@ -29,6 +32,10 @@ namespace Game1
         rotating
     }
 
+
+    /// <summary>
+    /// Enumeration to store possible action states for person 
+    /// </summary>
     public enum PeopleActionStates
     {
         idle,
@@ -42,11 +49,18 @@ namespace Game1
         finishedTypingChat
     }
 
+    /// <summary>
+    /// Enumeration to store possible emotional states for person. 
+    /// </summary>
     public enum PeopleEmotionalState
     {
         Comfortable, Uncomfortable, Playful, Tense, Energised, Lonely
     }
-    public struct DBPerson //halfway person, stores data about person from SQLite DataBase
+
+    /// <summary>
+    /// DBPerson is a halfway person to temporarily store data about person read in from SQLite database before People object can be constructed. 
+    /// </summary>
+    public struct DBPerson
     {
         public int DBID;
         public string Name;
@@ -223,6 +237,10 @@ namespace Game1
 
         }
 
+        /// <summary>
+        /// Returns the emotional state of character based on current needs, determining if a need is especially fulfilled or unfulfilled and transferring this to an emotion.
+        /// </summary>
+        /// <returns></returns>
         protected PeopleEmotionalState GetEmotionalState()
         {
 
@@ -262,7 +280,9 @@ namespace Game1
         }
 
 
-
+        /// <summary>
+        /// Calls BuildAI method on GOAP Personto create GOAP finite state machine
+        /// </summary>
         public void BuildAI()
         {
             //needs to be called after all talk to person actions created and added to town goap actions list
@@ -271,7 +291,10 @@ namespace Game1
 
 
 
-
+        /// <summary>
+        /// Used when character has decided to have social interaction with another character. Informs the chosen character of social interaction plans so it can be added to their action queue. Sets character as initiator of the recipient action.
+        /// </summary>
+        /// <param name="recipientAction"></param>
         public void SendRSVP(GOAPAction recipientAction)
         {
             //should already be pushed onto initiator's action queue
@@ -288,7 +311,10 @@ namespace Game1
         }
 
 
-
+        /// <summary>
+        /// Finds and adds equivalent social interaction being advertised by sender to action queue. Sets initiator of action as sender.
+        /// </summary>
+        /// <param name="sender">Person who decided to interact</param>
         public void ReceiveRSVP(People sender)
         {
             GOAPAction talkToSenderAction = town.GOAPActions.Find(a => a.interactionPerson == sender);
@@ -303,7 +329,10 @@ namespace Game1
 
         }
 
-
+        /// <summary>
+        /// Creates TalkToPersonAction and returns GOAPAction defined for TalkToPersonAction for character
+        /// </summary>
+        /// <returns></returns>
         public GOAPAction DefineActions()
         {
             TalkToPersonAction talk = new TalkToPersonAction(this);
@@ -314,7 +343,10 @@ namespace Game1
 
 
 
-
+        /// <summary>
+        /// Used to update relationship following autonomous interaction I.e. when sentiment analysis not required. Finds or creates new relationship and updates according to current relationship trend (positive or negative) 
+        /// </summary>
+        /// <param name="personInteractingWith"></param>
         public void UpdateRelationsAutonomous(People personInteractingWith)
         {
             const float relationshipAdjustment = 0.01f; //should be small as applied every update frame
@@ -348,7 +380,9 @@ namespace Game1
 
 
 
-
+        /// <summary>
+        /// Loads data for C4.5 algorithm. Creates new decision tree and calls method to discretise loaded continuous data. Calls Learn method on tree and stores return as root of tree. 
+        /// </summary>
         public static void BuildDecisionTree()
         {
             DataTable ID3Data = ExcelFileManager.ReadExcelFile("ID3Data.xlsx");
@@ -381,7 +415,14 @@ namespace Game1
 
 
 
-
+        /// <summary>
+        /// Calls DepleteNeeds method. Ticks GOAP state machine. Calls methods to handle People movement and update transformation matrix which is then applied to avatar’s world matrix to allow avatar to be rendered properly.  
+        /// </summary>
+        /// <param name="gameTime"></param>
+        /// <param name="graphicsDevice"></param>
+        /// <param name="projection"></param>
+        /// <param name="view"></param>
+        /// <param name="game"></param>
         public virtual void Update(GameTime gameTime, GraphicsDevice graphicsDevice, Matrix projection, Matrix view, Game1 game)
         {
             //currentHouse = House.getHouseContainingPoint(position);
@@ -440,7 +481,9 @@ namespace Game1
 
 
 
-
+        /// <summary>
+        /// Handles calling methods on PathFinder object to construct path to destination. Determines if start and end locations are inside houses/buildings, outside or a combination and therefore supplies the appropriate navmeshes to the PathFinder.  Applies matrix transformations to turn local house coordinates to global town coordinates used to render the avatar. If street traversal required, calls methods to determine sequence of streets required. 
+        /// </summary>
         public void BuildPath()
         {
             reachedGoal = false;
@@ -671,7 +714,7 @@ namespace Game1
         }
 
 
-    
+
 
 
 
@@ -701,14 +744,14 @@ namespace Game1
         //        mesh = Town.Town.navMesh;
         //        pathFinder = new Path(mesh);
         //        pathFinder.FindPath(position, goal, ref pathPoints);
-                
+
 
         //    }
 
         //    else if (currentlyOutside && !goalOutside)
         //    {
         //        List<Vector3> pathToHouse = new List<Vector3>();
-                
+
         //        mesh = Town.Town.navMesh;
         //        pathFinder = new Path(mesh);
         //        pathFinder.FindPath(position, goalHouse.TownLocation, ref pathToHouse);
@@ -728,7 +771,7 @@ namespace Game1
         //        }
 
 
-                
+
 
         //    }
 
@@ -754,7 +797,7 @@ namespace Game1
 
         //        pathPoints.AddRange(outsideToGoal);
 
-                 
+
         //    }
 
         //    else if (!currentlyOutside && !goalOutside)
@@ -844,7 +887,7 @@ namespace Game1
 
         //            }
 
-                   
+
 
 
 
@@ -863,7 +906,10 @@ namespace Game1
         //}
 
 
-
+        /// <summary>
+        /// Using PeopleMotionStates, determines movement action required in this Update frame. If the path is complete, the person is set into an idle state; if the person is just beginning to move after calculating their path, they are set into a rotating state; if the person is in a rotating state, their rotation matrix is updated and it is evaluated if their rotation is complete in which case they are set into a moving state; if the person is in a moving state, a new target vector is created and their position is advanced given direction, velocity and elapsed game time- a new translation matrix is then made from this position. 
+        /// </summary>
+        /// <param name="gameTime"></param>
 
         public virtual void MovePerson( GameTime gameTime)
         {
@@ -936,7 +982,9 @@ namespace Game1
 
         }
 
-
+        /// <summary>
+        /// Constructs a matrix representing the movements made by the person this update frame. To properly construct the matrix, a translation matrix describing a translation of the model back to the origin must be multiplied by the model’s rotation matrix and finally by a translation matrix restoring the model back to its original position. 
+        /// </summary>
         public void updateTransformationMatrix()
         {
             transformationMatrix = Matrix.CreateTranslation(-position)*rotationMatrix*translationMatrix; //updates transformation matrix by first moving model to orgin to allow rotation to be applied properly, then moving model back to current position
@@ -944,6 +992,10 @@ namespace Game1
         }
 
 
+        /// <summary>
+        /// Calculates angle through which avatar will rotate this update frame and constructs a rotation matrix  
+        /// </summary>
+        /// <param name="gameTime"></param>
         public void getNewRotationMatrix(GameTime gameTime)
         {
             
@@ -991,7 +1043,12 @@ namespace Game1
         }
 
 
-
+        /// <summary>
+        /// Calculates the target vector for the current position and target position. Sets new target position to be next point on path once previous point has been reached. 
+        /// </summary>
+        /// <param name="gameTime"></param>
+        /// <param name="targetPosition"></param>
+        /// <returns></returns>
         public Vector3 getTargetVector(GameTime gameTime, Vector3 targetPosition)
         {
             if (targetPosition.Y == -100) //returned when point not on plane selected
@@ -1022,6 +1079,11 @@ namespace Game1
         }
 
 
+
+        /// <summary>
+        /// Calculates new position by applying velocity, elapsed game time, and target vector. Produces translation matrix to move avatar to new position. 
+        /// </summary>
+        /// <param name="gameTime"></param>
         public void getNewTranslationMatrix(GameTime gameTime)
         {
             Vector3 newPos= position + (float)(velocity * gameTime.ElapsedGameTime.TotalSeconds) * targetVector;  //calculates new position for movement this frame

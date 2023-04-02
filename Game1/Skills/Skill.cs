@@ -6,7 +6,9 @@ using System.Threading.Tasks;
 using Microsoft.Xna.Framework;
 namespace Game1.Skills
 {
-
+    /// <summary>
+    /// Enumeration to store possible skill types 
+    /// </summary>
     public enum SkillTypes
     {
         Null,
@@ -25,7 +27,18 @@ namespace Game1.Skills
         public int Level=0;
         protected float RateOfSkillGain;
 
+
+        /// <summary>
+        ///  Returns ID for skill type used in SQLite database skill lookup system, where each skill type is assigned and identified by an integer value
+        /// </summary>
+        /// <returns></returns>
         public virtual int GetID() { return DBID; }
+
+        /// <summary>
+        /// Static method to assign database ID for each skill type to static DBID attribute of each derived Skill class. Appropriate skill class identified by string supplied as parameter.
+        /// </summary>
+        /// <param name="SkillString"></param>
+        /// <param name="SkillID"></param>
         public static void SetSkillID(string SkillString, int SkillID)
         {
             switch (SkillString)
@@ -41,9 +54,18 @@ namespace Game1.Skills
         }
 
 
+
+        /// <summary>
+        /// Returns SkillString attribute for skill class.
+        /// </summary>
+        /// <returns></returns>
         public virtual string GetSkillString() { return SkillString; }
 
-
+        /// <summary>
+        /// Returns DBID attribute for skill class specified by string parameter. 
+        /// </summary>
+        /// <param name="SkillString"></param>
+        /// <returns></returns>
         public static int GetSkillID(string SkillString)
         {
             switch (SkillString)
@@ -57,6 +79,13 @@ namespace Game1.Skills
             return -1;
         }
 
+
+
+        /// <summary>
+        /// Returns new child skill object of correct derived type given string name of skill.
+        /// </summary>
+        /// <param name="SkillName"></param>
+        /// <returns></returns>
         public static Skill GetSkillFromString(string SkillName)
         {
             switch (SkillName)
@@ -71,6 +100,11 @@ namespace Game1.Skills
 
         }
 
+        /// <summary>
+        /// Returns new child skill object of correct derived type given parameter of SkillType 
+        /// </summary>
+        /// <param name="type"></param>
+        /// <returns></returns>
 
         public static Skill GetNewSkill(SkillTypes type)
         {
@@ -86,6 +120,12 @@ namespace Game1.Skills
 
         }
 
+
+        /// <summary>
+        ///  Calculates and returns amount by which Score of skill should increase given rate of skill gain and elapsed game time.
+        /// </summary>
+        /// <param name="gameTime"></param>
+        /// <returns></returns>
         private float CalculateIncrementScore(GameTime gameTime)
         {
             float increment = (float)gameTime.ElapsedGameTime.TotalSeconds * RateOfSkillGain;
@@ -94,11 +134,14 @@ namespace Game1.Skills
 
         }
 
-
+        /// <summary>
+        /// Updates Score, ensuring it does not exceed maximum score. Calculates score as percentage of maximum score and updates skill level using this percentage. 
+        /// </summary>
+        /// <param name="gameTime"></param>
         public void UpdateSkill(GameTime gameTime)
         {
             Score += CalculateIncrementScore(gameTime);
-            Score = Math.Max(Score, 0);
+            
             Score = Math.Min(Score, MaxScore);
 
 

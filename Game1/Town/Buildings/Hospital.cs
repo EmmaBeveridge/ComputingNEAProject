@@ -8,8 +8,15 @@ using System.Threading.Tasks;
 using Game1.Careers;
 namespace Game1.Town.Buildings
 {
+
+    /// <summary>
+    /// Child Hospital class inherits from Building parent class; implements hospital in town. 
+    /// </summary>
     class Hospital : Building
     {
+        /// <summary>
+        /// Constructor for new hospital object. Sets model name, names of careers available at hospital, EmployedAtConditionString, and calls DefineActions() method. 
+        /// </summary>
         public Hospital()
         {
             modelName = "Hospital";
@@ -20,6 +27,10 @@ namespace Game1.Town.Buildings
 
         }
 
+
+        /// <summary>
+        /// Defines GOAP actions for hospital building and adds action label to describe action in button display to actionLabels list. 
+        /// </summary>
         public override void DefineActions()
         {
 

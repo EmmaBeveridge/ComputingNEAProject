@@ -17,16 +17,31 @@ namespace Game1.AStar
         NodeLinks linksDynamic = new NodeLinks();
         HashSet<Vertex> getLinksResult = new HashSet<Vertex>();
 
+        /// <summary>
+        /// Adds a new vertex to the node collection by adding to nodes attribute. 
+        /// </summary>
+        /// <param name="node"></param>
         public void Add(Vertex node)
         {
             nodes.Add(node);
         }
 
+        /// <summary>
+        /// Uses CalculateLinks method to calculate the links between the static vertices in the navmesh. 
+        /// </summary>
+        /// <param name="condition"></param>
         public void CalculateStaticLinks(Func<Vector3, Vector3, bool> condition)
         {
             CalculateLinks(condition, nodes, linksStatic); // static link letting walk through wall??? why?
         }
 
+
+        /// <summary>
+        /// Used to calculate the links between the start and end nodes (dynamic nodes) and the other static nodes within the collection. Method first checks if either the start or end nodes are contained within the static link collection. If not, the CalculateLinks method is used to calculate the dynamic links. 
+        /// </summary>
+        /// <param name="start"></param>
+        /// <param name="end"></param>
+        /// <param name="condition"></param>
         public void CalculateDynamicLinks(Vertex start, Vertex end, Func<Vector3, Vector3, bool> condition)
         {
             if (!linksStatic.Contains(start))
@@ -42,6 +57,12 @@ namespace Game1.AStar
 
         }
 
+
+        /// <summary>
+        /// Returns all of the links between the specified node and the other nodes in the collection using the GetLinks method on both the linksStatic and linksDynamic objects.
+        /// </summary>
+        /// <param name="point"></param>
+        /// <returns></returns>
         public IEnumerable<Vertex> GetLinks(Vertex point)
         {
             getLinksResult.Clear();
@@ -68,6 +89,13 @@ namespace Game1.AStar
             return getLinksResult;
         }
 
+
+        /// <summary>
+        /// Examines all node pairs and adds a link between them if they fulfil the specified condition – in this case, the InLineofSight function defined in the Path class is used. 
+        /// </summary>
+        /// <param name="condition"></param>
+        /// <param name="newNodes"></param>
+        /// <param name="links"></param>
         void CalculateLinks(Func<Vector3, Vector3, bool> condition, IEnumerable<Vertex> newNodes, NodeLinks links)
         {
             links.Clear();

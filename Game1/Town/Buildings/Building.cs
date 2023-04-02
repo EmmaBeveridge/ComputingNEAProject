@@ -51,7 +51,8 @@ namespace Game1.Town
         public static List<Building> buildings = new List<Building>();
 
         public BoundingBox buildingBox;
-        public List<Vector3> groundCorners = new List<Vector3>();
+
+        //public List<Vector3> groundCorners = new List<Vector3>();
 
 
         public Dictionary<string, GOAPAction> actionLabels = new Dictionary<string, GOAPAction>();
@@ -70,6 +71,9 @@ namespace Game1.Town
             modelName = "Office";
         }
 
+        /// <summary>
+        /// BuildButtons() : Generates action selection buttons and sets position to allow buttons to be displayed in a circle around the screen. 
+        /// </summary>
         public void GenerateAvatar()
         {
 
@@ -96,6 +100,10 @@ namespace Game1.Town
 
         }
 
+        /// <summary>
+        /// Generates action selection buttons and sets position to allow buttons to be displayed in a circle around the screen.
+        /// </summary>
+        /// <param name="graphicsDeviceManager"></param>
         public void BuildButtons(GraphicsDeviceManager graphicsDeviceManager)
         {
             for (int i = 0; i < actionLabels.Count; i++)
@@ -119,7 +127,11 @@ namespace Game1.Town
 
 
 
-
+        /// <summary>
+        /// Uses UIHandler to clear the current buttons displayed and adds all buttons advertising valid actions for the user to display list in UIHandler.
+        /// </summary>
+        /// <param name="game"></param>
+        /// <param name="player"></param>
         public void DisplayActions(Game1 game, Player player)
         {
             game.UIHandler.ClearButtons();
@@ -127,8 +139,12 @@ namespace Game1.Town
         }
 
 
-
-        public List<Button> GetValidButtons(Player person)
+        /// <summary>
+        ///  Determines which of the buildings actions are currently valid for the user (e.g. should not display option for user to quit job/ attend work at a building at which they are not employed) and returns list of action buttons describing only valid actions. 
+        /// </summary>
+        /// <param name="person"></param>
+        /// <returns></returns>
+        protected List<Button> GetValidButtons(Player person)
         {
             List<Button> validButtons = new List<Button>();
 
@@ -142,21 +158,23 @@ namespace Game1.Town
 
 
 
-        public void SetCorners()
-        {
-            //Regex regex = new Regex(@"T\d+\.R\.S\d\.(\d\.)*H\d+");
-            Regex regex = new Regex(@"B\d+$");
-            var match = regex.Match(id);
-            DataTable coordTable = ExcelFileManager.ReadCoordinates(match.Value, town: true);
+        //public void SetCorners()
+        //{
+        //    //Regex regex = new Regex(@"T\d+\.R\.S\d\.(\d\.)*H\d+");
+        //    Regex regex = new Regex(@"B\d+$");
+        //    var match = regex.Match(id);
+        //    DataTable coordTable = ExcelFileManager.ReadCoordinates(match.Value, town: true);
 
-            foreach (DataRow row in coordTable.Rows)
-            {
-                groundCorners.Add(new Vector3(int.Parse(row["X"].ToString()), 0, int.Parse(row["Z"].ToString())));
-            }
+        //    foreach (DataRow row in coordTable.Rows)
+        //    {
+        //        groundCorners.Add(new Vector3(int.Parse(row["X"].ToString()), 0, int.Parse(row["Z"].ToString())));
+        //    }
 
             
 
-        }
+        //}
+
+
 
         public virtual void DefineActions() { }
 

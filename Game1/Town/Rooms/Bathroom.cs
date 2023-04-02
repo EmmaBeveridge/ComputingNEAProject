@@ -7,6 +7,9 @@ using System.Threading.Tasks;
 
 namespace Game1.Rooms
 {
+    /// <summary>
+    /// Child Bathroom class inherits from parent Room class. 
+    /// </summary>
     class Bathroom : Room
     {
 

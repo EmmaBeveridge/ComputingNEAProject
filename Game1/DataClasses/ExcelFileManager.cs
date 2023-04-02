@@ -16,7 +16,11 @@ namespace Game1.DataClasses
         static string itemCoordinatesFileName = Directory.GetParent(Directory.GetCurrentDirectory()).Parent.Parent.Parent.Parent.FullName + "/Data/ItemCoordinates.xlsx";
 
 
-
+        /// <summary>
+        /// Reads data from Excel file into a DataTable object. 
+        /// </summary>
+        /// <param name="fileName"></param>
+        /// <returns></returns>
         public static DataTable ReadExcelFile (string fileName)
         {
             fileName = Directory.GetParent(Directory.GetCurrentDirectory()).Parent.Parent.Parent.Parent.FullName + "/Data/" + fileName;
@@ -26,7 +30,13 @@ namespace Game1.DataClasses
             
         }
 
-
+        /// <summary>
+        /// Reads coordinates for house or items depending on parameters using the static fields storing the relevant file names. 
+        /// </summary>
+        /// <param name="sheetName"></param>
+        /// <param name="town"></param>
+        /// <param name="item"></param>
+        /// <returns></returns>
         public static DataTable ReadCoordinates(string sheetName, bool town = false, bool item = false )
         {
             string fileName = null;

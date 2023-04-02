@@ -11,13 +11,19 @@ namespace Game1.Traits
         public new static string TraitString = "Gourmand";
         public new static int DBID;
 
-
+        /// <summary>
+        /// Constructor to create new gourmand trait 
+        /// </summary>
         public TraitGourmand()
         {
             needsPrioritised.Add(NeedNames.Hunger);
             needsAcceleratedDepletion.Add(NeedNames.Hunger);
         }
 
+        /// <summary>
+        /// Returns DBID for TraitGourmand class 
+        /// </summary>
+        /// <returns></returns>
         public override int GetID() { return DBID; }
 
     }

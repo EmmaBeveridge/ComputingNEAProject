@@ -45,7 +45,7 @@ namespace Game1.GOAP
     }
 
 
-    public class StateMachine<T>
+    public class StateMachine<T>//In this system, T is an object of the GOAPPersonState class. 
     {
         public event Action OnStateChanged;
 
@@ -57,8 +57,17 @@ namespace Game1.GOAP
 
         protected T Context;
 
+        /// <summary>
+        ///  Dictionary containing all of machine’s possible finite states. 
+        /// </summary>
         private readonly Dictionary<Type, State<T>> states = new Dictionary<Type, State<T>>();
 
+
+        /// <summary>
+        ///  Constructor for new finite state machine. Constructor assigns context of machine and sets up initial state provided as argument, adding it to the machine, setting it as the current state and calling the Begin method on the state. 
+        /// </summary>
+        /// <param name="context">GOAP Person State object</param>
+        /// <param name="initialState"> initial machine state</param>
         public StateMachine(T context, State<T> initialState)
         {
             this.Context = context;
@@ -70,7 +79,7 @@ namespace Game1.GOAP
         }
 
         /// <summary>
-        /// adds the state to the machine
+        /// Adds a state to the state machine. Calls SetMachineAndContext method on state, sending FSM and FSM context as arguments. Adds new state to machine’s states dictionary where the key is the type of the state object and the value is the state object itself. As keys in a dictionary must be unique – only one state of each state type can be added e.g. machine cannot have two instances of the Idle state. 
         /// </summary>
         public void AddState(State<T> state)
         {
@@ -79,7 +88,7 @@ namespace Game1.GOAP
         }
 
         /// <summary>
-        /// ticks the state machine with the provided delta time
+        /// Ticks the state machine using the game time supplied as a parameter. Calls the update method on the current state. If the transitionOnNextTick boolean property of the current state is true, the machine will then transition into its next state and call the Begin method on this new state. 
         /// </summary>
         public void Tick(GameTime gameTime)
         {
@@ -110,7 +119,7 @@ namespace Game1.GOAP
         }
 
         /// <summary>
-        /// changes the current state
+        ///  Changes machine state to state with type supplied as type paramater. Checks if and prevents attempting to change to the same state. Sets this as the machine’s NextState. 
         /// </summary>
         public void ChangeState<TR>() where TR : State<T>
         {
@@ -122,6 +131,11 @@ namespace Game1.GOAP
             this.NextState = this.states[newType];
         }
 
+
+        /// <summary>
+        /// Sets the NextState attribute of the machine. This is state into which the machine will transition into next. 
+        /// </summary>
+        /// <typeparam name="TR"></typeparam>
         public void SetNextState<TR>() where TR : State<T>
         {
             var nextType = typeof(TR);

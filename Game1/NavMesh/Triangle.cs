@@ -55,22 +55,34 @@ namespace Game1.NavMesh
         }
 
 
-
+        /// <summary>
+        ///  Returns if the triangle has an edge that can be considered equal to the line segment supplied as a parameter
+        /// </summary>
+        /// <param name="edge"></param>
+        /// <returns></returns>
         public bool HasEdge(LineSegment edge)
         {
             return AB == edge || BC == edge || CA == edge;
         }
 
-
+        /// <summary>
+        /// Returns if the triangle has a vertex at a position equal to the supplied vector
+        /// </summary>
+        /// <param name="point"></param>
+        /// <returns></returns>
         public bool HasVertex(Vector3 point)
         {
             return A.position == point || B.position == point || C.position == point;
         }
-       
 
 
 
 
+        /// <summary>
+        ///  Returns edge common to triangle object and triangle supplied as parameter 
+        /// </summary>
+        /// <param name="other"></param>
+        /// <returns></returns>
         public LineSegment GetSharedEdge(Triangle other)
         {
             if (HasEdge(other.AB))
@@ -91,6 +103,9 @@ namespace Game1.NavMesh
             }
         }
 
+        /// <summary>
+        ///  Calculates mathematical attributes of triangle and creates and assigns line segment objects for edges.
+        /// </summary>
         void Cache()
         {
             AB = new LineSegment(A, B);
@@ -122,7 +137,13 @@ namespace Game1.NavMesh
 
         }
 
-
+        /// <summary>
+        /// Static method, calculating area enclosed by triangle formed by three vector points supplied as parameters.
+        /// </summary>
+        /// <param name="a"></param>
+        /// <param name="b"></param>
+        /// <param name="c"></param>
+        /// <returns></returns>
         public static float Area(Vector3 a, Vector3 b, Vector3 c)
         {
 
@@ -194,9 +215,15 @@ namespace Game1.NavMesh
 
         //}
 
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="point"></param>
+        /// <returns></returns>
         public bool Encloses(Vector3 point)
         {
+            //https://blackpawn.com/texts/pointinpoly/default.html????
+
             if (point.X < boundsLT.X || point.Z < boundsLT.Z || point.X > boundsRB.X || point.Z > boundsRB.Z)
             {
                 return false;
@@ -276,7 +303,11 @@ namespace Game1.NavMesh
 
         }
 
-
+        /// <summary>
+        ///  Returns if the point is in the convex hull of the triangle by determining if the point can be expressed as C + alpha*CB + beta*CA where alpha and beta are positive values which sum to one or less 
+        /// </summary>
+        /// <param name="point"></param>
+        /// <returns></returns>
         public bool InConvexHull(Vector3 point)
         {
 
@@ -301,13 +332,23 @@ namespace Game1.NavMesh
 
         }
 
+        /// <summary>
+        /// static method returns value of the determinant of the augmented matrix formed by the 2 vector parameters. 
+        /// </summary>
+        /// <param name="a"></param>
+        /// <param name="b"></param>
+        /// <returns></returns>
         public static float Determinant(Vector3 a, Vector3 b)
         {
             return a.X * b.Z - a.Z * b.X;
         }
 
 
-
+        /// <summary>
+        /// Returns point in triangle that is closes to the specified point. If the point is contained within the triangle, the point itself is returned. If the point is not contained in the triangle, the edges of the triangle are iterated over and for each the closest point on the edge is found using GetClosestPointOnEdge method of line segment objects – the closest of these is returned as closest point in triangle. 
+        /// </summary>
+        /// <param name="point"></param>
+        /// <returns></returns>
         public Vector3 GetClosestPoint(Vector3 point)
         {
             float shortestDistance = float.PositiveInfinity;

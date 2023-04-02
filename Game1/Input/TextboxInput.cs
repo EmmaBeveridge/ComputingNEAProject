@@ -15,7 +15,15 @@ namespace Game1
         static KeyboardState currentKeyState;
         static KeyboardState previousKeyState;
 
+        /// <summary>
+        /// Constructor for new TextboxKeyboard object 
+        /// </summary>
         public TextboxKeyboard() { }
+
+        /// <summary>
+        /// Sets previousKeyState to currentKeyState and resets and returns currentKeyState to the state of the keyboard. 
+        /// </summary>
+        /// <returns></returns>
         public static KeyboardState GetState()
         {
             previousKeyState = currentKeyState;
@@ -23,12 +31,21 @@ namespace Game1
             return currentKeyState;
 
         }
-
+        /// <summary>
+        /// Returns if the specified key is currently held down. 
+        /// </summary>
+        /// <param name="key"></param>
+        /// <returns></returns>
         public static bool IsPressed(Keys key)
         {
             return currentKeyState.IsKeyDown(key);
         }
 
+        /// <summary>
+        /// Returns if the specified key was pressed.
+        /// </summary>
+        /// <param name="key"></param>
+        /// <returns></returns>
         public static bool HasNotBeenPressed(Keys key)
         {
             return currentKeyState.IsKeyDown(key) && !previousKeyState.IsKeyDown(key);
@@ -128,6 +145,11 @@ namespace Game1
 
 
         }
+
+        /// <summary>
+        /// Checks if mouse clicked over textbox or not and sets selected property accordingly
+        /// </summary>
+        /// <param name="textbox"></param>
         private static void HandleLeftMouseClick(Textbox textbox)
         {
             Rectangle textboxRectangle = new Rectangle((int)textbox.Position.X, (int)textbox.Position.Y, textbox.CellWidth, textbox.CellHeight);
@@ -136,6 +158,12 @@ namespace Game1
 
         }
 
+
+        /// <summary>
+        ///  returns character key from pressed keys. 
+        /// </summary>
+        /// <param name="keys"></param>
+        /// <returns></returns>
         private static Keys ExtractSingleChar(Keys[] keys)
         {
             foreach (Keys key in keys)

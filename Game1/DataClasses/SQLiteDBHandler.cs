@@ -41,14 +41,20 @@ namespace Game1.DataClasses
 
 
 
-
+        /// <summary>
+        /// Returns if database file for game exists 
+        /// </summary>
+        /// <returns></returns>
         public static bool DBExists()
         {
             return File.Exists(DBName);
         }
 
 
-
+        /// <summary>
+        /// Saves game state for each person. Updates career, trait, relationship, need, and skill data using SQLite queries. 
+        /// </summary>
+        /// <param name="people">People to save state for</param>
         public void SaveGame(List<People> people)
         {
             using (SQLiteConnection connection = new SQLiteConnection(connectionString))
@@ -148,7 +154,9 @@ namespace Game1.DataClasses
 
 
 
-
+        /// <summary>
+        ///  Uses Trait.SetTraitID method to set static attribute DBID for each child trait class to match TraitNumber field stored in database.
+        /// </summary>
         public void SetTraitIDs()
         {
             using (SQLiteConnection connection = new SQLiteConnection(connectionString))
@@ -180,6 +188,10 @@ namespace Game1.DataClasses
             }
         }
 
+
+        /// <summary>
+        /// Uses Skill.SetSkillID method to set static attribute DBID for each child skill class to match SkillNumber field stored in database.
+        /// </summary>
         public void SetSkillIDs()
         {
             using (SQLiteConnection connection = new SQLiteConnection(connectionString))
@@ -214,7 +226,12 @@ namespace Game1.DataClasses
 
 
 
-
+        /// <summary>
+        /// Populates relationships dictionary for person from database. 
+        /// </summary>
+        /// <param name="person1">Person to set relationship for</param>
+        /// <param name="people2">List of people with whom person1 may have relationship i.e. all people</param>
+        /// <returns></returns>
         public Dictionary<People, float> GetRelationships(People person1, List<People> people2)
         {
             Dictionary<People, float> relationships = new Dictionary<People, float>();
@@ -253,7 +270,11 @@ namespace Game1.DataClasses
 
         }
 
-
+        /// <summary>
+        /// Uses trait lookup system to return name of trait possessed by person. Adds corresponding trait object to person’s list of traits using Trait.GetTraitFromString method.
+        /// </summary>
+        /// <param name="person">DB person to get traits for</param>
+        /// <returns></returns>
         public List<Trait> GetTraits (DBPerson person)
         {
             List<Trait> traits = new List<Trait>();
@@ -286,7 +307,11 @@ namespace Game1.DataClasses
 
         }
 
-
+        /// <summary>
+        /// Uses skill lookup system to return name of skill possessed by person. Adds corresponding skill object to person’s list of skills using Skill.GetSkillFromString method.
+        /// </summary>
+        /// <param name="person">DB person to get skills for</param>
+        /// <returns></returns>
         public List<Skill> GetSkills(DBPerson person)
         {
             List<Skill> skills = new List<Skill>();
@@ -321,7 +346,12 @@ namespace Game1.DataClasses
         }
 
 
-
+        /// <summary>
+        /// Gets person’s need data and adds new need object to needs dictionary. Given list of traits as a parameter which is used with static methods in Trait class to determine which needs are prioritised, have accelerated/decelerated depletion for player.
+        /// </summary>
+        /// <param name="person">Person to get needs for</param>
+        /// <param name="traits">Person's traits</param>
+        /// <returns></returns>
         public Dictionary<NeedNames, Need> GetNeeds(DBPerson person, List<Trait> traits)
         {
 
@@ -349,7 +379,7 @@ namespace Game1.DataClasses
                         NeedNames Name = Need.GetNeedNamefromString(dataReader.GetString(dataReader.GetOrdinal("NeedName")));
                         float Score = dataReader.GetFloat(dataReader.GetOrdinal("Score"));
 
-                        Need need = new Need(_name: Name, _currentNeed: Score, generateNeedBar: person.IsPlayer, _prioritised: prioritisedNeeds.Contains(Name), _accelerated: acceleratedDepletionNeeds.Contains(Name));
+                        Need need = new Need(_name: Name, _currentNeed: Score, generateNeedBar: person.IsPlayer, _prioritised: prioritisedNeeds.Contains(Name), _accelerated: acceleratedDepletionNeeds.Contains(Name), _decelerated: deceleratedDepletionNeeds.Contains(Name));
 
                         needs.Add(Name, need);
 
@@ -364,7 +394,10 @@ namespace Game1.DataClasses
 
 
 
-
+        /// <summary>
+        /// Returns list of DBPeople which contain people data read from People table
+        /// </summary>
+        /// <returns></returns>
         public List<DBPerson> GetPeople()
         {
             List<DBPerson> DBPeople = new List<DBPerson>();
@@ -407,7 +440,11 @@ namespace Game1.DataClasses
 
 
 
-
+        /// <summary>
+        /// Adds basic player and NPC data to tables when new game created. Calls methods to add needs and traits to database for each person. 
+        /// </summary>
+        /// <param name="playerModelName">String name of selected player model set</param>
+        /// <param name="playerTraits">String list of selected traits for player</param>
         public void AddPeople(string playerModelName, List<string> playerTraits)
         {
 
@@ -516,6 +553,10 @@ namespace Game1.DataClasses
 
         }
 
+
+        /// <summary>
+        ///  Populates SkillLookup table with records for each skill, where SkillNumber is autoincremented and SkillName is obtained from static attribute SkillString from child skill classes. After populating table, calls SetSkillIDs().
+        /// </summary>
         public void CreateSkillLookupTable()
         {
             using (SQLiteConnection connection = new SQLiteConnection(connectionString))
@@ -541,7 +582,9 @@ namespace Game1.DataClasses
 
 
 
-
+        /// <summary>
+        /// Populates TraitLookup table with records for each trait, where TraitNumber is autoincremented and TraitName is obtained from static attribute TraitString from child trait classes. After populating table, calls SetTraitIDs().
+        /// </summary>
         public void CreateTraitLookupTable()
         {
 
@@ -582,7 +625,7 @@ namespace Game1.DataClasses
 
 
         /// <summary>
-        /// Adds persons traits to Trait table in db
+        /// Adds traits for person to Trait table in database. String representation of trait supplied in a list as a parameter is converted to the correct trait numbers as used in the database using  Trait.GetTraitID static method. 
         /// </summary>
         /// <param name="PersonID">Id of trait holder</param>
         /// <param name="TraitNames">Array of string names of traits of person</param>
@@ -607,7 +650,12 @@ namespace Game1.DataClasses
             
         }
 
-
+        /// <summary>
+        /// Adds skills for person to Skill table in database. String representation of skill supplied in a list as a parameter is converted to the correct skill numbers as used in the database using  Skill.GetSkillID static method.
+        /// </summary>
+        /// <param name="PersonID">ID of skill holder</param>
+        /// <param name="SkillsNames">Array of string names of skills for person</param>
+        /// <param name="connection">db connection</param>
         public void AddSkills(int PersonID, string[] SkillsNames, SQLiteConnection connection)
         {
 
@@ -629,6 +677,11 @@ namespace Game1.DataClasses
         }
 
 
+        /// <summary>
+        /// Adds record for each of person’s needs to Need table in database. Default need score set as 50.
+        /// </summary>
+        /// <param name="PersonID">ID of need holder</param>
+        /// <param name="connection">db connection</param>
         public void AddNeeds(int PersonID, SQLiteConnection connection)
         {
            
@@ -664,6 +717,10 @@ namespace Game1.DataClasses
             
 
         }
+
+        /// <summary>
+        /// Called when beginning a new game. Drops existing tables and creates new tables according to schema. Creates: People, Need, Relationship, Trait, TraitLookup, Skill, SkillLookup, InventoryIndex, InventoryItems. 
+        /// </summary>
         public void CreateTables()
         {
 

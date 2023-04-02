@@ -25,9 +25,11 @@ namespace Game1.UI
         Textbox currentTextbox;
 
 
-       
 
 
+        /// <summary>
+        ///  Constructor for new UIHandler object 
+        /// </summary>
         public UIHandler()
         {
             buttons = new List<Button>();
@@ -38,24 +40,36 @@ namespace Game1.UI
         }
 
 
+        /// <summary>
+        /// Clears list of action buttons currently displayed. 
+        /// </summary>
         public void ClearButtons()
         {
             buttons.Clear();
         }
 
 
+        /// <summary>
+        /// Adds list of buttons supplied as parameter to buttons to be displayed. 
+        /// </summary>
+        /// <param name="_buttons"></param>
         public void AddRangeButtons(List<Button> _buttons)
         {
             buttons.AddRange(_buttons);
         }
 
-
+        /// <summary>
+        /// Adds toolbar button to list of toolbar buttons to be displayed 
+        /// </summary>
+        /// <param name="toolbarButton"></param>
         public void AddToolbarButton(ToolbarButton toolbarButton)
         {
             toolbarButtons.Add(toolbarButton);
         }
 
-
+        /// <summary>
+        /// Closes all open toolbar panels by setting IsDisplayed property of each to false so they will not be drawn in Draw method. 
+        /// </summary>
         public void ClosePanels()
         {
             foreach (ToolbarButton button in toolbarButtons)
@@ -65,7 +79,12 @@ namespace Game1.UI
         }
 
 
-
+        /// <summary>
+        /// Builds a list of trait selection buttons and adds them to the traitSelectionButtons list, calculating the position of the trait buttons given screen dimensions and texture dimensions.  
+        /// </summary>
+        /// <param name="graphicsManager"></param>
+        /// <param name="traitButtonsTextures"></param>
+        /// <param name="selectedCharacter"></param>
         public void BuildTraitSelectionButtons(GraphicsDeviceManager graphicsManager, List<Texture2D> traitButtonsTextures, Texture2D selectedCharacter)
         {
 
@@ -108,7 +127,11 @@ namespace Game1.UI
 
 
 
-
+        /// <summary>
+        /// Builds a list of character selection buttons and adds them to the characterSelectionButtons list, calculating the position of the character buttons given screen dimensions and texture dimensions. 
+        /// </summary>
+        /// <param name="graphicsManager"></param>
+        /// <param name="characterTextures"></param>
         public void BuildCharacterSelectionButtons(GraphicsDeviceManager graphicsManager, List<Texture2D> characterTextures)
         {
             
@@ -137,7 +160,13 @@ namespace Game1.UI
 
         }
 
-
+        /// <summary>
+        /// Builds buttons for main menu (new game, resume game and exit). Resume game button is only built if a previous save exists using SQLiteDBHandler to determine if save database file exists. 
+        /// </summary>
+        /// <param name="graphicsManager"></param>
+        /// <param name="exitButtonTexture"></param>
+        /// <param name="resumeGameTexture"></param>
+        /// <param name="newGameTexture"></param>
         public void BuildMainMenuButtons(GraphicsDeviceManager graphicsManager, Texture2D exitButtonTexture, Texture2D resumeGameTexture, Texture2D newGameTexture)
         {
 
@@ -164,16 +193,23 @@ namespace Game1.UI
 
 
         }
-       
 
 
 
+        /// <summary>
+        ///  Builds exit button object and determines position of exit button on screen. 
+        /// </summary>
+        /// <param name="graphicsManager"></param>
         public void BuildExitButton(GraphicsDeviceManager graphicsManager)
         {
             exitButton = new ExitButton(null, new Vector2(graphicsManager.GraphicsDevice.Viewport.Width - ExitButton.defaultTexture.Width, 0));
         }
 
-
+        /// <summary>
+        /// Builds emotion button object, supplying player object as argument to EmotionButton constructor. 
+        /// </summary>
+        /// <param name="graphicsManager"></param>
+        /// <param name="player"></param>
         public void BuildEmotionButton(GraphicsDeviceManager graphicsManager, Player player) 
         {
             emotionButton = new EmotionButton(null, new Vector2(10, graphicsManager.GraphicsDevice.Viewport.Height-EmotionButton.PositiveEmotionTexture.Height), EmotionButton.PositiveEmotionTexture, player);
@@ -185,7 +221,11 @@ namespace Game1.UI
 
 
 
-
+        /// <summary>
+        /// Builds toolbar buttons and adds to list of toolbar buttons. Creates need bars for argument of NeedButton constructor. 
+        /// </summary>
+        /// <param name="graphicsManager"></param>
+        /// <param name="player"></param>
         public void BuildToolbarButtons(GraphicsDeviceManager graphicsManager, Player player)
         {
 
@@ -207,6 +247,12 @@ namespace Game1.UI
         }
 
 
+        /// <summary>
+        /// Supports textbox display by creating a new textbox if required and calling update function on currentTextbox and HandleInput on TextboxInputHandler class. If the textbox has been submitted, sends the text contained to player object for processing using ReceiveConversationData method on player object, then closes textbox. 
+        /// </summary>
+        /// <param name="gameTime"></param>
+        /// <param name="graphicsManager"></param>
+        /// <param name="player"></param>
         public void Update(GameTime gameTime, GraphicsDeviceManager graphicsManager, Player player )
         {
             if (displayTextbox)
@@ -235,7 +281,7 @@ namespace Game1.UI
 
 
         /// <summary>
-        /// Returns texture of character selected, texture used in game.characterNameDictionary to convert to name to get icon/model, null if none selected
+        /// Returns texture of character selected. Texture used in game.characterNameDictionary to convert to name to get icon/model, returns null if none selected in this update cycle. 
         /// </summary>
         /// <returns></returns>
         public Texture2D HandleCharacterSelection()
@@ -253,7 +299,10 @@ namespace Game1.UI
             
         }
 
-
+        /// <summary>
+        /// Returns texture of trait button selected. Texture used in Trait.ButtonToString dictionary to convert to button texture to get name of selected trait, returns null if none selected in this update cycle. 
+        /// </summary>
+        /// <returns></returns>
         public Texture2D HandleTraitSelection()
         {
             if (!MouseInput.WasLeftClicked())
@@ -276,7 +325,10 @@ namespace Game1.UI
 
 
 
-
+        /// <summary>
+        /// Returns menu button selected or null if none selected in this update cycle. 
+        /// </summary>
+        /// <returns></returns>
         public Button HandleMainMenuInput()
         {
             
@@ -314,10 +366,13 @@ namespace Game1.UI
         }
 
 
-        
 
 
 
+        /// <summary>
+        /// Draws main menu buttons using sprite batch parameter. 
+        /// </summary>
+        /// <param name="spriteBatch"></param>
         public void DrawMainMenuButtons(SpriteBatch spriteBatch)
         {
             foreach (Button mainMenuButton in mainMenuButtons)
@@ -328,7 +383,10 @@ namespace Game1.UI
             }
         }
 
-
+        /// <summary>
+        /// Draws character selection buttons using spritebatch parameter. 
+        /// </summary>
+        /// <param name="spriteBatch"></param>
         public void DrawCharacterSelectionButtons(SpriteBatch spriteBatch)
         {
             foreach (Button characterButton in characterSelectionButtons)
@@ -340,7 +398,10 @@ namespace Game1.UI
         }
 
 
-
+        /// <summary>
+        /// Draws trait selection buttons using spritebatch parameter. 
+        /// </summary>
+        /// <param name="spriteBatch"></param>
         public void DrawTraitSelectionButtons(SpriteBatch spriteBatch)
         {
             foreach (Button traitButton in traitSelectionButtons)
@@ -363,7 +424,11 @@ namespace Game1.UI
         }
 
 
-
+        /// <summary>
+        /// Draws current list of action buttons to be displayed, toolbar buttons, exit button, and emotion button. Also draws emotion button panel and textbox if set to be displayed. 
+        /// </summary>
+        /// <param name="spriteBatch"></param>
+        /// <param name="spriteFont"></param>
         public void Draw(SpriteBatch spriteBatch, SpriteFont spriteFont)
         {
 

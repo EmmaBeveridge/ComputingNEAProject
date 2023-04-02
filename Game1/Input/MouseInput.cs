@@ -21,6 +21,10 @@ namespace Game1
         public static MouseState previousMouseState;
         public static MouseState currentMouseState;
 
+        /// <summary>
+        ///  Sets and returns currentMouseState 
+        /// </summary>
+        /// <returns></returns>
         public static MouseState GetState()
         {
             
@@ -28,13 +32,19 @@ namespace Game1
             return currentMouseState;
         }
 
-
+        /// <summary>
+        /// Sets previousMouseState to currentMouseState 
+        /// </summary>
         public static void SetPreviousState()
         {
             previousMouseState = currentMouseState;
         }
 
 
+        /// <summary>
+        /// Returns if the left button of the mouse is being clicked and updates currentMouseState. 
+        /// </summary>
+        /// <returns></returns>
         public static bool WasLeftClicked()
         {
 
@@ -43,21 +53,35 @@ namespace Game1
         }
 
 
-
+        /// <summary>
+        /// Returns if the specified mouse button is currently held down 
+        /// </summary>
+        /// <param name="left"></param>
+        /// <returns></returns>
         public static bool IsPressed (bool left)
         {
             if (left) { return currentMouseState.LeftButton == ButtonState.Pressed; }
             else { return currentMouseState.RightButton == ButtonState.Pressed; }
         }
 
-
+        /// <summary>
+        /// Returns if specified mouse button is being clicked
+        /// </summary>
+        /// <param name="left"></param>
+        /// <returns></returns>
         public static bool HasNotBeenPressed(bool left)
         {
             if (left) { return currentMouseState.LeftButton == ButtonState.Pressed && previousMouseState.LeftButton == ButtonState.Released; }
             else { return currentMouseState.RightButton == ButtonState.Pressed && previousMouseState.RightButton == ButtonState.Released; }
         }
 
-
+        /// <summary>
+        /// Determines the 3D world coordinates or a user mouse click on a 2D screen. Uses mouse X and Y coordinates to create a near and far screen point which is then unprojected using the Camera object’s projection and view matrices in order to produce near and far world points. A direction vector is then calculated between the near and far world points in order to produce a Ray object. The intersection between this ray and ground plane of the world is determined to be the selected point. 
+        /// </summary>
+        /// <param name="GraphicsDevice"></param>
+        /// <param name="projection"></param>
+        /// <param name="view"></param>
+        /// <returns></returns>
         public static Vector3 MousePosToWorldCoordinates(GraphicsDevice GraphicsDevice, Matrix projection, Matrix view)
         {
 
@@ -97,7 +121,13 @@ namespace Game1
 
 
 
-
+        /// <summary>
+        /// Builds Ray object using near and far screen points and near and far world points. 
+        /// </summary>
+        /// <param name="GraphicsDevice"></param>
+        /// <param name="projection"></param>
+        /// <param name="view"></param>
+        /// <returns></returns>
         private static Ray GetRay(GraphicsDevice GraphicsDevice, Matrix projection, Matrix view)
         {
             //MouseState currentMouseState = GetState();
@@ -115,7 +145,15 @@ namespace Game1
 
         }
 
-
+        /// <summary>
+        ///  Examines each item in the current house to determine if the user has selected the item. Uses list of planes constructed by item to determine if the mouse ray intersects one of these planes and if the point of intersection is within the item; if both of these condition are true, the item has been selected.  
+        /// </summary>
+        /// <param name="currentHouse"></param>
+        /// <param name="graphicsDevice"></param>
+        /// <param name="projection"></param>
+        /// <param name="view"></param>
+        /// <param name="itemSelected"></param>
+        /// <returns></returns>
         public static bool FindItemSelected(House currentHouse, GraphicsDevice graphicsDevice, Matrix projection, Matrix view, ref Item itemSelected)
         {
 
@@ -169,6 +207,15 @@ namespace Game1
 
         }
 
+        /// <summary>
+        /// Applies similar principle to FindItemSelected method but instead iterates over each house in the town and checks planes of house. 
+        /// </summary>
+        /// <param name="town"></param>
+        /// <param name="graphicsDevice"></param>
+        /// <param name="projection"></param>
+        /// <param name="view"></param>
+        /// <param name="houseSelected"></param>
+        /// <returns></returns>
         public static bool FindHouseSelected(Town.Town town , GraphicsDevice graphicsDevice, Matrix projection, Matrix view, ref House houseSelected)
         {
 
@@ -226,7 +273,15 @@ namespace Game1
 
 
 
-
+        /// <summary>
+        /// Examines each person and determines if mouse ray intersects with that persons BoundingBox. The get method on each person’s BoundingBox will automatically update the BoundingBox using method in Avatar class. This added step of updating the structure used to determine if an intersection has occurred is only necessary for the people objects as they have dynamic positions. 
+        /// </summary>
+        /// <param name="people"></param>
+        /// <param name="graphicsDevice"></param>
+        /// <param name="projection"></param>
+        /// <param name="view"></param>
+        /// <param name="personSelected"></param>
+        /// <returns></returns>
         public static bool FindPersonSelected(List<People> people, GraphicsDevice graphicsDevice, Matrix projection, Matrix view, ref People personSelected)
         {
             Ray ray = GetRay(graphicsDevice, projection, view);
@@ -244,7 +299,15 @@ namespace Game1
         }
 
 
-
+        /// <summary>
+        /// Examines each building and determines if mouse ray intersects with the building’s BoundingBox I.e. has been selected. 
+        /// </summary>
+        /// <param name="buildings"></param>
+        /// <param name="graphicsDevice"></param>
+        /// <param name="projection"></param>
+        /// <param name="view"></param>
+        /// <param name="buildingSelected"></param>
+        /// <returns></returns>
         public static bool FindBuildingSelected(List<Building> buildings, GraphicsDevice graphicsDevice, Matrix projection, Matrix view, ref Building buildingSelected)
         {
             Ray ray = GetRay(graphicsDevice, projection, view);
@@ -261,6 +324,11 @@ namespace Game1
             return false;
         }
 
+        /// <summary>
+        /// Returns if exit button has been pressed.
+        /// </summary>
+        /// <param name="exitButton"></param>
+        /// <returns></returns>
         public static bool IsExitButtonPressed(ExitButton exitButton)
         {
             return MouseOverButton(exitButton, currentMouseState);
@@ -269,10 +337,18 @@ namespace Game1
 
 
 
-
+        /// <summary>
+        /// Returns if emotion button has been pressed.
+        /// </summary>
+        /// <param name="emotionButton"></param>
+        /// <returns></returns>
         public static bool IsEmotionButtonPressed(EmotionButton emotionButton) { return MouseOverButton(emotionButton, currentMouseState); }
 
-
+        /// <summary>
+        /// Returns button user has pressed. 
+        /// </summary>
+        /// <param name="buttonsToCheck"></param>
+        /// <returns></returns>
         public static Button GetButtonPressed(List<Button> buttonsToCheck)
         {
             currentMouseState = Mouse.GetState();
@@ -298,7 +374,11 @@ namespace Game1
         }
 
 
-
+        /// <summary>
+        /// Returns toolbar button user has pressed. 
+        /// </summary>
+        /// <param name="toolbarButtons"></param>
+        /// <returns></returns>
         public static ToolbarButton GetToolbarButton(List<ToolbarButton> toolbarButtons)
         {
             //MouseState currentMouseState = Mouse.GetState();
@@ -314,6 +394,12 @@ namespace Game1
         }
 
 
+        /// <summary>
+        /// Determines if the users mouse position is with the bounds of the button’s rectangle.
+        /// </summary>
+        /// <param name="button"></param>
+        /// <param name="currentMouseState"></param>
+        /// <returns></returns>
         private static bool MouseOverButton(Button button, MouseState currentMouseState)
         {
 
@@ -324,7 +410,11 @@ namespace Game1
 
         }
 
-
+        /// <summary>
+        ///  Determines if the user’s mouse position is within the bounds of the supplied rectangle. 
+        /// </summary>
+        /// <param name="rectangle"></param>
+        /// <returns></returns>
         public static bool MouseOverRectangle(Rectangle rectangle)
         {
             if (rectangle.Contains(currentMouseState.X, currentMouseState.Y))

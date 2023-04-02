@@ -23,6 +23,12 @@ namespace Game1.UI
 
         public bool isSelected = false;
 
+        /// <summary>
+        /// Constructor for new default button object
+        /// </summary>
+        /// <param name="argLabel"></param>
+        /// <param name="argPosition"></param>
+        /// <param name="argTexture"></param>
         public Button( string argLabel, Vector2 argPosition, Texture2D argTexture)
         {
             buttonLabel = argLabel;

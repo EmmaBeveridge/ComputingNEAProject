@@ -18,6 +18,9 @@ namespace Game1.NavMesh
         public float maxX;
         public float maxZ;
 
+        /// <summary>
+        /// List of vertex objects representing vertex points in mesh. 
+        /// </summary>
         public List<Vertex> vertices;
         int[] indices;
 
@@ -62,7 +65,11 @@ namespace Game1.NavMesh
         //}
 
 
-
+        /// <summary>
+        ///  Constructor for navmesh. When called, it is specified if the mesh is for the town or for the house – this affects the method called on the triangulator as different coordinate files must be accessed and processed. 
+        /// </summary>
+        /// <param name="town"></param>
+        /// <param name="house"></param>
         public Mesh(bool town=false, bool house = false)
         {
             if (house == true)
@@ -81,7 +88,11 @@ namespace Game1.NavMesh
 
         }
 
-
+        /// <summary>
+        /// Creates the triangles on which the mesh is based using point indices and vertices. Calls ExtendsBounds() method on each point to extend the boundaries of the navmesh as new vertices added. 
+        /// </summary>
+        /// <param name="points"></param>
+        /// <param name="indices"></param>
         void SetTriangles(List<Vertex> points, int[] indices)
         {
             if (indices.Length % 3 != 0) 
@@ -117,7 +128,10 @@ namespace Game1.NavMesh
 
         }
 
-
+        /// <summary>
+        /// Updates the maximum and minimum X and Z coordinates of the town if necessary. 
+        /// </summary>
+        /// <param name="point"></param>
         void ExtendBounds(Vector3 point)
         {
             maxX = Math.Max(maxX, point.X);
@@ -141,7 +155,7 @@ namespace Game1.NavMesh
 
 
 
-
+    
         private void CacheVertices()
         {
             vertexPositions = new Vector3[triangles.Length * 3];
@@ -158,7 +172,11 @@ namespace Game1.NavMesh
 
         }
 
-
+        /// <summary>
+        /// Returns triangle enclosing specified point by iterating over triangles in mesh and calling Encloses method on triangle objects, supplying the point as a parameter.
+        /// </summary>
+        /// <param name="point"></param>
+        /// <returns></returns>
         public Triangle GetTriangleAt (Vector3 point)
         {
             foreach (Triangle triangle in triangles)
@@ -174,6 +192,11 @@ namespace Game1.NavMesh
         }
 
 
+        /// <summary>
+        /// Returns if mesh contains a specified point. 
+        /// </summary>
+        /// <param name="point"></param>
+        /// <returns></returns>
         public bool Contains (Vector3 point)
         {
             if (point.X < minX || point.Z < minZ || point.X > maxX || point.Z > maxZ)
@@ -187,7 +210,11 @@ namespace Game1.NavMesh
 
         }
 
-
+        /// <summary>
+        /// Returns closest (or enclosing) triangle for a given point by iterating over triangles and checking if the point is contained within the triangle (returning if it is) and calculating the distance from the point to the closest point in the triangle and returning triangle with the shortest distance to the point.
+        /// </summary>
+        /// <param name="point"></param>
+        /// <returns></returns>
         public Triangle GetClosestTriangle(Vector3 point)
         {
 

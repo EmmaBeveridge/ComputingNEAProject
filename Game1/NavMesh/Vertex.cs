@@ -14,7 +14,11 @@ namespace Game1.NavMesh
         public int index;
         static int indexCounter = 0;
 
-
+        /// <summary>
+        /// Constructor for new vertex object, supplied with position of vertex. Unique index assigned to vertex index attribute if no index supplied in parameter. 
+        /// </summary>
+        /// <param name="argPosition"></param>
+        /// <param name="argIndex"></param>
         public Vertex(Vector3 argPosition, int argIndex = -1)
         {
             position = argPosition;
@@ -35,7 +39,11 @@ namespace Game1.NavMesh
         }
 
 
-
+        /// <summary>
+        /// Returns heuristic cost of moving from position supplied in parameter to position of vertex. 
+        /// </summary>
+        /// <param name="position"></param>
+        /// <returns></returns>
         public float Cost(IMapPosition position)
         {
             if (position == null)
@@ -46,6 +54,12 @@ namespace Game1.NavMesh
             return Heuristic(this, (Vertex)position);
         }
 
+
+        /// <summary>
+        /// Overloaded method returning if the position the object supplied in parameter is equal to the position of the vertex 
+        /// </summary>
+        /// <param name="b"></param>
+        /// <returns></returns>
         public bool Equals(IMapPosition b)
         {
            if (b is Vertex)
@@ -57,6 +71,11 @@ namespace Game1.NavMesh
 
         }
 
+        /// <summary>
+        /// Overloaded method returning if the position the object supplied in parameter is equal to the position of the vertex 
+        /// </summary>
+        /// <param name="b"></param>
+        /// <returns></returns>
         public bool Equals (Vertex b)
         {
             return (position == b.position);
@@ -64,7 +83,12 @@ namespace Game1.NavMesh
 
         }
 
-
+        /// <summary>
+        ///  Returns if positions of vertex parameters are equal. Handles null arguments by returning true if both verticies are null, otherwise returning false. 
+        /// </summary>
+        /// <param name="v1"></param>
+        /// <param name="v2"></param>
+        /// <returns></returns>
         public static bool operator == (Vertex v1, Vertex v2)
         {
             if (object.ReferenceEquals(v1, null))
@@ -89,19 +113,32 @@ namespace Game1.NavMesh
         }
 
 
-
+        /// <summary>
+        /// Returns Euclidean distance as heuristic for A* pathfinding.
+        /// </summary>
+        /// <param name="current"></param>
+        /// <param name="goal"></param>
+        /// <returns></returns>
         public static float Heuristic(Vertex current, Vertex goal)
         {
             return (current.position - goal.position).Length();
         }
 
 
-
+        /// <summary>
+        /// Allows implicit conversion of vertex to Vector3 object. Returns vertex position when vertex object is used as a Vector3 type object.
+        /// </summary>
+        /// <param name="vertex"></param>
         public static implicit operator Vector3(Vertex vertex)
         {
             return vertex.position;
         }
 
+
+        /// <summary>
+        /// Allows implicit conversion of Vector3 to vertex object. Returns new vertex object with position of Vector3 parameter.
+        /// </summary>
+        /// <param name="vector"></param>
         public static implicit operator Vertex(Vector3 vector)
         {
             return new Vertex(vector);

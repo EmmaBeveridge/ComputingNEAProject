@@ -28,9 +28,12 @@ namespace Game1.UI
 
         private Need need;
         private Vector2 position;
-        
 
 
+        /// <summary>
+        /// Creates white rectangle to be scaled and coloured depending on need level.
+        /// </summary>
+        /// <param name="graphicsDevice"></param>
         public static void GenerateTexture(GraphicsDevice graphicsDevice)
         {
             whiteRectangle = new Texture2D(graphicsDevice, 1, 1);
@@ -39,7 +42,10 @@ namespace Game1.UI
         }
 
 
-
+        /// <summary>
+        ///  Constructor for new NeedBar object, sets position of need bar . 
+        /// </summary>
+        /// <param name="_need"></param>
         public NeedBar(Need _need)
         {
             need = _need;
@@ -68,7 +74,11 @@ namespace Game1.UI
 
         }
 
-
+        /// <summary>
+        ///  Draws need name string and need bar where length and colour of bar represents need fulfilment.
+        /// </summary>
+        /// <param name="spriteBatch"></param>
+        /// <param name="spriteFont"></param>
         public void Draw(SpriteBatch spriteBatch, SpriteFont spriteFont)
         {
             spriteBatch.DrawString(spriteFont, need.Name.ToString(), new Vector2(position.X-100, position.Y-1), Color.Black);

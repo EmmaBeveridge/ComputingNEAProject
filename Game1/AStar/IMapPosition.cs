@@ -6,6 +6,9 @@ using System.Threading.Tasks;
 
 namespace Game1.AStar
 {
+    /// <summary>
+    /// Interface for positions on map on which A* algorithm is performed. 
+    /// </summary>
     public interface IMapPosition
     {
         float Cost(IMapPosition parent);

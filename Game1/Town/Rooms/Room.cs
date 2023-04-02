@@ -11,6 +11,9 @@ namespace Game1.Rooms
 {
     public class Room
     {
+        /// <summary>
+        ///  List containing the item objects within each room 
+        /// </summary>
         public List<Item> items = new List<Item>();
         
         [JsonProperty ("id")]
@@ -30,9 +33,14 @@ namespace Game1.Rooms
         [JsonProperty ("class")]
         public string roomClass;
 
-
+        /// <summary>
+        /// House object containing the room
+        /// </summary>
         public House house;
 
+        /// <summary>
+        /// List of GOAP actions for all of the items in the room.
+        /// </summary>
         public List<GOAPAction> GOAPActions = new List<GOAPAction>();
 
 
@@ -45,7 +53,9 @@ namespace Game1.Rooms
             roomClass = argRoomClass;
         }
 
-
+        /// <summary>
+        /// Uses matrix operations to transform room origin on local house coordinate system to global town coordinate system 
+        /// </summary>
         public void SetLocation()
         {
             Matrix rotationMatrix = Matrix.CreateRotationY(MathHelper.ToRadians(house.rotation));
