@@ -439,6 +439,40 @@ namespace Game1.DataClasses
 
 
 
+        /// <summary>
+        /// Container for NPC data. Convenient way to store/format attribute data for NPCs so they can be added to the SQLite database
+        /// </summary>
+        struct NPC
+        {
+            public int DBID;
+            public string Name;
+            public int HouseNum;
+            public string Career;
+            public string ModelName;
+            public string[] Traits;
+
+
+            /// <summary>
+            /// Constructor for new NPC object
+            /// </summary>
+            /// <param name="name"></param>
+            /// <param name="houseNum"></param>
+            /// <param name="career"></param>
+            /// <param name="modelName"></param>
+            /// <param name="traits"></param>
+            public NPC(int dbid, string name, int houseNum, string career, string modelName, string[] traits)
+            {
+                DBID = dbid;
+                Name = name;
+                HouseNum = houseNum;
+                Career = career;
+                ModelName = modelName;
+                Traits = traits; 
+
+            }
+
+        }
+
 
         /// <summary>
         /// Adds basic player and NPC data to tables when new game created. Calls methods to add needs and traits to database for each person. 
@@ -447,16 +481,16 @@ namespace Game1.DataClasses
         /// <param name="playerTraits">String list of selected traits for player</param>
         public void AddPeople(string playerModelName, List<string> playerTraits)
         {
+            #region Data for NPCs
+            List<NPC> NPCs = new List<NPC>();
 
-            Dictionary<int, string[]> PeopleTraits = new Dictionary<int, string[]>
-            {
-                { 2, new string[] { "Lazy", "Gourmand" } }, 
-                { 3, new string[] { "Loner", "FunLoving" } } 
-            
-            };
+            NPCs.Add(new NPC(2, "Fred", 2, "store clerk","ManRed", new string[] { "Sociable", "FunLoving" } ));
+            NPCs.Add(new NPC(3, "Daphne", 3, "teacher", "WomanPurple", new string[] { "Sociable", "Clean" }));
+            NPCs.Add(new NPC(4, "Velma", 4, "doctor", "WomanYellow", new string[] { "Loner", "FunLoving" }));
+            NPCs.Add(new NPC(5, "Shaggy", 5, "office worker", "ManGreen", new string[] { "Lazy", "Gourmand" }));
+            NPCs.Add(new NPC(6, "Scooby", 6, "", "ManGreen", new string[] { "Gourmand", "FunLoving" }));
+            #endregion
 
-
-            
             try
             {
                 using (SQLiteConnection connection = new SQLiteConnection(connectionString))
@@ -473,15 +507,23 @@ namespace Game1.DataClasses
                         insertCommand.Parameters.AddWithValue("@IsPlayer", 1);
 
                         insertCommand.ExecuteNonQuery();
+
+
+
+
+                        foreach (NPC npc in NPCs)
+                        {
+                            insertCommand.Parameters.AddWithValue("@Name", npc.Name);
+                            insertCommand.Parameters.AddWithValue("@HouseNum", npc.HouseNum);
+                            insertCommand.Parameters.AddWithValue("@Career", npc.Career);
+                            insertCommand.Parameters.AddWithValue("@ModelName", npc.ModelName);
+                            insertCommand.Parameters.AddWithValue("@IsPlayer", 0);
+
+                            insertCommand.ExecuteNonQuery();
+
+                        }
+
                         
-
-                        insertCommand.Parameters.AddWithValue("@Name", "Jane Doe");
-                        insertCommand.Parameters.AddWithValue("@HouseNum", 2);
-                        insertCommand.Parameters.AddWithValue("@Career", "store clerk");
-                        insertCommand.Parameters.AddWithValue("@ModelName", "WomanYellow");
-                        insertCommand.Parameters.AddWithValue("@IsPlayer", 0);
-
-                        insertCommand.ExecuteNonQuery();
 
                         
 
@@ -513,7 +555,7 @@ namespace Game1.DataClasses
                                 }
                                 else
                                 {
-                                    AddTraits(dbid, PeopleTraits[dbid], connection);
+                                    AddTraits(dbid, NPCs.Find(npc => npc.DBID == dbid).Traits, connection);
                                 }
 
 
@@ -775,7 +817,7 @@ namespace Game1.DataClasses
 
 
 
-                        command.CommandText = "CREATE TABLE IF NOT EXISTS Trait(TraitID INTEGER NOT NULL UNIQUE, TraitHolderID INTEGER NOT NULL, TraitNumber INTEGER NOT NULL, PRIMARY KEY(TraitID AUTOINCREMENT), FOREIGN KEY(TraitHolderID) REFERENCES People(PersonID), FOREIGN KEY(TraitNumber) REFERENCES TraitLookup(TraitNumber))";
+                        command.CommandText = "CREATE TABLE IF NOT EXISTS Trait(TraitID INTEGER NOT NULL UNIQUE, TraitHolderID INTEGER NOT NULL, TraitNumber INTEGER NOT NULL, PRIMARY KEY(TraitID AUTOINCREMENT), FOREIGN KEY(TraitHolderID) REFERENCES People(PersonID) ON DELETE CASCADE, FOREIGN KEY(TraitNumber) REFERENCES TraitLookup(TraitNumber) ON DELETE CASCADE); CREATE UNIQUE INDEX idx2 ON Trait(TraitHolderID, TraitNumber);";
 
                         command.ExecuteNonQuery();
 

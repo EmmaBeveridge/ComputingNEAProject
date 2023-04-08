@@ -82,6 +82,7 @@
     <Compile Include="Careers\Politician.cs" />
     <Compile Include="Careers\StoreClerk.cs" />
     <Compile Include="Careers\Teacher.cs" />
+    <Compile Include="Characters\PathPoints.cs" />
     <Compile Include="DataClasses\PointConverter.cs" />
     <Compile Include="Characters\Need.cs" />
     <Compile Include="DataClasses\SQLiteDBHandler.cs" />

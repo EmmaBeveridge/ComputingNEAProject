@@ -99,22 +99,22 @@ namespace Game1.NavMesh.TriangulatePolygon
             //}
 
 
-            //foreach (Building building in Building.buildings)
-            //{
-            //    List<Vector2> buildingVertices = new List<Vector2>();
-            //    holeCount++;
+            foreach (Building building in Building.buildings)
+            {
+                List<Vector2> buildingVertices = new List<Vector2>();
+                holeCount++;
 
-            //    foreach (Vector3 corner in building.groundCorners)
-            //    {
+                foreach (Vector3 corner in building.groundCorners)
+                {
 
-            //        buildingVertices.Add(new Vector2(corner.X, corner.Z));
+                    buildingVertices.Add(new Vector2(corner.X, corner.Z));
 
-            //    }
+                }
 
-            //    holeVertices.Add(buildingVertices);
+                holeVertices.Add(buildingVertices);
 
 
-            //}
+            }
 
 
 
@@ -665,15 +665,18 @@ namespace Game1.NavMesh.TriangulatePolygon
             Vector2 prevPos = new Vector2(previous.position.X, previous.position.Z);
             Vector2 nextPos = new Vector2(next.position.X, next.position.Z);
 
-            //float det = (vertexPos.X - prevPos.X) * (nextPos.Y - vertexPos.Y) - (nextPos.X - vertexPos.X) * (vertexPos.Y - prevPos.Y);
-            //return (det < 0);
+            float det = (vertexPos.X - prevPos.X) * (nextPos.Y - vertexPos.Y) - (nextPos.X - vertexPos.X) * (vertexPos.Y - prevPos.Y);
+            return (det < 0);
 
-            Vector2 d1 = Vector2.Normalize(vertexPos - prevPos); //points from prevPos towards vertexPos
-            Vector2 d2 = Vector2.Normalize(nextPos - vertexPos); //points from vertexPos towards nextPos
-            Vector2 n2 = new Vector2(-d2.Y, d2.X); //rotates d2 through 270, makes it so that if angle is either obtuse or acute (ie. convex) dot product between vectors >0 as either vector can be projected onto the other so that length of projection in direction of vector >0
 
-            return (Vector2.Dot(d1, n2) > 0f);
 
+            #region Test Failed Code
+            //Vector2 d1 = Vector2.Normalize(vertexPos - prevPos); //points from prevPos towards vertexPos
+            //Vector2 d2 = Vector2.Normalize(nextPos - vertexPos); //points from vertexPos towards nextPos
+            //Vector2 n2 = new Vector2(-d2.Y, d2.X); //rotates d2 through 270, makes it so that if angle is either obtuse or acute (ie. convex) dot product between vectors >0 as either vector can be projected onto the other so that length of projection in direction of vector >0
+
+            //return (Vector2.Dot(d1, n2) > 0f);
+            #endregion
 
 
 

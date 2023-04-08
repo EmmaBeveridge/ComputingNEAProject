@@ -10,13 +10,13 @@ using System.Threading;
 using Game1.NavMesh;
 using Game1.Town;
 using Game1.Town.Districts;
-
 using Game1.ML;
 using Game1.UI;
 using System.Data;
 using Game1.DataClasses;
 using Game1.ID3;
 using Game1.Traits;
+using Game1.Characters;
 
 namespace Game1
 
@@ -69,9 +69,7 @@ namespace Game1
 
 
 
-        Texture2D tempTexture;
-
-       
+        
 
         public Game1()
         {
@@ -190,6 +188,17 @@ namespace Game1
             NeedBar.GenerateTexture(GraphicsDevice);
             ToolbarPanel.GenerateTexture(GraphicsDevice);
             RelationshipBar.GenerateTexture(GraphicsDevice);
+
+
+
+
+            #region Draw Path Points
+            PathPoint.SetPathPointModel(Content.Load<Model>("PathPointModel"));
+            #endregion
+
+
+
+
         }
 
         protected override void UnloadContent()
@@ -376,7 +385,6 @@ namespace Game1
 
 
             People.BuildDecisionTree();
-
 
 
             
@@ -674,11 +682,20 @@ namespace Game1
                     avatar.Draw(camera.view, camera.projection);  
                 }
 
+
+                #region Draw Path Points
+                if (player.drawPathPoints)
+                {
+                    PathPoint.DrawPath(camera.view, camera.projection);
+                }
+
+                #endregion
+
                 spriteBatch.Begin();
 
                 UIHandler.Draw(spriteBatch, spriteFont);
 
-
+                
 
                 spriteBatch.End();
                 

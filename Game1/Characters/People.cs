@@ -20,6 +20,7 @@ using Game1.Careers;
 using Game1.Traits;
 using Game1.Skills;
 using Game1.UI;
+using Game1.Characters;
 
 namespace Game1
 {
@@ -107,7 +108,7 @@ namespace Game1
         //protected Vector3 targetPosition = Vector3.Zero;
         protected Vector3 targetVector = Vector3.Zero;
         protected Vector3 viewVector = Vector3.Forward;
-        protected const float velocity = 100f;
+        protected const float velocity = 25f;
         protected const float angularVelocity = 20f;
 
         protected Matrix transformationMatrix;
@@ -173,6 +174,11 @@ namespace Game1
         public bool IsAvailable = true;
 
 
+        #region Draw Path Points
+        public bool drawPathPoints = false;
+        #endregion
+
+
 
         public People(Model _model, Vector3 _position, Mesh argMesh, Town.Town argTown, Game1 argGame, Texture2D argIcon, int argDBID, string argName, House argHouse, Career argCareer, List<Trait> argTraits, Dictionary<NeedNames, Need> argNeeds, List<Skill> argSkills, bool _isPlayer = false)
         {
@@ -221,6 +227,10 @@ namespace Game1
         }
 
 
+
+        
+
+
         /// <summary>
         /// Virtual method to display career feedback to player. Overriden in Player class.
         /// </summary>
@@ -228,6 +238,13 @@ namespace Game1
         {
 
         }
+
+
+
+
+
+
+
 
 
 
@@ -1057,10 +1074,20 @@ namespace Game1
                 if (targetVector.Length() < maxDistanceCanCover) // prevents problem of avatar overshooting target position and then recalculating target vector and overshooting again causing it to oscillate about its target point.
                                                                  // if the object can cover the entire distance to target point in next frame, then it should 
                 {
+                   
+
+                    #region Draw Path Points 
+                    
+                    if (drawPathPoints)
+                    {
+                        PathPoint.RemovePathPointAtPosition(pathPoints[0]);
+                    }
+                    #endregion
+
                     pathPoints.RemoveAt(0);
 
 
-                    
+
                     //motionState = PeopleMotionStates.idle; //changes motion state back to idle as object completes its movement 
                     //actionState = PeopleActionStates.idle; //changes action state back to idle as object completes its movement
                     return targetVector; //returns the target vector of full length as all of vector can be moved through next frame

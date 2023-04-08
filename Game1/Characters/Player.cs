@@ -15,6 +15,7 @@ using Game1.UI;
 using Game1.Careers;
 using Game1.Traits;
 using Game1.Skills;
+using Game1.Characters;
 
 namespace Game1
 {
@@ -37,6 +38,8 @@ namespace Game1
 
         PeopleSelectingState selectingState = PeopleSelectingState.none;
 
+       
+
         /// <summary>
         /// Constructor to make new Player object
         /// </summary>
@@ -55,19 +58,29 @@ namespace Game1
         /// <param name="argSkills"></param>
         public Player(Model _model, Vector3 _position, Mesh argMesh, Town.Town argTown, Game1 argGame, Texture2D argIcon, int argDBID, string argName, House argHouse, Career argCareer, List<Trait> argTraits, Dictionary<NeedNames, Need> argNeeds, List<Skill> argSkills) : base(_model, _position, argMesh, argTown, argGame, argIcon, argDBID, argName, argHouse, argCareer, argTraits, argNeeds, argSkills, true)
         {
+            #region Draw Path Points
+            drawPathPoints = true;
+            #endregion
 
         }
 
-        /// <summary>
-        /// Overrides base class Update(). Calls DepleteNeeds method. Ticks GOAP state machine. Determines if user selection is taking place and, using MouseInput class methods, determines what the user is attempting to select e.g. NPC, item, house, button etc. If the user has selected an action by clicking on a button, this action is loaded into their action queue. Calls methods to handle People movement and update transformation matrix which is then applied to avatar’s world matrix to allow avatar to be rendered properly. Relevant UI changes made using UIHandler class. 
-        /// </summary>
-        /// <param name="gameTime"></param>
-        /// <param name="graphicsDevice"></param>
-        /// <param name="projection"></param>
-        /// <param name="view"></param>
-        /// <param name="game"></param>
-        public override void Update(GameTime gameTime, GraphicsDevice graphicsDevice, Matrix projection, Matrix view, Game1 game)
+    /// <summary>
+    /// Overrides base class Update(). Calls DepleteNeeds method. Ticks GOAP state machine. Determines if user selection is taking place and, using MouseInput class methods, determines what the user is attempting to select e.g. NPC, item, house, button etc. If the user has selected an action by clicking on a button, this action is loaded into their action queue. Calls methods to handle People movement and update transformation matrix which is then applied to avatar’s world matrix to allow avatar to be rendered properly. Relevant UI changes made using UIHandler class. 
+    /// </summary>
+    /// <param name="gameTime"></param>
+    /// <param name="graphicsDevice"></param>
+    /// <param name="projection"></param>
+    /// <param name="view"></param>
+    /// <param name="game"></param>
+    public override void Update(GameTime gameTime, GraphicsDevice graphicsDevice, Matrix projection, Matrix view, Game1 game)
         {
+
+            #region Draw Path Points
+            bool generatePathPoints = false;
+            #endregion
+
+
+
 
             DepleteNeeds(gameTime);
             emotionalState = GetEmotionalState();
@@ -178,9 +191,13 @@ namespace Game1
                 {
                     goal = goalHouse.TownLocation;
                     actionState = PeopleActionStates.moving;
-                    BuildPath();
                     Console.WriteLine("Selected:" + goalHouse.id);
 
+                    BuildPath();
+
+                    #region Draw Path Points
+                    generatePathPoints = true;
+                    #endregion
 
 
                 }
@@ -201,7 +218,13 @@ namespace Game1
                     {
                         goalHouse = House.getHouseContainingPoint(goal);
                         actionState = PeopleActionStates.moving;
+
                         BuildPath();
+
+                        #region Draw Path Points
+                        generatePathPoints = true;
+                        #endregion
+
                     }
 
                 }
@@ -217,6 +240,12 @@ namespace Game1
             {
                 actionState = PeopleActionStates.moving;
                 BuildPath();
+
+                #region Draw Path Points
+                generatePathPoints = true;
+                #endregion
+
+
                 MovePerson(gameTime);
 
             }
@@ -226,6 +255,20 @@ namespace Game1
 
                 MovePerson(gameTime);
             }
+
+
+            #region Draw Path Points
+            if (drawPathPoints)
+            {
+                if (generatePathPoints)
+                {
+                    PathPoint.BuildRangePathPoints(pathPoints);
+                }
+            }
+            #endregion
+
+
+
 
 
 
@@ -377,6 +420,15 @@ namespace Game1
                 reachedGoal = true;
                 currentHouse = goalHouse;
                 //currentBuilding = goalBuilding;
+
+                #region Draw Path Points
+                if (drawPathPoints)
+                {
+                    PathPoint.ClearPathPoints();
+                }                
+                #endregion
+
+
                 return;
             }
 
@@ -427,6 +479,15 @@ namespace Game1
                     reachedGoal = true;
                     currentHouse = goalHouse;
                     //currentBuilding = goalBuilding;
+
+
+                    #region Draw Path Points
+                    if (drawPathPoints)
+                    {
+                        PathPoint.ClearPathPoints();
+                    }
+                    #endregion
+
                     return;
                 }
 

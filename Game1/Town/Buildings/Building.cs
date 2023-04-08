@@ -52,7 +52,7 @@ namespace Game1.Town
 
         public BoundingBox buildingBox;
 
-        //public List<Vector3> groundCorners = new List<Vector3>();
+        public List<Vector3> groundCorners = new List<Vector3>();
 
 
         public Dictionary<string, GOAPAction> actionLabels = new Dictionary<string, GOAPAction>();
@@ -157,7 +157,7 @@ namespace Game1.Town
         }
 
 
-
+        #region TESTING FAILED
         //public void SetCorners()
         //{
         //    //Regex regex = new Regex(@"T\d+\.R\.S\d\.(\d\.)*H\d+");
@@ -170,11 +170,11 @@ namespace Game1.Town
         //        groundCorners.Add(new Vector3(int.Parse(row["X"].ToString()), 0, int.Parse(row["Z"].ToString())));
         //    }
 
-            
+
 
         //}
 
-
+        #endregion
 
         public virtual void DefineActions() { }
 
