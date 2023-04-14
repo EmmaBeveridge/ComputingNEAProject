@@ -106,7 +106,8 @@ namespace Game1.UI
     {
         Dictionary<People, float> relationships;
         List<List<KeyValuePair<People, float>>> screens = new List<List<KeyValuePair<People, float>>>();
-        public int currentScreen = 0;
+        private int RelationshipScreenWidth = 125;
+        
 
         /// <summary>
         ///  Constructor for new RelationshipsPanel object, supplied with dictionary of relationships as parameter, setting panel scales and positioning. 
@@ -125,22 +126,29 @@ namespace Game1.UI
         /// <param name="spriteFont"></param>
         public override void Draw(SpriteBatch spriteBatch, SpriteFont spriteFont)
         {
+            if (relationships.Count == 0) { panelScale.X = 450; panelPosition.X = 450; }
+            else { panelScale.X = RelationshipScreenWidth * relationships.Count(); panelPosition.X = 800- RelationshipScreenWidth * relationships.Count(); }  //800 is screen width
+
             spriteBatch.Draw(texture: whiteRectangle, position: panelPosition, scale: panelScale, layerDepth: 0.5f);
-            
-            if (screens.Count >= 1)
+
+            if (relationships.Count > 0)
             {
-                for (int i = 0; i < screens[currentScreen].Count; i++)
+
+
+                for (int i = 0; i < relationships.Count; i++)
                 {
-                    KeyValuePair<People, float> relationship = screens[currentScreen][i];
 
-                    float X = panelPosition.X + i * relationship.Key.icon.Width + (i + 1) * 20;
+                    KeyValuePair<People, float> relationship = relationships.ElementAt(i);
 
-                    spriteBatch.Draw(texture: relationship.Key.icon,  scale: new Vector2(1f, 1f), position: new Vector2(X, panelPosition.Y + 20));
+                    float X = panelPosition.X + 10 + i * (relationship.Key.icon.Width + 20);
+                    
+                    spriteBatch.Draw(texture: relationship.Key.icon, scale: new Vector2(1f, 1f), position: new Vector2(X, panelPosition.Y + 20));
 
                     RelationshipBar.Draw(spriteBatch, new Vector2(X + relationship.Key.icon.Width / 2, panelPosition.Y + 25 + relationship.Key.icon.Height), relationship.Value);
                 }
 
             }
+
             else
             {
                 spriteBatch.DrawString(spriteFont, "Go get some friends, loser", new Vector2(panelPosition.X + 15, panelPosition.Y + 85), Color.Black);
@@ -188,7 +196,7 @@ namespace Game1.UI
 
         public override void InitialisePanel()
         {
-            SplitIntoScreens();
+            //SplitIntoScreens();
         }
     }
 

@@ -24,12 +24,12 @@ namespace Game1
 
     public class Need
     {
-        private static float DepletionRateHunger = 0.4f;
-        private static float DepletionRateToilet = 0.6f;
-        private static float DepletionRateSleep = 0.1f;
+        private static float DepletionRateHunger = 0.1f;
+        private static float DepletionRateToilet = 0.3f;
+        private static float DepletionRateSleep = 0.05f;
         private static float DepletionRateHygiene = 0.2f;
-        private static float DepletionRateFun = 0.4f;
-        private static float DepletionRateSocial = 0.3f;
+        private static float DepletionRateFun = 0.2f;
+        private static float DepletionRateSocial = 0.05f;
 
 
         public NeedNames Name;

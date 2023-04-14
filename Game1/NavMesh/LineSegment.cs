@@ -73,6 +73,24 @@ namespace Game1.NavMesh
         }
 
 
+
+        public bool Intersects(LineSegment segment)
+        {
+            return Intersects(segment.v1, segment.v2);
+        }
+
+        public bool Intersects(LineSegment[] segments)
+        {
+            foreach (LineSegment segment in segments)
+            {
+                if (Intersects(segment.v1, segment.v2)) { return true; }
+
+            }
+
+            return false;
+        }
+
+
         /// <summary>
         /// Returns if line intersects with the line segment. Parameters for if the line is infinite or able to be extend in the negative direction.  
         /// </summary>

@@ -66,7 +66,7 @@ namespace Game1.DataClasses
                     foreach (People person in people) //save needs, relationships, career
                     {
                         command.CommandText = "UPDATE People SET Career = @Career WHERE PersonID = @PersonID";
-                        command.Parameters.AddWithValue("@Career", person.Career==null?"":person.Career.ToString());
+                        command.Parameters.AddWithValue("@Career", person.Career==null?"":person.Career.CareerName);
                         command.Parameters.AddWithValue("@PersonID", person.DBID);
 
                         command.ExecuteNonQuery();

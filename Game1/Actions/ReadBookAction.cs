@@ -60,7 +60,7 @@ namespace Game1.Actions
             actionTimeElapsed += timer.ElapsedGameTime.TotalSeconds;
             EstTimeToFinish = Duration - (float)actionTimeElapsed;
 
-            Console.WriteLine("reading book");
+            //££Console.WriteLine("reading book");
 
             if (needs[NeedAffected].IsFulfilled() && actionTimeElapsed > minActionTime)
             {

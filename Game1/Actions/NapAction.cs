@@ -60,7 +60,7 @@ namespace Game1.Actions
             actionTimeElapsed += gameTime.ElapsedGameTime.TotalSeconds;
             EstTimeToFinish = Duration - (float)actionTimeElapsed;
 
-            Console.WriteLine("napping");
+            //££Console.WriteLine("napping");
 
             if (needs[NeedAffected].IsFulfilled() && actionTimeElapsed > minActionTime)
             {

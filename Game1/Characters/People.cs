@@ -108,7 +108,7 @@ namespace Game1
         //protected Vector3 targetPosition = Vector3.Zero;
         protected Vector3 targetVector = Vector3.Zero;
         protected Vector3 viewVector = Vector3.Forward;
-        protected const float velocity = 25f;
+        protected const float velocity = 75f;
         protected const float angularVelocity = 20f;
 
         protected Matrix transformationMatrix;
@@ -932,7 +932,7 @@ namespace Game1
                 actionState = PeopleActionStates.idle;
                 //currentHouse = House.getHouseContainingPoint(position);
                 currentHouse = goalHouse;
-                currentBuilding = goalBuilding;
+                //currentBuilding = goalBuilding;
 
                 reachedGoal = true;
                 return;
@@ -946,15 +946,17 @@ namespace Game1
 
 
 
-                if (!(targetVector.X == 0 && targetVector.Z == 0)) 
+                float ErrorMargin = 10;
+
+                if (!(Math.Abs(targetVector.X) < ErrorMargin && Math.Abs(targetVector.Z) < ErrorMargin)) //need margin of error here???
                 {
                     motionState = PeopleMotionStates.rotating;
-                
-                    getNewRotationMatrix(gameTime);
-                
-                }
 
-                
+                }
+                else { motionState = PeopleMotionStates.moving; }
+
+
+
 
             }
 
@@ -973,7 +975,7 @@ namespace Game1
                     actionState = PeopleActionStates.idle;
                     //currentHouse = House.getHouseContainingPoint(position);
                     currentHouse = goalHouse;
-                    currentBuilding = goalBuilding;
+                    //currentBuilding = goalBuilding;
                     reachedGoal = true;
                     return;
                 }

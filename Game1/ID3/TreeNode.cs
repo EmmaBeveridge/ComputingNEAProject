@@ -52,6 +52,7 @@ namespace Game1.ID3
         public TreeNode(string _name, int _index, NodeAttribute _attribute, string _edge)
         {
             Name = _name;
+            
             AttributeListIndex = _index;
             TableIndex = _index + 1; //ID column not included in attribute index so must increment
             Attribute = _attribute;

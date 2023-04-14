@@ -434,7 +434,24 @@ namespace Game1
 
 
 
+            #region Logging Need decay rates
 
+            foreach (People person in people)
+            {
+                
+                Console.WriteLine($"\n\nNeed depletion rates for {person.Name}\nTraits: {person.Traits[0]} and {person.Traits[1]}"); 
+
+                foreach (KeyValuePair<NeedNames, Need> need in person.Needs)
+                {
+                    Console.WriteLine($"\tNeed: {need.Key} Decay Rate:{need.Value.DepletionRate}");
+                }
+
+
+
+            }
+
+
+            #endregion
 
 
 

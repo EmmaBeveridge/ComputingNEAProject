@@ -63,7 +63,7 @@ namespace Game1
     class TextboxInputHandler
     {
 
-        static int timeBeforeNextDelete = 10;
+        static int timeBeforeNextDelete;
 
         public static void HandleInput(GameTime gameTime, Textbox textbox)
         {
@@ -82,7 +82,7 @@ namespace Game1
 
             if (kbs.IsKeyUp(Keys.Back) && kbs.IsKeyUp(Keys.Delete))
             {
-                timeBeforeNextDelete = 10;
+                timeBeforeNextDelete = 0;
             }
 
             if (keys.Count() > 0)
@@ -94,16 +94,13 @@ namespace Game1
 
                 if (kbs.IsKeyDown(Keys.Back) || kbs.IsKeyDown(Keys.Delete))
                 {
+                    
                     if (timeBeforeNextDelete == 0)
                     {
-                        timeBeforeNextDelete = 10;
+                        if (textbox.Selected) { textbox.AddText('\b'); timeBeforeNextDelete = 30; }
+                       
                     }
 
-                    if (timeBeforeNextDelete == 10)
-                    {
-                        if (textbox.Selected) { textbox.AddText('\b'); }
-                       
-                    } 
                     
                     timeBeforeNextDelete--;
 

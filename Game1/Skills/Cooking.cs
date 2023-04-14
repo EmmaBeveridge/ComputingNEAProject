@@ -19,7 +19,7 @@ namespace Game1.Skills
         {
             SkillType = SkillTypes.Cooking;
            
-            RateOfSkillGain = 0.1f;
+            RateOfSkillGain = 0.5f;
 
         }
 

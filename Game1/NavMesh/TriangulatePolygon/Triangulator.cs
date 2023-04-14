@@ -9,6 +9,7 @@ using System.Data;
 using Game1.DataClasses;
 using Game1.Town;
 using Game1.Town.Buildings;
+using System.Text.RegularExpressions;
 
 namespace Game1.NavMesh.TriangulatePolygon
 {
@@ -23,6 +24,7 @@ namespace Game1.NavMesh.TriangulatePolygon
         
          public List<Vertex> resultVertices;
          public int[] indices;
+        public List<LineSegment> polygonEdges = new List<LineSegment>();
 
 
          readonly CircularLinkedListIndexed<Vertex> polygonVertices = new CircularLinkedListIndexed<Vertex>();
@@ -62,6 +64,56 @@ namespace Game1.NavMesh.TriangulatePolygon
         {
             List<List<Vector2>> holeVertices = new List<List<Vector2>>();
 
+
+
+
+            //for (int i = 2; i <= 2; i++)
+            //{
+            //    Building building = Building.buildings.Find(b => b.GetType() == typeof(Office));
+            //    //Regex regex = new Regex($@"B{i}$");
+            //    //Building building = Building.buildings.Find(b => regex.IsMatch(b.id));
+            //    List<Vector2> buildingVertices = new List<Vector2>();
+            //    holeCount++;
+            //    Console.WriteLine(building.id);
+
+            //    foreach (Vector3 corner in building.groundCorners)
+            //    {
+
+            //        buildingVertices.Add(new Vector2(corner.X , corner.Z));
+
+            //    }
+
+
+            //    holeVertices.Add(buildingVertices);
+
+            //}
+
+
+
+
+
+            //holeVertices.Add(new List<Vector2> { new Vector2(100, 0), new Vector2(0, 0), new Vector2(0, -100), new Vector2(100, -100) });
+
+
+            //foreach (Building building in Building.buildings)
+            //{
+            //    List<Vector2> buildingVertices = new List<Vector2>();
+            //    holeCount++;
+
+            //    foreach (Vector3 corner in building.groundCorners)
+            //    {
+
+            //        buildingVertices.Add(new Vector2(corner.X, corner.Z));
+
+            //    }
+
+            //    buildingVertices.Reverse();
+
+            //    holeVertices.Add(buildingVertices);
+
+
+            //}
+
             foreach (House house in House.houses)
             {
                 List<Vector2> houseVertices = new List<Vector2>();
@@ -80,52 +132,89 @@ namespace Game1.NavMesh.TriangulatePolygon
 
 
 
-            //for (int i = 0; i < 1; i++)
-            //{
-            //    Building building = Building.buildings.Find(b => b.GetType() == typeof(Office));
-            //    List<Vector2> buildingVertices = new List<Vector2>();
-            //    holeCount++;
-            //    Console.WriteLine(building.id);
-
-            //    foreach (Vector3 corner in building.groundCorners)
-            //    {
-
-            //        buildingVertices.Add(new Vector2(corner.X, corner.Z));
-
-            //    }
-
-            //    holeVertices.Add(buildingVertices);
-
-            //}
-
-
-            foreach (Building building in Building.buildings)
-            {
-                List<Vector2> buildingVertices = new List<Vector2>();
-                holeCount++;
-
-                foreach (Vector3 corner in building.groundCorners)
-                {
-
-                    buildingVertices.Add(new Vector2(corner.X, corner.Z));
-
-                }
-
-                holeVertices.Add(buildingVertices);
-
-
-            }
-
-
-
             foreach (Vector3 corner in Town.Town.corners)
             {
                 shapeVertices.Add(new Vector2(corner.X, corner.Z));
             }
 
+
+
+            //holeVertices.Remove(holeVertices.Last());
+            //holeVertices.Add(new List<Vector2> { new Vector2(2070, -30), new Vector2(2070, 860), new Vector2(1610, 860), new Vector2(1610, -30) });
+            //holeVertices.Add(new List<Vector2> { new Vector2(-1055, 1230), new Vector2(-1330, 1080), new Vector2(-1235, 900), new Vector2(-950, 1060) });
+            //holeVertices.Add(new List<Vector2> { new Vector2(360, 295), new Vector2(0, 295), new Vector2(0, 0), new Vector2(360, 0) });
+
+
+
+
+            #region Translate all vertices so all Z coordinates negative
+
+            //float ZTranslation = holeVertices.OrderByDescending(h => h.Max(v => v.Y)).First().Max(v => v.Y)+100; //find largest z coordinate i.e. amount all vertices must be translated by
+            float ZTranslation = shapeVertices.Max(v => v.Y)+100; //find largest z coordinate i.e. amount all vertices must be translated by
+
+            List<List<Vector2>> translatedHoles = new List<List<Vector2>>();
+            foreach (List<Vector2> hole in holeVertices)
+            {
+
+                List<Vector2> translatedHole = new List<Vector2>();
+
+                foreach (Vector2 vertex in hole)
+                {
+                    translatedHole.Add(new Vector2(vertex.X, vertex.Y - ZTranslation));
+                }
+
+
+                translatedHoles.Add(translatedHole);
+
+            }
+
+
+            List<Vector2> translatedShapeVertices = new List<Vector2>();
+
+
+            foreach (Vector2 vertex in shapeVertices)
+            {
+                translatedShapeVertices.Add(new Vector2(vertex.X, vertex.Y - ZTranslation));
+
+            }
+
+
+
+
+            holeVertices = translatedHoles;
+            shapeVertices = translatedShapeVertices;
+
+
+
+            #endregion
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
             
-        
-            for (int i = 0; i < holeCount; i++)
+
+            //for (int i = 0; i < holeCount; i++)
+            while (holeVertices.Count>0)
             {
 
                 List<Vector2> nextHole = new List<Vector2>();
@@ -147,11 +236,11 @@ namespace Game1.NavMesh.TriangulatePolygon
                 
                 shapeVertices = CutHoleInShape(shapeVertices.ToArray(), nextHole.ToArray()).ToList<Vector2>();
 
-                Console.WriteLine("\n\n\nHOLE:" + i);
-                foreach( var vertex in shapeVertices)
-                {
-                    Console.WriteLine("v : "+vertex.ToString());
-                }
+                //Console.WriteLine("\n\n\nHOLE:" + i);
+                //foreach( var vertex in shapeVertices)
+                //{
+                //    Console.WriteLine("v : "+vertex.ToString());
+                //}
 
             }
 
@@ -159,10 +248,12 @@ namespace Game1.NavMesh.TriangulatePolygon
 
             //FixVertices(ref shapeVertices);
 
+
             
 
 
-            Triangulate(shapeVertices.ToArray());
+
+            Triangulate(shapeVertices.ToArray(), ZTranslation);
             
         }
 
@@ -263,7 +354,7 @@ namespace Game1.NavMesh.TriangulatePolygon
         /// Begins by identifying all convex and reflex vertices and calculating the ear vertices of the polygon. Method then enters loop calling ClipNextEar method until there are no more ear vertices or there are fewer than 3 polygon vertices remaining. If there are exactly 3 polygon vertices remaining, a final triangle is added made from these three vertices. 
         /// </summary>
         /// <param name="inputVertices"></param>
-        public void Triangulate(Vector2[] inputVertices)//Vector2 used where Y = Z
+        public void Triangulate(Vector2[] inputVertices, float ZtranslationToApply = 0)//Vector2 used where Y = Z
         {
 
 
@@ -283,25 +374,98 @@ namespace Game1.NavMesh.TriangulatePolygon
             {
                 polygonVertices.AddLast(new Vertex(new Vector3(outputVertices[i].X, yValue, outputVertices[i].Y), i));
             }
-            
-            resultVertices = polygonVertices.ToList();
+
+
+
+
+            #region CreateLineSegments
+
+            for (int i = 0; i < polygonVertices.Count; i++)
+            {
+                polygonEdges.Add(new LineSegment(polygonVertices[i].Value, polygonVertices[i + 1].Value));
+
+            }
+
+            #endregion
+
+
+
+
+
+
+
+            #region Translate vertices back
+
+            if (ZtranslationToApply != 0)
+            {
+                resultVertices = new List<Vertex>();
+
+                foreach (Vertex polyVertex in polygonVertices)
+                {
+                    resultVertices.Add(new Vertex(new Vector3(polyVertex.position.X, polyVertex.position.Y, polyVertex.position.Z + ZtranslationToApply), polyVertex.index));
+                }
+
+            }
+            else
+            {
+                resultVertices = polygonVertices.ToList();
+            }
+
+
+            #endregion
+
 
 
             FindConvexAndReflexVertices();
             FindEarVertices();
+
+
+
+            foreach (Vertex item in polygonVertices)
+            {
+                Console.WriteLine(item.position.ToString());
+            }
+
+
 
             while (polygonVertices.Count > 3 && earVertices.Count > 0)
             {
                 ClipNextEar(triangles);
             }
 
+            //bool recheckEars = true;
+            //while (recheckEars)
+            //{
+            //    while (polygonVertices.Count > 3 && earVertices.Count > 0)
+            //    {
+            //        ClipNextEar(triangles);
+            //    }
+
+            //    if (polygonVertices.Count > 3)
+            //    {
+            //        FindEarVertices();
+
+            //        if (earVertices.Count == 0)
+            //        {
+            //            recheckEars = false;
+            //        }
+
+            //    }
+            //    else
+            //    {
+            //        recheckEars = false;
+            //    }
+
+
+            //}
+
+            FindEarVertices();
 
             if (polygonVertices.Count == 3)
             {
                 triangles.Add(new Triangle(polygonVertices[0].Value, polygonVertices[1].Value, polygonVertices[2].Value));
             }
 
-            
 
             indices = new int[triangles.Count * 3];
             for (int i = 0; i < triangles.Count; i++)
@@ -312,6 +476,7 @@ namespace Game1.NavMesh.TriangulatePolygon
                 indices[(i * 3) + 2] = triangles[i].C.index;
 
             }
+
 
             
         }
@@ -407,14 +572,18 @@ namespace Game1.NavMesh.TriangulatePolygon
             FindEarVertices();
 
 
-            Vertex holeVertexMaxX = holePolygon[0];
-            foreach (Vertex vertex in holePolygon)
-            {
-                if (vertex.position.X> holeVertexMaxX.position.X)
-                {
-                    holeVertexMaxX = vertex;
-                }
-            }
+
+            Vertex holeVertexMaxX = holePolygon.OrderByDescending(v => v.position.X).First();
+
+
+            //Vertex holeVertexMaxX = holePolygon[0];
+            //foreach (Vertex vertex in holePolygon)
+            //{
+            //    if (vertex.position.X > holeVertexMaxX.position.X)
+            //    {
+            //        holeVertexMaxX = vertex;
+            //    }
+            //}
 
 
             List<LineSegment> segmentsToTest = new List<LineSegment>();
@@ -474,6 +643,8 @@ namespace Game1.NavMesh.TriangulatePolygon
 
             foreach (Vertex vertex  in reflexVertices)
             {
+                if (vertex.Equals(P)) { continue; } //don't add reflex P
+
                 if (mip.Encloses(vertex.position))
                 {
 
@@ -485,17 +656,38 @@ namespace Game1.NavMesh.TriangulatePolygon
 
             }
 
+            //if (reflexVerticesInmip.Count > 0)
+            //{
+            //    float smallestDotProduct = -1f; //smallest dot product => smallest angle
+            //    foreach (Vertex vertex in reflexVerticesInmip)
+            //    {
+            //        Vector3 d = Vector3.Normalize(vertex.position - holeVertexMaxX.position);
+            //        float dotProduct = Vector3.Dot(Vector3.UnitX, d);
+
+            //        if (dotProduct < smallestDotProduct)
+            //        {
+            //            smallestDotProduct = dotProduct;
+            //            P = vertex;
+            //        }
+
+
+
+            //    }
+
+
+
+            //}
+
             if (reflexVerticesInmip.Count > 0)
             {
-                float smallestDotProduct = -1f; //smallest dot product => smallest angle
+                float smallestDistance = float.MaxValue; //smallest dot product => smallest angle
                 foreach (Vertex vertex in reflexVerticesInmip)
                 {
-                    Vector3 d = Vector3.Normalize(vertex.position - holeVertexMaxX.position);
-                    float dotProduct = Vector3.Dot(Vector3.UnitX, d);
-
-                    if (dotProduct < smallestDotProduct)
+                    float dist = (vertex.position - holeVertexMaxX.position).Length();
+                    
+                    if (dist < smallestDistance)
                     {
-                        smallestDotProduct = dotProduct;
+                        smallestDistance = dist;
                         P = vertex;
                     }
 
@@ -506,6 +698,10 @@ namespace Game1.NavMesh.TriangulatePolygon
 
 
             }
+
+
+
+
 
 
             int startHoleIndex = holePolygon.IndexOf(holeVertexMaxX);
@@ -562,6 +758,67 @@ namespace Game1.NavMesh.TriangulatePolygon
         }
 
 
+
+
+        //private int FindEarWithSmallestAngle(Vertex ear)
+        //{
+        //    double smallestAngle = double.MaxValue;
+        //    int indexOfSmallestEarinPolygonList = -1;
+           
+        //    int instanceCount = 0;
+
+        //    for (int i = 0; i < polygonVertices.Count; i++)
+        //    {
+        //        if (polygonVertices[i].Value.position != ear.position)
+        //        {
+        //            continue;
+        //        }
+        //        else
+        //        {
+        //            instanceCount++;
+
+
+                   
+        //            Vertex previous = polygonVertices[i - 1].Value;
+        //            Vertex next = polygonVertices[i + 1].Value;
+
+
+        //            Vector2 earPos = new Vector2(ear.position.X, ear.position.Z);
+        //            Vector2 prevPos = new Vector2(previous.position.X, previous.position.Z);
+        //            Vector2 nextPos = new Vector2(next.position.X, next.position.Z);
+
+
+        //            Vector2 d1 = Vector2.Normalize(prevPos - earPos); //points from earPos towards prevPos
+        //            Vector2 d2 = Vector2.Normalize(nextPos - earPos); //points from earPos towards nextPos
+
+        //            double angle = Math.Acos(Vector2.Dot(d1, d2) / (d1.Length() * d2.Length()));
+
+        //            if (angle > Math.PI / 2) { angle = Math.PI - angle; }
+
+
+        //            if (angle < smallestAngle)
+        //            {
+        //                indexOfSmallestEarinPolygonList = i;
+                        
+        //                smallestAngle = angle;
+        //            }
+
+
+
+        //        }
+
+        //    }
+
+
+
+
+        //    return indexOfSmallestEarinPolygonList;
+
+        //}
+
+
+
+
         /// <summary>
         /// Removes ear vertex from polygon vertices and adds ear triangle to the list of triangles. Proceeds to make a call to ValidateAdjacentVertex() for each of the adjacent vertices. This is because, after removing the ear vertex, a convex adjacent vertex may now also be an ear and a reflex vertex may now be convex and possibly an ear as well.  
         /// </summary>
@@ -569,12 +826,34 @@ namespace Game1.NavMesh.TriangulatePolygon
         private void ClipNextEar(ICollection<Triangle> triangles)
         {
             Vertex ear = earVertices[0].Value;
+
+            //List<int> InstanceIndexes = new List<int>();
+
+            //for (int i = 0; i < earVertices.Count; i++)
+            //{
+            //    if (earVertices[i].Value.position == ear.position)
+            //    {
+            //        InstanceIndexes.Add(i);
+            //    }
+            //}
+
+            //if (InstanceIndexes.Count > 1)
+            //{
+            //    int indexOfNextEar = FindEarWithSmallestAngle(InstanceIndexes, ear);
+            //    ear = earVertices[indexOfNextEar].Value;
+            //}
+
+
+
+
             Vertex previous = polygonVertices[polygonVertices.IndexOf(ear) - 1].Value;
             Vertex next = polygonVertices[polygonVertices.IndexOf(ear) + 1].Value;
 
             triangles.Add(new Triangle(ear, next, previous));
 
-            earVertices.RemoveAt(0);
+            Console.WriteLine("Removed:"+ear.position.ToString());
+
+            earVertices.RemoveAt(0); 
             polygonVertices.RemoveAt(polygonVertices.IndexOf(ear));
 
             if (earVertices.Count == 0)
@@ -658,6 +937,18 @@ namespace Game1.NavMesh.TriangulatePolygon
         /// <returns></returns>
         private bool IsConvex(Vertex vertex)
         {
+
+            List<int> InstanceIndexes = new List<int>();
+
+            for (int i = 0; i < polygonVertices.Count; i++)
+            {
+                if (polygonVertices[i].Value.position == vertex.position)
+                {
+                    InstanceIndexes.Add(i);
+                }
+            }
+
+
             Vertex previous = polygonVertices[polygonVertices.IndexOf(vertex) - 1].Value;
             Vertex next = polygonVertices[polygonVertices.IndexOf(vertex) + 1].Value;
 
@@ -665,19 +956,18 @@ namespace Game1.NavMesh.TriangulatePolygon
             Vector2 prevPos = new Vector2(previous.position.X, previous.position.Z);
             Vector2 nextPos = new Vector2(next.position.X, next.position.Z);
 
-            float det = (vertexPos.X - prevPos.X) * (nextPos.Y - vertexPos.Y) - (nextPos.X - vertexPos.X) * (vertexPos.Y - prevPos.Y);
-            return (det < 0);
+            //float det = (vertexPos.X - prevPos.X) * (nextPos.Y - vertexPos.Y) - (nextPos.X - vertexPos.X) * (vertexPos.Y - prevPos.Y);
+            //return (det < 0);
 
 
 
-            #region Test Failed Code
-            //Vector2 d1 = Vector2.Normalize(vertexPos - prevPos); //points from prevPos towards vertexPos
-            //Vector2 d2 = Vector2.Normalize(nextPos - vertexPos); //points from vertexPos towards nextPos
-            //Vector2 n2 = new Vector2(-d2.Y, d2.X); //rotates d2 through 270, makes it so that if angle is either obtuse or acute (ie. convex) dot product between vectors >0 as either vector can be projected onto the other so that length of projection in direction of vector >0
+            
+            Vector2 d1 = Vector2.Normalize(vertexPos - prevPos); //points from prevPos towards vertexPos
+            Vector2 d2 = Vector2.Normalize(nextPos - vertexPos); //points from vertexPos towards nextPos
+            Vector2 n2 = new Vector2(-d2.Y, d2.X); //rotates d2 through 270, makes it so that if angle is either obtuse or acute (ie. convex) dot product between vectors >0 as either vector can be projected onto the other so that length of projection in direction of vector >0
 
-            //return (Vector2.Dot(d1, n2) > 0f);
-            #endregion
-
+            return (Vector2.Dot(d1, n2) > 0f);
+            
 
 
         }
@@ -694,11 +984,19 @@ namespace Game1.NavMesh.TriangulatePolygon
         {
             foreach (Vertex vertex in convexVertices)
             {
+
+
                 if (IsEar(vertex))
                 {
+
+
+                    Console.WriteLine("\t" + vertex.position.ToString());
                     earVertices.AddLast(vertex);
                 }
-
+                else
+                {
+                    Console.WriteLine(vertex.position.ToString());
+                }
             }
         }
 
@@ -711,8 +1009,24 @@ namespace Game1.NavMesh.TriangulatePolygon
         /// <returns></returns>
         private bool IsEar(Vertex vertex)
         {
+            
             Vertex previous = polygonVertices[polygonVertices.IndexOf(vertex) - 1].Value;
             Vertex next = polygonVertices[polygonVertices.IndexOf(vertex) + 1].Value;
+
+            //foreach (Vertex reflexVertex in reflexVertices)
+            //{
+            //    if (reflexVertex.Equals(previous) || reflexVertex.Equals(vertex) || reflexVertex.Equals(next))
+            //    {
+            //        continue;
+            //    }
+
+            //    if (Triangle.Encloses(previous, vertex, next, reflexVertex))
+            //    {
+            //        return false;
+            //    }
+
+
+            //}
 
             foreach (Vertex reflexVertex in reflexVertices)
             {
@@ -728,6 +1042,30 @@ namespace Game1.NavMesh.TriangulatePolygon
 
 
             }
+
+
+            Triangle EarTriangle = new Triangle(next, vertex, previous);
+
+            foreach (LineSegment segment in polygonEdges)
+            {
+                if (!EarTriangle.HasVertex(segment.v1) || !EarTriangle.HasVertex(segment.v2))
+                {
+                    if (segment.Intersects(EarTriangle.edges)) { return false; }
+
+
+                }
+                    
+                    
+            }
+
+
+
+
+
+
+
+
+
 
             return true;
 

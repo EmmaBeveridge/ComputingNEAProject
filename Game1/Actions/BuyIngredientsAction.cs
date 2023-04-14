@@ -51,6 +51,7 @@ namespace Game1.Actions
         {
             ActionComplete = false;
             actionTimeElapsed = 0;
+            person.currentBuilding = this.Building;
         }
 
         /// <summary>
@@ -75,7 +76,7 @@ namespace Game1.Actions
             actionTimeElapsed += gameTime.ElapsedGameTime.TotalSeconds;
             EstTimeToFinish = Duration - (float)actionTimeElapsed;
 
-            Console.WriteLine("buying groceries");
+            //££Console.WriteLine("buying groceries");
 
             if (actionTimeElapsed > minActionTime)
             {

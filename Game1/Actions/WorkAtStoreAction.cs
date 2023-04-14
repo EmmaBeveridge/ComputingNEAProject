@@ -86,7 +86,7 @@ namespace Game1.Actions
             actionTimeElapsed += gameTime.ElapsedGameTime.TotalSeconds;
             EstTimeToFinish = Duration - (float)actionTimeElapsed;
 
-            Console.WriteLine("working at store");
+            //££Console.WriteLine("working at store");
             WorkScore += Career.ReturnWorkScoreIncrement(person);
 
             if (actionTimeElapsed > minActionTime)

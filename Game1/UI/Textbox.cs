@@ -1,11 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Microsoft.Xna.Framework;
+﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using System;
+using System.Collections.Generic;
 
 namespace Game1.UI
 {
@@ -41,7 +38,7 @@ namespace Game1.UI
         public static int defaultLength = 100;
         public static SpriteFont defaultFont;
 
-        public static int lineLength = 25;
+        public static int lineLength = 27;
         public static int lineHeight = 5;
 
         public Textbox(Texture2D _texture, Texture2D _cursorTexture, Point _dims, Point _cursorDims, Vector2 _position, int _length, bool _visible, SpriteFont _font, string _text)
@@ -161,8 +158,8 @@ namespace Game1.UI
 
                     if (CurrentText[CurrentText.Length - 1] == '\n') 
                     {
-                        CurrentText.Remove(CurrentText.Length-2, 2);
-                        CursorPosition = new Vector2(lineEndXValue.Pop(), CursorPosition.Y- lineHeight); //problem with stack underflow
+                        CurrentText = CurrentText.Remove(CurrentText.Length-2, 2);
+                        CursorPosition = new Vector2(lineEndXValue.Pop(), CursorPosition.Y- lineHeight); 
                     }
 
                     else

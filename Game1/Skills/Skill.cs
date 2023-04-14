@@ -24,7 +24,7 @@ namespace Game1.Skills
         public static int DBID;
         public float Score=0;
         protected float MaxScore = 100;
-        public int Level=0;
+        public int Level { get { return (int)(Score / 10f); } }
         protected float RateOfSkillGain;
 
 
@@ -145,9 +145,6 @@ namespace Game1.Skills
             Score = Math.Min(Score, MaxScore);
 
 
-            float percent = (float)Score / (float)MaxScore;
-
-            Level = (int)(percent*100 / 10f);
         }
 
 

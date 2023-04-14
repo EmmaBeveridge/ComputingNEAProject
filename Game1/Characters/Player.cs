@@ -437,26 +437,16 @@ namespace Game1
                 Vector3 nextTarget = pathPoints[0];
                 targetVector = getTargetVector(gameTime, nextTarget);
 
-                House nextHouse = House.getHouseContainingPoint(nextTarget);
+                float ErrorMargin = 10;
 
-
-
-                if ( nextHouse == null && currentHouse!= null)
-                {
-                    game.AddAvatar(currentHouse.wallAvatars.Find(a => a.model == currentHouse.roofModel));
-                }
-                else if (nextHouse != null && nextHouse != currentHouse)
-                {
-                    game.RemoveAvatar(nextHouse.wallAvatars.Find(a => a.model == nextHouse.roofModel));
-                }
-
-                if (!(targetVector.X == 0 && targetVector.Z == 0)) //need margin of error here???
+                if (!(Math.Abs(targetVector.X)<ErrorMargin  && Math.Abs(targetVector.Z) <ErrorMargin)) //need margin of error here???
                 {
                     motionState = PeopleMotionStates.rotating;
 
                     //getNewRotationMatrix(gameTime);
 
                 }
+                else { motionState = PeopleMotionStates.moving; }
 
 
 
@@ -500,9 +490,21 @@ namespace Game1
 
                 rotationMatrix = Matrix.Identity;
                 getNewTranslationMatrix(gameTime);
+                
+                
+                #region Adds and removes roofs
 
+                House nextHouse = House.getHouseContainingPoint(currentTarget);
+                if (nextHouse == null && currentHouse != null)
+                {
+                    game.AddAvatar(currentHouse.wallAvatars.Find(a => a.model == currentHouse.roofModel));
+                }
+                else if (nextHouse != null && nextHouse != currentHouse)
+                {
+                    game.RemoveAvatar(nextHouse.wallAvatars.Find(a => a.model == nextHouse.roofModel));
+                }
 
-
+                #endregion
             }
 
         }

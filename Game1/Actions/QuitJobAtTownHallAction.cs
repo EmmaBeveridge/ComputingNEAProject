@@ -77,7 +77,7 @@ namespace Game1.Actions
             actionTimeElapsed += gameTime.ElapsedGameTime.TotalSeconds;
             EstTimeToFinish = Duration - (float)actionTimeElapsed;
 
-            Console.WriteLine("quitting job at town hall");
+            //££Console.WriteLine("quitting job at town hall");
 
             if (actionTimeElapsed > minActionTime)
             {

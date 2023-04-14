@@ -231,31 +231,36 @@ namespace Game1.Town.Districts
 
             Street parent = startStreet; 
 
-            while (parent != LCA)
+            while (parent != LCA && parent != null) //dont add start of lca street
             {
                 streetPoints.Add(parent.Start); 
                 parent = parent.parent;
             }
             
             
+            
             List<Vector3> goalToLCA = new List<Vector3>();
             //goalToLCA.Add(endStreet);
 
-            parent = endStreet;
+            parent = endStreet.parent; //dont want to add end point of end street to list
 
             if (endStreet.parent != null)
             {
 
 
-                do
+                while (parent != LCA && parent != null)
                 {
-                    parent = parent.parent; //will add LCA to street points too
                     goalToLCA.Add(parent.End);
+                    parent = parent.parent; 
+                    
 
-                } while (parent != LCA);
+                } 
 
             }
-            //goalToLCA.RemoveAt(0); //Dont want to go to end of last street so remove it
+
+            goalToLCA.Add(LCA.End); //want to go to end of lca street
+
+            
 
             goalToLCA.Reverse();
             streetPoints.AddRange(goalToLCA);

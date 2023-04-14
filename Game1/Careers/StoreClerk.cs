@@ -9,7 +9,7 @@ namespace Game1.Careers
     class StoreClerk:Career
     {
         public static string Name = "store clerk";
-        public static string Description = "Serve customers at the general store";
+        public static string Description = "Serve customers at the\ngeneral store";
         public override string CareerName { get { return Name; } }
         public override string CareerDescription { get { return Description; } }
 

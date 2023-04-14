@@ -41,11 +41,11 @@ namespace Game1.ID3
         /// </summary>
         /// <param name="QueryData"> DIctionary containing current Need values for the person </param>
         /// <returns></returns>
-        public NeedNames GetResult(Dictionary<NeedNames, Need> QueryData)
+        public NeedNames GetResult(Dictionary<NeedNames, Need> QueryData, bool printTrace = false)
         {
             
             Dictionary<string, string> QueryDict = MakeQueryDict(QueryData);
-            string result = CalculateResult(Root, QueryDict, "", QueryData);
+            string result = CalculateResult(Root, QueryDict, "", QueryData, printTrace);
 
             if (result != "Attribute not found")
             {
@@ -104,12 +104,21 @@ namespace Game1.ID3
         /// <param name="result"></param>
         /// <param name="QueryData"></param>
         /// <returns></returns>
-        private string CalculateResult (TreeNode root, Dictionary<string, string> QueryDict, string result, Dictionary<NeedNames, Need> QueryData)
+        private string CalculateResult (TreeNode root, Dictionary<string, string> QueryDict, string result, Dictionary<NeedNames, Need> QueryData, bool printTrace = false)
         {
 
 
 
-            //FIX DATA SET SO DOESNT RECOMMEND NEED WITH HIGH VALUE
+            if (printTrace)
+            {
+                Console.WriteLine(root.Name);
+
+            }
+
+
+
+
+            
             
             bool valueFound = false;
             //result += root.Name.ToUpper() + " -- ";
@@ -122,6 +131,9 @@ namespace Game1.ID3
                 //result = root.Edge.ToLower() + " --> " + root.Name.ToUpper();
 
                 result = root.Name.ToUpper();
+
+
+
 
 
                 if (IsResultGood(root, QueryData))
@@ -167,7 +179,12 @@ namespace Game1.ID3
 
                         //return result + CalculateResult(childNode, QueryDict, $"{childNode.Edge.ToLower()} --> ");
 
-                        return CalculateResult(childNode, QueryDict, "", QueryData);
+
+                        if (printTrace) { Console.WriteLine($"\t|\n\t|{childNode.Edge}\n\t|\n\tV"); }
+
+
+
+                        return CalculateResult(childNode, QueryDict, "", QueryData, printTrace);
 
                     }
 
@@ -192,7 +209,9 @@ namespace Game1.ID3
 
 
                 QueryDict.Remove(root.Name);
-                return CalculateResult(bestNode, QueryDict, "", QueryData);
+                if (printTrace) { Console.WriteLine($"\t|\n\t|{bestNode.Edge}\n\t|\n\tV"); }
+
+                return CalculateResult(bestNode, QueryDict, "", QueryData, printTrace);
 
 
 

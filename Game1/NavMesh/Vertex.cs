@@ -27,13 +27,14 @@ namespace Game1.NavMesh
             if (argIndex == -1)
             {
                 index = indexCounter;
+                indexCounter++;
             }
             else
             {
                 index = argIndex;
             }
 
-            indexCounter++;
+            //indexCounter++;
 
 
         }

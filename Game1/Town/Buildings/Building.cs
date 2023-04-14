@@ -95,7 +95,7 @@ namespace Game1.Town
 
             buildingBox = avatar.UpdateBoundingBox();
 
-            //SetCorners();
+            SetCorners();
 
 
         }
@@ -151,32 +151,31 @@ namespace Game1.Town
             if (person.Career != null && CareerNames.Contains(person.Career.CareerName)) //employed in career at building
             {
                 validButtons.AddRange(actionButtons.FindAll(b => b.buttonAction.GetStateOfPrecondition(EmployedAtConditionString) == true));
-            } 
+            }
             else { validButtons.AddRange(actionButtons.FindAll(b => b.buttonAction.GetStateOfPrecondition(EmployedAtConditionString) == false)); }
             return validButtons;
         }
 
 
         #region TESTING FAILED
-        //public void SetCorners()
-        //{
-        //    //Regex regex = new Regex(@"T\d+\.R\.S\d\.(\d\.)*H\d+");
-        //    Regex regex = new Regex(@"B\d+$");
-        //    var match = regex.Match(id);
-        //    DataTable coordTable = ExcelFileManager.ReadCoordinates(match.Value, town: true);
+        public void SetCorners()
+        {
+            //Regex regex = new Regex(@"T\d+\.R\.S\d\.(\d\.)*H\d+");
+            Regex regex = new Regex(@"B\d+$");
+            var match = regex.Match(id);
+            DataTable coordTable = ExcelFileManager.ReadCoordinates(match.Value, town: true);
 
-        //    foreach (DataRow row in coordTable.Rows)
-        //    {
-        //        groundCorners.Add(new Vector3(int.Parse(row["X"].ToString()), 0, int.Parse(row["Z"].ToString())));
-        //    }
+            foreach (DataRow row in coordTable.Rows)
+            {
+                groundCorners.Add(new Vector3(int.Parse(row["X"].ToString()), 0, int.Parse(row["Z"].ToString())));
+            }
 
 
+          }
 
-        //}
+#endregion
 
-        #endregion
-
-        public virtual void DefineActions() { }
+public virtual void DefineActions() { }
 
 
 

@@ -3,6 +3,7 @@ using Microsoft.Xna.Framework;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 
 namespace Game1.GOAP
 {
@@ -187,8 +188,10 @@ namespace Game1.GOAP
                 
                 var goalState = this.planner.CreateWorldState();
 
+                bool printTrace = true; //this.planner.person.isPlayer ? true : false;
+                if (printTrace) { Console.WriteLine($"\n\nID3 Query Trace for {this.planner.person.Name}\nTraits: {this.planner.person.Traits[0]} and {this.planner.person.Traits[1]}\n"); }
 
-                NeedNames need = People.decisionTree.GetResult(Needs);
+                NeedNames need = People.decisionTree.GetResult(Needs, printTrace) ;
 
 
                 needToFulfill = need;
@@ -311,6 +314,7 @@ namespace Game1.GOAP
                 {
                     this.Context.actionPlan = new Stack<GOAPAction>();
                     this.Machine.SetNextState<Idle>();
+                    Thread.Sleep(10);
                 }
 
 
