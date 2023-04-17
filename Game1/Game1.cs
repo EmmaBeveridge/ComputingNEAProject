@@ -89,9 +89,6 @@ namespace Game1
            
            
             base.Initialize();
-            //graphicsManager.PreferredBackBufferWidth = GraphicsDevice.DisplayMode.Width;
-            //graphicsManager.PreferredBackBufferHeight = GraphicsDevice.DisplayMode.Height;
-            //graphicsManager.IsFullScreen = true;
             graphicsManager.ApplyChanges();
             camera = new Camera(GraphicsDevice, this.Window, new Vector3(0,60,-200), Vector3.Zero);
             this.IsMouseVisible = true;
@@ -101,7 +98,10 @@ namespace Game1
         }
 
 
-
+        /// <summary>
+        /// Asynchronous method that calls CreateTownInDBAsync() on cloudDBHandler object to execute Cypher query to create the database (or merge changes if database already exists)
+        /// </summary>
+        /// <returns></returns>
         public static async Task CreateTownDB()
         {            
             using (var cloudDBHandler = new CloudDBHandler())
@@ -114,9 +114,9 @@ namespace Game1
 
 
         /// <summary>
-        /// Loads basic textures and those needed for main menu and loading screen
+        /// Loads all 2D textures from Monogame pipeline e.g. loading screen and menu backgrounds, button textures etc. And adds to relevant lists to be drawn in Draw(). Calls methods in UIHandler class to build buttons. Calls GenerateTexture methods for NeedBar, ToolbarPanel, and RelationshipBar classes. 
         /// </summary>
-        protected  override void LoadContent()
+        protected override void LoadContent()
         {
             spriteBatch = new SpriteBatch(GraphicsDevice);
 
@@ -205,8 +205,11 @@ namespace Game1
         {
         }
 
-        
 
+        /// <summary>
+        ///Asynchronous method using a cloudDBHandler object to execute Cypher queries to return town objects. Iterates through town hierarchy (I.e. each district in town, each street in each district, each house on each street etc.) in order to set object properties. Note: objects e.g. house and town are not instantiated in this method but many of their properties and initialisation methods e.g. GenerateAvatar() are set and called by this method. List of GOAPActions is also created in this method as well as generating the static house and town navmeshes.
+        /// </summary>
+        /// <returns></returns>
         public async Task BuildTownAsync()
         {
             CloudDBHandler cloudDBHandler = new CloudDBHandler();
@@ -324,7 +327,10 @@ namespace Game1
 
 
 
-
+        /// <summary>
+        /// Removes avatar from list of avatars to be drawn.
+        /// </summary>
+        /// <param name="avatar"></param>
         public void RemoveAvatar(Avatar avatar)
         {
             int index = avatars.FindIndex(a => a.id == avatar.id);
@@ -335,58 +341,37 @@ namespace Game1
 
         }
 
+        /// <summary>
+        /// Adds the avatar to list of avatars to be drawn
+        /// </summary>
+        /// <param name="avatar"></param>
         public void AddAvatar(Avatar avatar)
         {
             avatars.Add(avatar);
         }
 
 
-        
+
 
 
         /// <summary>
-        /// Loads data for game. Loaded when loading screen displayed
+        /// Calls methods relating to querying and initialising Neo4j town database. Loads 3D models of characters and creates People and Player objects. Builds dictionaries to convert character model strings stored in database to Model objects and corresponding 2D texture icons. Calls BuildML method on MLMain class to build sentiment analysis model. Calls BuildDecisionTree method on People class to build C4.5 decision tree. Calls ResumeGameMethod on ResumeGameButtonClass to resume game loaded from SQLite database. Adds actions allowing characters to talk to each other to list of available town actions. Calls BuildAI method for each People object. Uses UIHandler to build toolbar, exit, and emotion button objects.
         /// </summary>
         /// <returns></returns>
         async Task LoadGame()
         {
 
 
-            //Thread createTownThread = new Thread(CreateTownDB);
-            //createTownThread.Start();
+            await CreateTownDB().ConfigureAwait(false); // Create town database
+            await BuildTownAsync().ConfigureAwait(false); //Build town objects
 
-            //Thread createHouseThread = new Thread(BuildHouseAsync);
-            //createHouseThread.Start();
-            //Thread.Sleep(5000);
+            MLMain.BuildML(); //Build sentiment analysis model
 
 
-            //await Task.Run(() => CreateTownDB());
-            //await Task.Run(() => BuildHouseAsync());
+            People.BuildDecisionTree(); //Build need selection decision tree
 
 
-            await CreateTownDB().ConfigureAwait(false);
-
-
-
-
-
-            //await BuildHouseAsync().ConfigureAwait(false);
-
-            await BuildTownAsync().ConfigureAwait(false);
-
-
-
-            
-
-
-
-
-            MLMain.BuildML();
-
-
-            People.BuildDecisionTree();
-
-
+            //Load models and icons and add to dictionaries
             
             modelDictionary.Add("WomanPurple", Content.Load<Model>("WomanPurpleModel")); 
             iconDictionary.Add("WomanPurple", Content.Load<Texture2D>("WomanPurpleIcon"));
@@ -397,39 +382,27 @@ namespace Game1
             modelDictionary.Add("ManRed", Content.Load<Model>("ManRedModel"));
             iconDictionary.Add("ManRed", Content.Load<Texture2D>("ManRedIcon"));
 
-            //Model man2 = Content.Load<Model>("man4");
-            //Model woman5 = Content.Load<Model>("woman5");
-            //Texture2D womanPurple = Content.Load<Texture2D>("WomanPurple");
-            //Texture2D womanYellow = Content.Load<Texture2D>("WomanYellow");
-
-
-
-            ResumeGameButton.ResumeGame(this);
-
             
-            //player = new Player(woman2, new Vector3(10, 0, 0), Town.Town.navMesh, towns[0], this, womanPurple);
 
+            ResumeGameButton.ResumeGame(this); //resume the game
 
-            //people.Add(player);
-            ////people.Add(new People(man2, new Vector3(10, 5, 10), navMesh));
-            //people.Add(new People(woman5, new Vector3(60, 0, 40), Town.Town.navMesh, towns[0], this, womanYellow));
+          
 
+            avatars.AddRange(people.Select(people => people.avatar)); //add people avatars to avatar list so can be drawn
 
-            avatars.AddRange(people.Select(people => people.avatar));
-
-            People.people.AddRange(people);
+            People.people.AddRange(people); //add people to list of people
 
 
             foreach (People person in people)
             {
-                towns[0].GOAPActions.Add(person.DefineActions()); //only one town but would need to change if added more
+                towns[0].GOAPActions.Add(person.DefineActions()); //define GOAP actions for each person
 
             }
 
 
             foreach (People person in people)
             {
-                person.BuildAI();
+                person.BuildAI(); //Create GOAP finite state machine
             }
 
 
@@ -454,84 +427,31 @@ namespace Game1
             #endregion
 
 
+            avatars.Add(new Avatar(Content.Load<Model>("Grass"), new Vector3(0, -12, 0))); 
 
-
-
-            //avatars.Add(new Avatar(Content.Load<Model>("houseBake6"), new Vector3(0, 41, 0)));
-
-
-
-
-
-
-
-
-
-
-
-            //avatars.Add(new Avatar(Content.Load<Model>("Store"), Vector3.Zero));
-            avatars.Add(new Avatar(Content.Load<Model>("Grass"), new Vector3(0, -12, 0))); // was at y=-12
-            //avatars.Add(new Avatar(Content.Load<Model>("HouseInteriorWalls"), new Vector3(0, -5, 0))); //was at y=-2
-            //avatars.Add(new Avatar(Content.Load<Model>("HouseExteriorWalls"), new Vector3(0, -5, 0))); //was at y=-2
-                //avatars.Add(new Avatar(Content.Load<Model>("Countertop"), new Vector3(60, 0, 100)));
-                //avatars.Add(new Avatar(Content.Load<Model>("CountertopSink"), new Vector3(105, 0, 100)));
-                //avatars.Add(new Avatar(Content.Load<Model>("Shower"), new Vector3(330, 0, -105)));
-                //avatars.Add(new Avatar(Content.Load<Model>("Toilet"), new Vector3(285, 0, -55)));
-                //avatars.Add(new Avatar(Content.Load<Model>("Bookcase"), new Vector3(70, 0, 5)));
-                //avatars.Add(new Avatar(Content.Load<Model>("Fridge"), new Vector3(155, 0, 100)));
-                //avatars.Add(new Avatar(Content.Load<Model>("Sink"), new Vector3(230, 0, -115)));
-                //avatars.Add(new Avatar(Content.Load<Model>("Dresser"), new Vector3(215, 0, 70)));
-                //avatars.Add(new Avatar(Content.Load<Model>("Chair"), new Vector3(45, 0, 55)));
-                //avatars.Add(new Avatar(Content.Load<Model>("Chair"), new Vector3(85, 0, 55)));
-                //avatars.Add(new Avatar(Content.Load<Model>("Table"), new Vector3(50, 0, 55)));
-                //avatars.Add(new Avatar(Content.Load<Model>("EndTable"), new Vector3(330, 0, 40)));
-                //avatars.Add(new Avatar(Content.Load<Model>("Bin"), new Vector3(180, 0, 75)));
-                //avatars.Add(new Avatar(Content.Load<Model>("Sofa"), new Vector3(90, 0, -105)));
-                //avatars.Add(new Avatar(Content.Load<Model>("Oven"), new Vector3(25, 0, 100)));
-                //avatars.Add(new Avatar(Content.Load<Model>("TV"), new Vector3(105, 0, -50)));
-
-
-
-
-
-
-            //foreach (House house in houses)
-            //{
-            //    foreach (Room room in house.rooms)
-            //    {
-            //        foreach (Item item in room.items)
-            //        {
-            //            avatars.Add(new Avatar(Content.Load<Model>(item.modelName), new Vector3(float.Parse(item.locationX), -2, float.Parse(item.locationZ))));
-            //        }
-            //    }
-            //}
-
-
-
+            //Build UI buttons
             UIHandler.BuildToolbarButtons(graphicsManager, player);
             UIHandler.BuildExitButton(graphicsManager);
             UIHandler.BuildEmotionButton(graphicsManager, player);
             
             
-
+            //Set game state to playing as finished loading
             gameState = GameStates.States.Playing;
-            
-
-            //avatars.Add(new Avatar( Content.Load<Model>("Oven"), new Vector3 (204,-5,13)));
-            //avatars.Add(new Avatar( Content.Load<Model>("Fridge"), new Vector3 (204,-5, -184)));
-            //avatars.Add(new Avatar( Content.Load<Model>("Sofa"), new Vector3 (-11,-5,-88)));
-            //avatars.Add(new Avatar( Content.Load<Model>("Bed"), new Vector3 (187,-5,-347)));
-            //avatars.Add(new Avatar( Content.Load<Model>("toiletWhite"), new Vector3 (39,-5, -303)));
-            //avatars.Add(new Avatar( Content.Load<Model>("TV"), new Vector3 (79,-5, -88)));
-            ////avatars.Add(new Avatar( Content.Load<Model>("shower2"), new Vector3 (70,0,50)));
-
-
 
 
         }
 
 
-
+        /// <summary>
+        /// Resets previous mouse state. Using GameStates, the function will call:
+        /// 1.	If in MainMenu state: uses UIHandler to handle main menu input.If Exit button selected, game will exit; if new game button selected, will transition GameState to Character Selection state; if resume game button selected, will transition GameState to Loading state.
+        /// 2.	If in CharacterSelection state: Uses UIHandler to handle character selection input.If a character has been selected, uses lookup dictionary to find selected character name to store in database.Uses UIHandler to build trait selection buttons.Transitions GameState to Trait Selection state.
+        /// 3.	If in TraitSelection state: uses UIHandler to handle trait selection. As users can select 2 traits for their character: if trait button pressed, switches selected state to allow users to select and unselect trait buttons. When 2 traits have been selected, uses NewGameButton class to create new game.Transitions GameState to Loading.
+        /// 4.	 If Loading state: LoadGame() method (not automatically called by Monogame) is called
+        /// 5.	If Playing state: Update() function on each person, the people being the only fully dynamic objects in the game and therefore the only objects which must be updated on each Update Draw iteration.Calls Update method on UIHandler to update UI display e.g.change buttons being drawn etc.
+        /// The Camera Update method is called in this method regardless of game state, except when a textbox is being displayed to prevent user keyboard input from being interpreted as camera movement.
+        /// </summary>
+        /// <param name="gameTime"></param>
         protected override async void Update(GameTime gameTime)
         {
 
@@ -582,8 +502,7 @@ namespace Game1
                 if (selectedCharacter != null)
                 {
                     NewGameButton.selectedCharacterName = characterNameDictionary[selectedCharacter];
-                    //NewGameButton.CreateNewGame();
-                    //gameState = GameStates.States.Loading;
+                    
                     selectedCharacterTexture = selectedCharacter;
 
                     UIHandler.BuildTraitSelectionButtons(graphicsManager, Trait.ButtonToString.Keys.ToList(), selectedCharacter);
@@ -643,14 +562,13 @@ namespace Game1
             
             else if (gameState==GameStates.States.Loading && !isLoading)
             {
-                //backgroundThread = new Thread(LoadGame);
+                
                 isLoading = true;
-                //backgroundThread.Start();
+                
 
                 await Task.Run(async () => { await LoadGame(); } );
 
-                //await LoadGame();
-
+               
 
             }
 
@@ -684,6 +602,10 @@ namespace Game1
             base.Update(gameTime);
         }
 
+        /// <summary>
+        /// : Using GameStates, the function will either draw a 2D menu or loading screen or, if the game is in play mode, the Draw function for each avatar in the game as well as any selection or toolbar buttons. Each 3D item displayed in the game will have its own avatar used to render it.
+        /// </summary>
+        /// <param name="gameTime"></param>
         protected override void Draw(GameTime gameTime)
         {
 
@@ -727,8 +649,6 @@ namespace Game1
                 loadingScreens.Add(loadingScreens[0]);
                 loadingScreens.RemoveAt(0);
 
-                //spriteBatch.Draw(tempTexture, position:Vector2.Zero, scale: new Vector2(0.7f, 0.8f));
-
                 spriteBatch.End();
                 Thread.Sleep(65);
                 
@@ -753,7 +673,7 @@ namespace Game1
                 spriteBatch.Begin();
                
                 spriteBatch.Draw(characterSelectionBackground, position: new Vector2(0, -10), scale: new Vector2(0.7f, 0.8f));
-                //spriteBatch.DrawString(spriteFont: spriteFont, text:"select character", position: new Vector2(graphicsManager.GraphicsDevice.Viewport.Width / 7, 10), scale: new Vector2(3, 2), color: Color.Black, rotation: 0f, effects: SpriteEffects.None, layerDepth:1f, origin: Vector2.Zero);
+               
 
                 UIHandler.DrawCharacterSelectionButtons(spriteBatch);
                 spriteBatch.End();

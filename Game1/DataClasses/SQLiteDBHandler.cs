@@ -67,6 +67,7 @@ namespace Game1.DataClasses
                     {
                         command.CommandText = "UPDATE People SET Career = @Career WHERE PersonID = @PersonID";
                         command.Parameters.AddWithValue("@Career", person.Career==null?"":person.Career.CareerName);
+                       
                         command.Parameters.AddWithValue("@PersonID", person.DBID);
 
                         command.ExecuteNonQuery();

@@ -6,7 +6,10 @@ using System.Threading.Tasks;
 
 namespace Game1.Careers
 {
-    class StoreClerk:Career
+    /// <summary>
+    /// Implements the Store Clerk career inheriting from Career parent
+    /// </summary>
+    class StoreClerk :Career
     {
         public static string Name = "store clerk";
         public static string Description = "Serve customers at the\ngeneral store";

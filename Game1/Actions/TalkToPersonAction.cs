@@ -86,7 +86,7 @@ namespace Game1.Actions
 
 
 
-            //££Console.WriteLine("talking");
+            Console.WriteLine("talking");
 
             if (needs[NeedAffected].IsFulfilled() && actionTimeElapsed > minActionTime)
             {

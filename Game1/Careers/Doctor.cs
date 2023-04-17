@@ -6,6 +6,9 @@ using System.Threading.Tasks;
 
 namespace Game1.Careers
 {
+    /// <summary>
+    /// Implements the Doctor career inheriting from Career parent
+    /// </summary>
     class Doctor : Career
     {
         public static string Name = "doctor";

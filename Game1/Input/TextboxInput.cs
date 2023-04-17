@@ -63,8 +63,16 @@ namespace Game1
     class TextboxInputHandler
     {
 
+        /// <summary>
+        /// : Attribute to prevent one press of delete key, deleting many characters. Each update for which delete key is being pressed decrements attribute, resets when reaches 0. Attribute resets when delete key not being pressed. Character only deleted when attribute is at initial value.
+        /// </summary>
         static int timeBeforeNextDelete;
 
+        /// <summary>
+        ///  If the textbox is selected, processes keyboard input as textbox input. Handles timing for delete key, textbox submission, and extracting character to add to textbox.
+        /// </summary>
+        /// <param name="gameTime"></param>
+        /// <param name="textbox"></param>
         public static void HandleInput(GameTime gameTime, Textbox textbox)
         {
             

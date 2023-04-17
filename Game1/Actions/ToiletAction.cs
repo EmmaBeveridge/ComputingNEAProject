@@ -63,7 +63,7 @@ namespace Game1.Actions
             EstTimeToFinish = Duration - (float)actionTimeElapsed;
 
 
-            //££Console.WriteLine("using toilet");
+            Console.WriteLine("using toilet");
 
             if (needs[NeedAffected].IsFulfilled() && actionTimeElapsed > minActionTime)
             {

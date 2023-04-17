@@ -90,7 +90,7 @@ namespace Game1.StreetTraversal
             int queryLeftChild = RangeMinimumQueryRecurse(2 * index + 1, segmentStart, segmentMid, queryStart, queryEnd, segmentPointer);
             int queryRightChild = RangeMinimumQueryRecurse(2 * index + 2, segmentMid + 1, segmentEnd, queryStart, queryEnd, segmentPointer);
 
-            if (queryLeftChild == -1) { return queryRightChild; } // if query segment partly contained in parent node but not in leftCHildNode then must be partly contained by rightCHildNode
+            if (queryLeftChild == -1) { return queryRightChild; } // if query segment partly contained in parent node but not in leftChildNode then must be partly contained by rightChildNode
             else if (queryRightChild == -1) { return queryLeftChild; }
             //if query segment split across left and right children
             return (level[queryLeftChild] < level[queryRightChild] ? queryLeftChild : queryRightChild);

@@ -494,7 +494,7 @@ namespace Game1.GOAP
                                 this.Machine.SetNextState<WaitForItem>();
                             }
 
-                            else //not tested but think putting else here is right??
+                            else
                             {
                                 this.Machine.SetNextState<PerformAction>();
                             }

@@ -37,16 +37,6 @@ namespace Game1.Items
 
                 Vector3 townCoords = (Matrix.CreateTranslation(itemCoords) * room.house.houseToTownTransformation).Translation;
 
-                //if (townCoords.X> keyCoordinates["maxX"]) { keyCoordinates["maxX"] = townCoords.X; }
-                //if (townCoords.Y> keyCoordinates["maxY"]) { keyCoordinates["maxY"] = townCoords.Y; }
-                //if (townCoords.Z> keyCoordinates["maxZ"]) { keyCoordinates["maxZ"] = townCoords.Z; }
-                //if (townCoords.X< keyCoordinates["minX"]) { keyCoordinates["minX"] = townCoords.X; }
-                //if (townCoords.Y< keyCoordinates["minY"]) { keyCoordinates["minY"] = townCoords.Y; }
-                //if (townCoords.Z< keyCoordinates["minZ"]) { keyCoordinates["minZ"] = townCoords.Z; }
-
-
-
-
                 corners.Add(townCoords);
             }
 
